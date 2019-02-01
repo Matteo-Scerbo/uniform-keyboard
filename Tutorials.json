@@ -1,0 +1,2269 @@
+{
+  "tutorials": {
+    "names": {
+      "First tutorial": true,
+      "Hallelujah": true
+    },
+    "data": {
+      "First tutorial": {
+        "steps": 5,
+        "keypresses": {
+          "Step01-001": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-002": {
+            "code": "KeyW",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-003": {
+            "code": "KeyR",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-004": {
+            "code": "KeyR",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-005": {
+            "code": "Digit6",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-006": {
+            "code": "Digit6",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-007": {
+            "code": "KeyI",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-008": {
+            "code": "KeyI",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-009": {
+            "code": "Digit6",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-010": {
+            "code": "Digit6",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-011": {
+            "code": "KeyR",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-012": {
+            "code": "KeyR",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-013": {
+            "code": "KeyW",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step01-014": {
+            "code": "KeyW",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step01-999": {
+            "code": "Enter",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-001b": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-001c": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-001d": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-002a": {
+            "code": "KeyW",
+            "timestamp": 500,
+            "type": "keyup"
+          },
+          "Step02-002b": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-002c": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-002d": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-999": {
+            "code": "Enter",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step03-999": {
+            "code": "Enter",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-001": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-002": {
+            "code": "KeyR",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step04-003": {
+            "code": "Digit6",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step04-004": {
+            "code": "KeyI",
+            "timestamp": 250,
+            "type": "keydown"
+          },
+          "Step04-005": {
+            "code": "KeyW",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step04-006": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-007": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-008": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-999": {
+            "code": "Enter",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step05-001": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-002": {
+            "code": "KeyI",
+            "timestamp": 250,
+            "type": "keyup"
+          },
+          "Step05-999": {
+            "code": "Enter",
+            "timestamp": 0,
+            "type": "keyup"
+          }
+        },
+        "settings": {
+          "mechanic": "Free",
+          "mode": -1,
+          "scale": 0,
+          "sequence": 0,
+          "tensionVisible": false
+        },
+        "messages": {
+          "Step01": {
+            "text": "This is the first step of the tutorial.\nIt plays an arpeggio."
+          },
+          "Step02": {
+            "text": "This is the second step.\nIt plays a chord."
+          },
+          "Step03": {
+            "text": "This step displays a message without playing anything,\nthe next will play something with no message."
+          },
+          "Step04": {
+            "text": ""
+          },
+          "Step05": {
+            "text": "This is the last step.\nBye!"
+          }
+        }
+      },
+      "Hallelujah": {
+        "steps": 1,
+        "keypresses": {
+          "Step01-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-001b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-002a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-002b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step01-003": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-004": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-005": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-006": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-007": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-008": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-009": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-010": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-011a": {
+            "code": "Digit2",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-011b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-012a": {
+            "code": "Digit2",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-012b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step01-012a": {
+            "code": "Digit2",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step01-012b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step01-013": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step01-014": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-011a": {
+            "code": "Digit2",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-011b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-012a": {
+            "code": "Digit2",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step02-012b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step02-013": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step02-014": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step03-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-001b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-002a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-002b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step03-003": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-004": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-005": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-006": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-007": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-008": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-009": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-010": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-011a": {
+            "code": "Digit2",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-011b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-012a": {
+            "code": "Digit2",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step03-012b": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step03-013": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step03-014": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-011a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-011b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-012a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step04-012b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step04-013": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step04-014": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step05-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-011": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-012": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step05-013": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step05-014": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step06-001": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-002": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-003": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-004": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-005": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-006": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-007": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-008": {
+            "code": "Digit8",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-009": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-010": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-011": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-012": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step06-013": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step06-014": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step07-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-001b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-002a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-002b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step07-003": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-004": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-005": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-006": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-007": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-008": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-009": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-010": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-011a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-011b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-012a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step07-012b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step07-013": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step07-014": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step08-001": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-002": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-003": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-004": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-005": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-006": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-007": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-008": {
+            "code": "Digit8",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-009": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-010": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-011": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-012": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step08-013": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step08-014": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step09-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-001b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-002a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-002b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step09-003": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-004": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-005": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-006": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-007": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-008": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-009": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-010": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-011a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-011b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-012a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step09-012b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step09-013": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step09-014": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step10-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-007": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-008": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step10-009": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-010": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-011": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-012": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-013": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-014": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step10-015": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step10-016": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step11-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step11-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-011a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-011b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-012a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step11-012b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step11-013": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step11-014": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step12-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-011a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-011b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-012a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step12-012b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step12-013": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step12-014": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step13-001": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-002": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-003": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-004": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-005": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-006": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-007": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-008": {
+            "code": "Digit8",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-009": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-010": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-011": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-012": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step13-013": {
+            "code": "Numpad3",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step13-014": {
+            "code": "Numpad3",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step14-001": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-002": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-003": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-004": {
+            "code": "Digit8",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-005": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-006": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-007": {
+            "code": "Equal",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-008": {
+            "code": "Equal",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-009": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-010": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-011": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-012": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step14-013": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step14-014": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step15-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step15-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step15-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step15-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step15-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step15-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step15-011": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step15-012": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step16-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-011a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-011b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-012a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step16-012b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step16-013": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step16-014": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step17-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step17-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step17-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step17-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step17-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step17-011": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step17-012": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-011": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-012": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step18-013": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step18-014": {
+            "code": "Numpad6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step19-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step19-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step19-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step19-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step19-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step19-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step19-011": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step19-012": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-001a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-001b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-002a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-002b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step20-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-005": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-006": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-009": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-010": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-011a": {
+            "code": "Digit1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-011b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-012a": {
+            "code": "Digit1",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step20-012b": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step20-013": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step20-014": {
+            "code": "Numpad4",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step21-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step21-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step21-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step21-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step21-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step21-011": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step21-012": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-001": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-002": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-003": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-004": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-005": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-006": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-007": {
+            "code": "Digit7",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-008": {
+            "code": "Digit7",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-009": {
+            "code": "Digit5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-010": {
+            "code": "Digit5",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-011": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-012": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step22-013": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step22-014": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step23-001a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-001b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-002a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-002b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step23-003": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-004": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-005": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-006": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-007": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-008": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-009": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-010": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-011a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-011b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-012a": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step23-012b": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step23-013": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step23-014": {
+            "code": "Numpad5",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step24-001": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-002": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-003": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-004": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-005": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-006": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-007": {
+            "code": "Digit8",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-008": {
+            "code": "Digit8",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-009": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-010": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-011": {
+            "code": "KeyE",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-012": {
+            "code": "KeyE",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step24-013": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step24-014": {
+            "code": "Numpad1",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step25-001": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-002": {
+            "code": "KeyW",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-003": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-004": {
+            "code": "KeyR",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-005": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-006": {
+            "code": "Digit6",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-007": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-008": {
+            "code": "KeyI",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-009": {
+            "code": "KeyP",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-010": {
+            "code": "KeyP",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-011": {
+            "code": "Equal",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-012": {
+            "code": "Equal",
+            "timestamp": 333,
+            "type": "keyup"
+          },
+          "Step25-013a": {
+            "code": "KeyW",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-013b": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-013c": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-013d": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keydown"
+          },
+          "Step25-014a": {
+            "code": "KeyW",
+            "timestamp": 999,
+            "type": "keyup"
+          },
+          "Step25-014b": {
+            "code": "KeyR",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step25-014c": {
+            "code": "Digit6",
+            "timestamp": 0,
+            "type": "keyup"
+          },
+          "Step25-014d": {
+            "code": "KeyI",
+            "timestamp": 0,
+            "type": "keyup"
+          }
+        },
+        "settings": {
+          "mechanic": "Free",
+          "mode": 0,
+          "scale": 1,
+          "sequence": 0,
+          "tensionVisible": true
+        },
+        "messages": {
+          "Step01": {
+            "text": "Hallelujah, written by Leonard Cohen"
+          }
+        }
+      }
+    }
+  },
+  "rooms": {
+    "room_name": {
+      "owner": null
+    }
+  },
+  "users": {
+    "u_id": {
+      "room": null,
+      "nickname": null
+    }
+  },
+  "messages": {
+    "room_name": {
+      "pushID": {
+        "user": null,
+        "nickname": null,
+        "text": null
+      }
+    }
+  },
+  "settings": {
+    "room_name": {
+      "mechanic": null,
+      "mode": null,
+      "scale": null,
+      "sequence": null,
+      "tensionVisible": null
+    }
+  },
+  "keypresses": {
+    "room_name": {
+      "pushID": {
+        "code": null,
+        "timestamp": null,
+        "type": null
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "tutorials": {
+    "names": {
+      "tutorial_name": {
+        "steps": null
+      }
+    },
+    "data": {
+      "tutorial_name": {
+        "keypresses": {
+          "Step01-001": {
+            "code": null,
+            "timestamp": null,
+            "type": null
+          },
+        },
+        "settings": {
+          "mechanic": null,
+          "mode": null,
+          "scale": null,
+          "sequence": null,
+          "tensionVisible": null
+        },
+        "messages": {
+          "Step01": {
+            "text": null
+          }
+        }
+      }
+    }
+  },
+  "rooms": {
+    "room_name": {
+      "owner": null,
+      "nickname": null
+    }
+  },
+  "users": {
+    "u_id": {
+      "room": null
+    }
+  },
+  "messages": {
+    "room_name": {
+      "pushID": {
+        "user": null,
+        "nickname": null,
+        "text": null
+      }
+    }
+  },
+  "settings": {
+    "room_name": {
+      "mechanic": null,
+      "mode": null,
+      "scale": null,
+      "sequence": null,
+      "tensionVisible": null
+    }
+  },
+  "keypresses": {
+    "room_name": {
+      "pushID": {
+        "code": null,
+        "timestamp": null,
+        "type": null
+      }
+    }
+  }
+}

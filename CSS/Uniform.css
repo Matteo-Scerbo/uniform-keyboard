@@ -1,0 +1,623 @@
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  width: inherit;
+  height: inherit;
+  overflow: hidden;
+  font: 100% sans-serif;
+  background-image: linear-gradient(to bottom right, #2C3E50, #2980B9);
+}
+
+#settingsBox {
+  width: 840px;
+  min-height: 50px;
+  padding: 10px;
+  margin: 0 auto;
+  z-index: -2;
+  color: #ECF0F1;
+}
+
+span {
+  width: fit-content;
+  height: fit-content;
+  display: inline-block;
+}
+
+#page, #fakePage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  overflow: auto;
+  background-color: white;
+  transform-origin: top left;
+  border-radius: 2px;
+}
+
+@keyframes skew {
+  from {
+    transform: translate(0px, 0px) rotate(0deg);
+    opacity: 1;
+  }
+
+  to {
+    transform: translate(50px, 100px) rotate(3deg);
+    opacity: 0.9;
+  }
+}
+
+@-moz-keyframes skew {
+  from {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  to {
+    transform: translate(50px, 100px) rotate(3deg);
+  }
+}
+
+@-webkit-keyframes skew {
+  from {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  to {
+    transform: translate(50px, 100px) rotate(3deg);
+  }
+}
+
+@-o-keyframes skew {
+  from {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  to {
+    transform: translate(50px, 100px) rotate(3deg);
+  }
+}
+
+.menuIcon {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  transition: .1s;
+  margin: 10px 10px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.menuIcon span {
+  background-color: #2C3E50;
+  position: absolute;
+  border-radius: 2px;
+  width: 100%;
+  height: 4px;
+}
+
+.menuIcon span:nth-child(1) {
+  top: 0px;
+  left: 0px;
+}
+
+.menuIcon span:nth-child(2) {
+  top: 13px;
+  left: 0px;
+}
+
+.menuIcon span:nth-child(3) {
+  bottom: 0px;
+  left: 0px;
+}
+
+.clickedMenuIcon span {
+  background-color: #C0392B;
+}
+
+.clickedMenuIcon span:nth-child(1) {
+  transform: rotate(45deg);
+  top: 13px;
+}
+
+.clickedMenuIcon span:nth-child(2) {
+  transform: scale(.1);
+}
+
+.clickedMenuIcon span:nth-child(3) {
+  transform: rotate(-45deg);
+  top: 13px;
+}
+
+.settingsLabel {
+  position: absolute;
+  display: inline;
+  top: 0;
+  margin: 20px 0;
+  color: #2C3E50;
+  font-weight: 600;
+}
+
+#keyboardBox {
+  position: relative;
+  width: 800px;
+  height: 232px;
+  padding: 25px;
+  margin: 0 auto;
+  margin-top: 25px;
+  border-radius: 50px;
+  background-color: #BDC3C7;
+  touch-action: none;
+}
+
+#sequenceBox, #tensionBox, #onlineBox {
+  position: relative;
+  min-height: 75px;
+  padding: 10px;
+  margin: 10px auto;
+}
+
+#sequenceBox {
+  height: fit-content;
+  display: table;
+}
+
+#tensionBox {
+  width: 425px;
+  display: none;
+}
+
+#onlineBox {
+  width: 840px;
+  min-height: 144px;
+  display: block;
+}
+
+#chatBox {
+  max-height: 150px;
+  overflow: hidden;
+  position: relative;
+  margin: 10px auto;
+}
+
+#chatBoxFadeOut {
+  height: 50px;
+  background: linear-gradient(white, transparent 50px);
+}
+
+#chatBoxFadeOutContainer {
+  height: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.overlay {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  cursor: default;
+}
+
+#chatOverlay {
+  width: inherit;
+  height: inherit;
+  padding: inherit;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+#chatOverlayMessages {
+  height: 80%;
+  overflow: auto;
+}
+
+#offlineOverlay {}
+
+p {
+  margin: 0;
+}
+
+#loadChatText {
+  font-weight: bold;
+  text-align: center;
+  color: #ECF0F1;
+  margin: 2px;
+}
+
+#viewChatText {
+  font-weight: bold;
+  text-align: center;
+}
+
+#nicknameText {
+  color: #ECF0F1;
+  margin: 2px;
+}
+
+.overlayText {
+  position: absolute;
+  width: 90%;
+  margin: 5%;
+  text-align: center;
+  font-size: 50px;
+  color: #ECF0F1;
+}
+
+#feelingText {
+  opacity: 1;
+  transition: 1s opacity;
+  fill: var(--inside);
+  font-weight: bold;
+  font-size: 45px;
+}
+
+#longingText {
+  opacity: 0;
+  transition: 0.5s;
+  font-weight: bold;
+}
+
+#longingText:hover {
+  opacity: 1;
+}
+
+#anticipationText {
+  opacity: 0;
+  transition: 0.5s;
+  font-weight: bold;
+}
+
+#anticipationText:hover {
+  opacity: 1;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 250px;
+  background: #BDC3C7;
+  outline: none;
+}
+
+.key {
+  width: 50px;
+  height: 50px;
+  margin: 0.5%;
+  border-radius: 5px;
+  box-shadow: 3px 2px 1px #808080;
+  display: inline-block;
+  position: relative;
+}
+
+.white {
+  color: #2C3E50;
+  background-color: #ECF0F1;
+}
+
+.black {
+  color: #ECF0F1;
+  background-color: #2C3E50;
+}
+
+.pressed {
+  box-shadow: inset 2px 3px 4px rgba(0, 0, 0, 0.7);
+  transform: translate(3px, 2px);
+}
+
+.label {
+  font: 75% sans-serif;
+  font-style: italic;
+  text-align: left;
+  position: absolute;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+.character {
+  top: 0;
+  left: 5%;
+}
+
+.ENGnote {
+  bottom: 0;
+  right: 5%;
+}
+
+.ITAnote {
+  bottom: 0;
+  left: 5%;
+}
+
+.mode {
+  width: 30px;
+  height: 30px;
+  margin: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  font: 170% serif;
+  text-align: center;
+  background-color: var(--inside);
+  box-shadow: 0px 0px 0px 5px var(--outside) inset;
+}
+
+.sequenceElement {
+  display: inline-block;
+}
+
+.sequenceLabel {
+  width: 50px;
+  height: 40px;
+  margin: 15px;
+  padding-top: 10px;
+}
+
+.I {
+  --inside: #2ECC71;
+  --outside: #27AE60;
+}
+
+.II {
+  --inside: #16A085;
+  --outside: #1ABC9C;
+}
+
+.III {
+  --inside: #3498DB;
+  --outside: #2980B9;
+}
+
+.IV {
+  --inside: #8E44AD;
+  --outside: #9B59B6;
+}
+
+.V {
+  --inside: #E74C3C;
+  --outside: #C0392B;
+}
+
+.VI {
+  --inside: #D35400;
+  --outside: #E67E22;
+}
+
+.VII {
+  --inside: #F1C40F;
+  --outside: #F39C12;
+}
+
+.unselected {
+  opacity: 0.6;
+  background-color: transparent;
+}
+
+.leftArrow {
+  top: 7px;
+  position: relative;
+  display: inline-block;
+  height: 0px;
+  width: 0px;
+  margin-right: 20px;
+  border: 17px solid;
+  border-color:
+    #34495E #34495E transparent transparent;
+  transform: rotate(-135deg);
+}
+
+.leftArrow:before, .leftArrow:after {
+  content: '';
+  position: absolute;
+  border: 12px solid;
+}
+
+.leftArrow:before {
+  border-color:
+    #34495E transparent transparent #34495E;
+  right: 0px;
+  transform-origin: top right;
+  transform: rotate(45deg);
+}
+
+.leftArrow:after {
+  border-color:
+    transparent #34495E #34495E transparent;
+  right: 0px;
+  transform-origin: top right;
+  transform: rotate(-45deg);
+}
+
+.rightArrow {
+  top: 7px;
+  position: relative;
+  display: inline-block;
+  height: 0px;
+  width: 0px;
+  margin-left: 20px;
+  border: 17px solid;
+  border-color:
+    #34495E #34495E transparent transparent;
+  transform: rotate(45deg);
+}
+
+.rightArrow:before, .rightArrow:after {
+  content: '';
+  position: absolute;
+  border: 12px solid;
+}
+
+.rightArrow:before {
+  border-color:
+    #34495E transparent transparent #34495E;
+  right: 0px;
+  transform-origin: top right;
+  transform: rotate(45deg);
+}
+
+.rightArrow:after {
+  border-color:
+    transparent #34495E #34495E transparent;
+  right: 0px;
+  transform-origin: top right;
+  transform: rotate(-45deg);
+}
+
+.expectation {
+  transform: rotate(-45deg);
+}
+
+.consonance {
+  transform: rotate(135deg);
+}
+
+.percentageFill {
+  display: none;
+  margin: auto;
+  height: 0px;
+  width: 0px;
+  border: 20px solid;
+  border-color: #7F8C8D #7F8C8D transparent transparent;
+}
+
+.percentageOutline {
+  height: 40px;
+  width: 40px;
+  border: 1px solid #2C3E50;
+  border-width: 2px 2px 0 0;
+  transform: translate(-20px, -22px);
+}
+
+.indicator {
+  display: inline;
+  margin: 0 10px;
+}
+
+.indicator svg polyline {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.indicator svg polyline.back {
+  stroke: var(--outside);
+}
+
+.indicator svg polyline.front {
+  stroke: var(--inside);
+  stroke-dasharray: 100% 200%;
+  stroke-dashoffset: 300%;
+  animation: slide 1s linear infinite;
+}
+
+.indicator svg polyline.standalone {
+  stroke: var(--inside);
+  stroke-dasharray: 100% 200%;
+  stroke-dashoffset: 300%;
+  animation:
+    slide 1s linear infinite,
+    fade 3s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@-o-keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide {
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+@-moz-keyframes slide {
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+@-webkit-keyframes slide {
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+@-o-keyframes slide {
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+.message {
+  width: fit-content;
+  background: #BDC3C7;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+
+.admin {
+  background: linear-gradient(#F39C12, #F1C40F 10px);
+}
+
+button {
+  padding: 10px 15px;
+  border: 0;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #3498DB;
+  color: #fff;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:active {
+  box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.2);
+}
+
+.create {
+  background-color: #27AE60;
+  margin-right: 15px;
+}
+
+.leave {
+  background-color: #E74C3C;
+}
+
+.tutorial {
+  background-color: #E67E22;
+}
+
+.step {
+  background-color: #34495E;
+}
