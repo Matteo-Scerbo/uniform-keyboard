@@ -1,69 +1,93 @@
 {
   "tutorials": {
     "names": {
-      "tutorial_name": {
-        "steps": null
+      "tutorial_name": true
+    }
+  },
+  "data": {
+    "tutorial_name": {
+      "steps": "Number",
+      "keypresses": {
+        "Step01-001": {
+          "code": "String",
+          "timestamp": "Number",
+          "type": "String"
+        },
+      },
+      "settings": {
+        "mechanic": "String",
+        "mode": "Number",
+        "scale": "Number",
+        "sequence": "Number",
+        "tensionVisible": "Boolean"
+      },
+      "messages": {
+        "Step01": {
+          "text": "String"
+        }
       }
+    }
+  },
+  "uploads": {
+    "names": {
+      "owner": "String"
     },
     "data": {
-      "tutorial_name": {
+      "file_name": {
+        "owner": "String",
         "keypresses": {
-          "Step01-001": {
-            "code": null,
-            "timestamp": null,
-            "type": null
+          "push_ID": {
+            "code": "String",
+            "timestamp": "Number",
+            "type": "String"
           },
         },
         "settings": {
-          "mechanic": null,
-          "mode": null,
-          "scale": null,
-          "sequence": null,
-          "tensionVisible": null
-        },
-        "messages": {
-          "Step01": {
-            "text": null
-          }
+          "mechanic": "String",
+          "mode": "Number",
+          "scale": "Number",
+          "sequence": "Number",
+          "tensionVisible": "Boolean"
         }
       }
     }
   },
   "rooms": {
     "room_name": {
-      "owner": null,
-      "nickname": null
+      "owner": "String"
     }
   },
   "users": {
     "u_id": {
-      "room": null
+      "room": "String",
+      "nickname": "String"
     }
   },
   "messages": {
     "room_name": {
-      "pushID": {
-        "user": null,
-        "nickname": null,
-        "text": null
+      "push_ID": {
+        "admin": "Boolean",
+        "user": "String",
+        "nickname": "String",
+        "text": "String"
       }
     }
   },
   "settings": {
     "room_name": {
-      "mechanic": null,
-      "mode": null,
-      "scale": null,
-      "sequence": null,
-      "tensionVisible": null
+      "mechanic": "String",
+      "mode": "Number",
+      "scale": "Number",
+      "sequence": "Number",
+      "tensionVisible": "Boolean"
     }
   },
   "keypresses": {
     "room_name": {
-      "pushID": {
-        "code": null,
-        "timestamp": null,
-        "type": null
+      "push_ID": {
+        "code": "String",
+        "timestamp": "Number",
+        "type": "String"
       }
     }
   }

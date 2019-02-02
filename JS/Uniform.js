@@ -111,6 +111,23 @@ var tutorialStep = 0;
 var tutorialStepsCount = 0;
 
 
+// These are for recording.
+
+// true while recording.
+var recordingNow = false;
+// An object listing keypresses.
+var recordedKeypresses = {};
+// Number of recorded keypresses.
+var recordedKeypressesCount = 0;
+// The settings associated with the current recording.
+var recordingSettings = {};
+
+// true when looking at another user's recording.
+var inUserUpload = false;
+// Keypresses of another user's recording.
+var userUploadKeypressSequence = [];
+
+
 // These are for handling the page visualization.
 
 // The chat overlay blocks the keyboard,
@@ -257,7 +274,7 @@ document.getElementById( 'writeMessage' )
 window.addEventListener( 'keydown', ( event ) => {
   if ( chatOverlayIsVisible || event.repeat ) {
     return;
-  };
+  }
   if ( !event.code.startsWith( 'F' ) && !event.code == 'Escape' ) {
     event.preventDefault();
   }
@@ -267,7 +284,7 @@ window.addEventListener( 'keydown', ( event ) => {
 window.addEventListener( 'keyup', ( event ) => {
   if ( chatOverlayIsVisible ) {
     return;
-  };
+  }
   if ( !event.code.startsWith( 'F' ) ) {
     event.preventDefault();
   }
@@ -280,25 +297,27 @@ document.querySelectorAll( '.key' )
     key.addEventListener( 'mousedown', ( event ) => {
       if ( chatOverlayIsVisible ) {
         return;
-      }; // This might be overkill: the overlay would be over the keys
+      } // This might be overkill: the overlay would be over the keys
       handleLocalEvent( 'keydown', key.dataset[ 'code' ], event.timeStamp );
     } );
     key.addEventListener( 'mouseup', ( event ) => {
       if ( chatOverlayIsVisible ) {
         return;
-      }; // This might be overkill: the overlay would be over the keys
+      } // This might be overkill: the overlay would be over the keys
       handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
     } );
     key.addEventListener( 'mouseleave', ( event ) => {
       if ( chatOverlayIsVisible ) {
         return;
-      }; // This might be overkill: the overlay would be over the keys
+      } // This might be overkill: the overlay would be over the keys
       handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
     } );
   } );
 
-// This is called on every keydown or keyup event on the window.
+// This is called on every keydown or keyup event on the window (and mouse clicks).
 // It decides between playing a note or performing another action.
+// Can call handleNoteStart() and handleNoteStop(),
+// changeMode(), nextTutorialStep(), or previousTutorialStep().
 function handleLocalEvent( type, code, timestamp ) {
   if ( type == 'keydown' ) {
     switch ( true ) {
@@ -328,20 +347,32 @@ function handleLocalEvent( type, code, timestamp ) {
     }
   }
 
-  if ( roomName && iAmAdmin ) {
-    let computedTimestamp = timestamp - previousLocalTimestamp;
-    if ( !previousLocalTimestamp ) {
-      computedTimestamp = 0
-    };
-    previousLocalTimestamp = timestamp;
+  let computedTimestamp = timestamp - previousLocalTimestamp;
+  if ( !previousLocalTimestamp ) {
+    computedTimestamp = 0
+  }
+  previousLocalTimestamp = timestamp;
 
+  let keypress = {
+    code: code,
+    type: type,
+    timestamp: computedTimestamp
+  }
+
+  if ( recordingNow ) {
+    if ( recordedKeypressesCount >= 99999 ) {
+      console.error( 'Too many keypresses!' );
+      return;
+    }
+    recordedKeypresses[ ( recordedKeypressesCount++ )
+      .toString()
+      .padStart( 5, '0' ) ] = keypress;
+  }
+
+  if ( roomName && iAmAdmin ) {
     firebase.database()
       .ref( 'keypresses/' + roomName )
-      .push( {
-        code: code,
-        type: type,
-        timestamp: computedTimestamp
-      } )
+      .push( keypress )
       .catch( function ( error ) {
         console.error( 'Error updating keypress on Realtime Database:', error );
       } );
@@ -355,8 +386,8 @@ function handleLocalEvent( type, code, timestamp ) {
 // If no other keypresses are being handled, the new one is; otherwise it's pushed to the queue.
 // The first event of a series is reproduced with a delay, to ensure that the following events are heard in time.
 // The following events are scheduled based on their delay in relation to the previous, which is part of the DB entry.
-function listenForRemoteEvents( snap, delay ) {
-  let remoteEvent = snap.val();
+function listenForRemoteEvents( val, delay ) {
+  let remoteEvent = val;
   remoteEvents.push( {
     type: remoteEvent.type,
     code: remoteEvent.code,
@@ -367,7 +398,7 @@ function listenForRemoteEvents( snap, delay ) {
   }
 }
 
-// This acts on heard keypresses from the room admin in the same way as handleLocalEvent,
+// This acts on heard keypresses from the room admin in the same way as handleLocalEvent(),
 // and schedules the next queued keypress if present.
 function handleNextRemoteEvent() {
   if ( remoteEvents[ 0 ].type == 'keydown' ) {
@@ -405,7 +436,7 @@ document.querySelectorAll( 'input' )
   .forEach( function ( item ) {
     if ( item.id == 'writeMessage' ) {
       return;
-    };
+    }
     item.addEventListener( 'focus', function () {
       this.blur();
     } )
@@ -492,16 +523,6 @@ firebase.auth()
           console.error( "Error: couldn't update room.", error );
           return;
         } );
-
-      firebase.database()
-        .ref( 'users/' + userID )
-        .onDisconnect()
-        .update( {
-          room: 'lobby'
-        } )
-        .catch( function ( error ) {
-          console.error( "Error: couldn't update room.", error );
-        } );
     } else {
       userID = null;
     }
@@ -573,7 +594,7 @@ function loadJSON( callback, filename ) {
     if ( xobj.readyState == 4 && xobj.status == '200' ) {
       callback( xobj.responseText );
     }
-  };
+  }
   xobj.send( null );
 }
 
@@ -582,12 +603,13 @@ function loadJSON( callback, filename ) {
 
 // Finds the key that was pressed, starts the appropriate synth, and
 // changes the interface to show the pressed button.
+// Always calls startTone().
 function handleNoteStart( code ) {
   let button = document.querySelector( '[data-code="' + code + '"]' );
 
   if ( button == null ) {
     return;
-  };
+  }
 
   startTone( button.dataset[ 'id' ] );
 
@@ -595,12 +617,13 @@ function handleNoteStart( code ) {
 }
 
 // Finds the key that was released, stops the corresponding synth, and resets the interface.
+// Always calls stopTone().
 function handleNoteStop( code ) {
   let button = document.querySelector( '[data-code="' + code + '"]' );
 
   if ( button == null ) {
     return;
-  };
+  }
 
   stopTone( button.dataset[ 'id' ] );
 
@@ -611,7 +634,7 @@ function handleNoteStop( code ) {
 function startTone( i ) {
   if ( oscList[ i ] !== null ) {
     return;
-  };
+  }
 
   oscList[ i ] = audioContext.createOscillator();
   lpfList[ i ] = audioContext.createBiquadFilter();
@@ -649,10 +672,11 @@ function stopTone( i ) {
 // Finds the lowest and highest versions of the chord's tonal on the keyboard,
 // the third and fifth between them, all keys corresponfing to those notes,
 // and simulates pressing them.
+// Always calls handleNoteStart() and handleNoteStop().
 function playChord( mode ) {
-  if ( mode > 6 || playChordSelected == false ) {
+  if ( mode > 6 ) {
     return;
-  };
+  }
 
   let first = document.getElementsByClassName( numerals[ ( 0 + mode ) % 7 ] );
   let third = document.getElementsByClassName( numerals[ ( 2 + mode ) % 7 ] );
@@ -721,17 +745,18 @@ function playChord( mode ) {
 // COLORED INTERFACE FUNCTIONS
 
 // Changes the scale.
+// Always calls renderScale().
 function changeScale( value ) {
   if ( isNaN( value ) ) {
     return;
-  };
+  }
   value = +value;
 
   if ( value < 13 && value >= 0 ) {
     currentScale = scaleList[ value ];
   } else {
     return;
-  };
+  }
 
   currentScaleIndex = value;
 
@@ -752,10 +777,11 @@ function changeScale( value ) {
 }
 
 // Changes the mode according to the selected mechanic and keypress.
+// Always calls renderMode(), handleChordProgression().
 function changeMode( code ) {
   if ( modeMechanic == 'None' ) {
     return;
-  };
+  }
 
   if ( code == 'Space' ) {
     currentModeIndex = ( currentModeIndex + 1 ) % currentSequence.length;
@@ -764,25 +790,28 @@ function changeMode( code ) {
 
     if ( number == null ) {
       return;
-    };
+    }
 
     number = parseInt( number[ 0 ], 10 );
     if ( number > currentSequence.length ) {
       return;
-    };
+    }
 
     currentModeIndex = number - 1;
     if ( currentModeIndex == -1 ) {
       currentModeIndex = 0
-    };
-  };
+    }
+  }
 
   renderMode();
   handleChordProgression();
-  playChord( currentSequence[ currentModeIndex ] );
+  if ( playChordSelected ) {
+    playChord( currentSequence[ currentModeIndex ] )
+  }
 }
 
 // Changes the mode mechanic.
+// Always calls renderSequence().
 function changeModeMechanic( value ) {
   modeMechanic = value;
   currentModeIndex = -1;
@@ -830,6 +859,7 @@ function changeModeMechanic( value ) {
 
 // Clears the tags from all colored markers and assigns them again according to
 // the selected scale.
+// Always calls renderMode().
 function renderScale() {
   // Remove color classes.
   let divs = document.querySelectorAll( '.mode' );
@@ -857,6 +887,9 @@ function renderScale() {
 
 // Clears the highlights from all colored markers and assigns them again
 // according to the selected mode.
+// Always calls renderFakePage(), broadcastSettings().
+// (broadcastSettings is called here simply because this is called after any
+// setting change worth broadcasting - the exception is toggleTensionBox)
 function renderMode() {
   // Reset all markers on the keyboard to selected,
   let divs = document.querySelectorAll( '.mode' );
@@ -899,6 +932,7 @@ function renderMode() {
 }
 
 // Change the sequence according to the selected mechanic.
+// Always calls renderMode().
 function renderSequence() {
   // Empty the sequence box.
   let box = document.getElementById( 'sequenceBox' );
@@ -1045,6 +1079,7 @@ function renderFakePage() {
 }
 
 // Display the harmonic tension and feeling, or don't.
+// Always calls renderFakePage(), broadcastSettings().
 function toggleTensionBox() {
   tensionBoxIsVisible = !tensionBoxIsVisible;
 
@@ -1057,6 +1092,7 @@ function toggleTensionBox() {
 }
 
 // Display tutorial, rooms, and chat, or don't.
+// Always calls renderFakePage().
 function toggleOnlineBox() {
   onlineBoxIsVisible = !onlineBoxIsVisible;
 
@@ -1079,7 +1115,7 @@ function toggleChatOverlay() {
       .style.display = 'block';
     document.getElementById( 'viewChatText' )
       .innerHTML = 'Close full chat';
-    if ( inTutorial ) {
+    if ( inTutorial || inUserUpload ) {
       document.getElementById( 'chatOverlayInput' )
         .style.display = 'none';
     } else {
@@ -1146,7 +1182,6 @@ function alertFeeling( feeling, intensity ) {
   window.setTimeout( function () {
     text.style.opacity = 0;
   }, 2000 );
-
 }
 
 // Update the tension wave visualization.
@@ -1198,6 +1233,7 @@ function changeTension( intensity ) {
 
 // A new chord has been played: push it on the queue, compute the tension,
 // get the predicitons for consonance and expectation.
+// Always calls changeTension().
 function handleChordProgression() {
   if ( currentModeIndex < 0 ) {
     playedSequence = [];
@@ -1208,7 +1244,7 @@ function handleChordProgression() {
   }
   if ( playedSequence[ playedSequence.length - 1 ] == numerals[ currentSequence[ currentModeIndex ] ] ) {
     return;
-  };
+  }
 
   playedSequence.push( numerals[ currentSequence[ currentModeIndex ] ] );
 
@@ -1309,6 +1345,7 @@ function handleChordProgression() {
 
 // Get the next chord predictions by looking at the sequence in memory.
 // If too many prediction probabilities are null, try again w/ shorter memory.
+// Can call iteratively getNextChord().
 function getNextChord( consideredHistory ) {
 
   let playedSequenceString = playedSequence[ playedSequence.length - consideredHistory ];
@@ -1475,7 +1512,7 @@ function getNextChord( consideredHistory ) {
   numerals.forEach( function ( num ) {
     if ( !probabilities[ num ] ) {
       probabilities[ num ] = 0
-    };
+    }
   } );
 
   return probabilities;
@@ -1499,11 +1536,11 @@ function createRoom() {
 
   if ( roomName || !userID ) {
     return;
-  };
+  }
   roomName = prompt( 'Enter the room name' );
   if ( !roomName ) {
     return;
-  };
+  }
 
   firebase.database()
     .ref( 'rooms/' + roomName + '/owner' )
@@ -1569,6 +1606,14 @@ function createRoom() {
                 .ref( 'keypresses/' + roomName )
                 .onDisconnect()
                 .remove()
+              );
+              morePromises.push(
+                firebase.database()
+                .ref( 'users/' + userID )
+                .onDisconnect()
+                .update( {
+                  room: 'lobby'
+                } )
               );
 
               Promise.all( morePromises )
@@ -1676,7 +1721,7 @@ function joinRoom( name ) {
 
   if ( roomName || !name || !userID ) {
     return;
-  };
+  }
 
   roomName = name;
 
@@ -1685,7 +1730,18 @@ function joinRoom( name ) {
     .update( {
       room: roomName
     } )
-    .catch( function ( error ) {
+    .then( function () {
+
+      firebase.database()
+        .ref( 'users/' + userID )
+        .onDisconnect()
+        .update( {
+          room: 'lobby'
+        } )
+        .catch( function ( error ) {
+          console.error( "Error: couldn't update room.", error );
+        } );
+    }, function ( error ) {
       console.error( "Error: couldn't enter room.", error );
       roomName = null;
       return;
@@ -1721,7 +1777,7 @@ function joinRoom( name ) {
           justEnteredRoom = false;
           return;
         }
-        listenForRemoteEvents( snap, remoteEventDelay );
+        listenForRemoteEvents( snap.val(), remoteEventDelay );
       } );
 
   playedSequence = [];
@@ -1732,7 +1788,7 @@ function joinRoom( name ) {
     .ref( 'settings/' + roomName )
     .on( 'child_added',
       function ( snap ) {
-        handleRemoteSettings( snap );
+        handleRemoteSettings( snap.val() );
       } );
 
   firebase.database()
@@ -1777,13 +1833,13 @@ function leaveRoom() {
 
   if ( !roomName ) {
     return;
-  };
+  }
 
   if ( iAmAdmin ) {
 
     if ( !confirm( 'You are the room admin. Leaving will delete the room.' ) ) {
       return;
-    };
+    }
 
     let promises = [];
 
@@ -1894,9 +1950,9 @@ function leaveRoom() {
 // Update the graphic interface and start the first tutorial step.
 function loadTutorial( name ) {
 
-  if ( roomName || !name || inTutorial ) {
+  if ( roomName || !name || inTutorial || inUserUpload ) {
     return;
-  };
+  }
 
   firebase.database()
     .ref( 'tutorials/data/' + name )
@@ -1906,7 +1962,8 @@ function loadTutorial( name ) {
       tutorialStepsCount = snap.val()
         .steps;
 
-      handleRemoteSettings( snap.child( 'settings' ) );
+      handleRemoteSettings( snap.child( 'settings' )
+        .val() );
 
       let i = 0;
       tutorialKeypressSequences = [];
@@ -1989,10 +2046,11 @@ function loadTutorial( name ) {
 }
 
 // Stop the current tutorial, any scheduled keypresses, and current notes.
+// Always calls updateRoomBox(), updateChatListener().
 function exitTutorial() {
-  if ( roomName || !inTutorial ) {
+  if ( roomName || ( !inTutorial && !inUserUpload ) ) {
     return;
-  };
+  }
 
   remoteEvents = [];
   clearTimeout( scheduledEvent );
@@ -2012,7 +2070,7 @@ function nextTutorialStep() {
   if ( !inTutorial || tutorialStep >= tutorialStepsCount - 1 ) {
     console.log( 'Not allowed' );
     return;
-  };
+  }
   tutorialStep++;
 
   if ( tutorialMessages[ tutorialStep ] ) {
@@ -2041,7 +2099,7 @@ function nextTutorialStep() {
 
   if ( tutorialKeypressSequences[ tutorialStep ] ) {
     tutorialKeypressSequences[ tutorialStep ].forEach( function ( keypressSnap ) {
-      listenForRemoteEvents( keypressSnap, 0 );
+      listenForRemoteEvents( keypressSnap.val(), 0 );
     } );
   }
 }
@@ -2050,7 +2108,7 @@ function nextTutorialStep() {
 function repeatTutorialStep() {
   if ( !inTutorial ) {
     return;
-  };
+  }
 
   remoteEvents = [];
   clearTimeout( scheduledEvent );
@@ -2062,7 +2120,7 @@ function repeatTutorialStep() {
 
   if ( tutorialKeypressSequences[ tutorialStep ] ) {
     tutorialKeypressSequences[ tutorialStep ].forEach( function ( keypressSnap ) {
-      listenForRemoteEvents( keypressSnap, 0 );
+      listenForRemoteEvents( keypressSnap.val(), 0 );
     } );
   }
 }
@@ -2072,7 +2130,7 @@ function previousTutorialStep() {
   if ( !tutorialStep || !inTutorial ) {
     console.log( 'Not allowed' );
     return;
-  };
+  }
   tutorialStep--;
 
   if ( tutorialMessages[ tutorialStep + 1 ] ) {
@@ -2094,7 +2152,7 @@ function previousTutorialStep() {
 
   if ( tutorialKeypressSequences[ tutorialStep ] ) {
     tutorialKeypressSequences[ tutorialStep ].forEach( function ( keypressSnap ) {
-      listenForRemoteEvents( keypressSnap, 0 );
+      listenForRemoteEvents( keypressSnap.val(), 0 );
     } );
   }
 }
@@ -2119,90 +2177,129 @@ function updateRoomBox() {
   firebase.database()
     .ref( 'tutorials/names' )
     .once( 'value' )
-    .then( function ( snap ) {
+    .then( function ( snapTutorials ) {
 
-      let tutorials = snap.val();
-      if ( tutorials ) {
-        Object.keys( tutorials )
-          .forEach( function ( tutorial ) {
+        let tutorialpar = document.createElement( 'p' );
+        tutorialpar.appendChild( document.createTextNode( 'Tutorials:' ) );
+        box.appendChild( tutorialpar );
 
-            let tutorialButton = document.createElement( 'button' );
-            tutorialButton.appendChild( document.createTextNode( tutorial ) );
+        let tutorials = snapTutorials.val();
+        if ( tutorials ) {
+          Object.keys( tutorials )
+            .forEach( function ( tutorial ) {
 
-            ( function ( tutorial ) {
-              tutorialButton.addEventListener( 'click', ( event ) => {
-                loadTutorial( tutorial );
-              } );
-            } )( tutorial );
+              let tutorialButton = document.createElement( 'button' );
+              tutorialButton.appendChild( document.createTextNode( tutorial ) );
 
-            tutorialButton.classList.add( 'tutorial' );
+              ( function ( tutorial ) {
+                tutorialButton.addEventListener( 'click', ( event ) => {
+                  loadTutorial( tutorial );
+                } );
+              } )( tutorial );
 
-            box.appendChild( tutorialButton );
-          } );
-      }
+              tutorialButton.classList.add( 'tutorial' );
 
-      box.appendChild( document.createElement( 'br' ) );
-
-      let newButton = document.createElement( 'button' );
-      newButton.appendChild( document.createTextNode( 'New room' ) );
-      newButton.addEventListener( 'click', ( event ) => {
-        createRoom();
-      } );
-      newButton.classList.add( 'create' );
-
-      box.appendChild( newButton );
-
-      firebase.database()
-        .ref( 'rooms' )
-        .on( 'child_added', function ( snap ) {
-
-          if ( roomName || inTutorial ) {
-            return;
-          };
-
-          let roomButton = document.createElement( 'button' );
-          roomButton.appendChild( document.createTextNode( snap.key ) );
-          ( function ( snap ) {
-            roomButton.addEventListener( 'click', ( event ) => {
-              joinRoom( snap.key )
+              box.appendChild( tutorialButton );
             } );
-          } )( snap );
+        }
 
-          let box = document.getElementById( 'roomsBox' );
-          box.appendChild( roomButton );
-        } );
+        box.appendChild( document.createElement( 'br' ) );
 
-      firebase.database()
-        .ref( 'rooms' )
-        .on( 'child_removed', function ( snap ) {
-          if ( roomName ) {
-            return;
-          };
-          let roomButton = document.evaluate( '//button[text()="' + snap.key + '"]',
-            document, null, XPathResult.ANY_TYPE, null );
-          roomButton = roomButton.iterateNext();
-          if ( roomButton ) {
-            roomButton.remove();
-          }
-        } );
-    }, function ( error ) {
-      console.error( "Couldn't load tutorial names.", error );
-    } );
+        let userUploadpar = document.createElement( 'p' );
+        userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
+        box.appendChild( userUploadpar );
+
+        firebase.database()
+          .ref( 'uploads/names' )
+          .once( 'value' )
+          .then( function ( snapUploads ) {
+
+            let uploads = snapUploads.val();
+            if ( uploads ) {
+              Object.keys( uploads )
+                .forEach( function ( upload ) {
+
+                  let uploadButton = document.createElement( 'button' );
+                  uploadButton.appendChild( document.createTextNode( upload ) );
+
+                  ( function ( upload ) {
+                    uploadButton.addEventListener( 'click', ( event ) => {
+                      loadUserUpload( upload );
+                    } );
+                  } )( upload );
+
+                  uploadButton.classList.add( 'tutorial' );
+
+                  box.appendChild( uploadButton );
+                } );
+            }
+
+            box.appendChild( document.createElement( 'br' ) );
+
+            let roompar = document.createElement( 'p' );
+            roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
+            box.appendChild( roompar );
+
+            let newButton = document.createElement( 'button' );
+            newButton.appendChild( document.createTextNode( 'Create room' ) );
+            newButton.addEventListener( 'click', ( event ) => {
+              createRoom();
+            } );
+            newButton.classList.add( 'create' );
+
+            box.appendChild( newButton );
+
+            firebase.database()
+              .ref( 'rooms' )
+              .on( 'child_added', function ( snapRoom ) {
+
+                if ( roomName || inTutorial || inUserUpload ) {
+                  return;
+                }
+
+                let roomButton = document.createElement( 'button' );
+                roomButton.appendChild( document.createTextNode( snapRoom.key ) );
+                ( function ( snapRoom ) {
+                  roomButton.addEventListener( 'click', ( event ) => {
+                    joinRoom( snapRoom.key )
+                  } );
+                } )( snapRoom );
+
+                let box = document.getElementById( 'roomsBox' );
+                box.appendChild( roomButton );
+              } );
+
+            firebase.database()
+              .ref( 'rooms' )
+              .on( 'child_removed', function ( snapRoom ) {
+                if ( roomName ) {
+                  return;
+                }
+                let roomButton = document.evaluate( '//button[text()="' + snapRoom.key + '"]',
+                  document, null, XPathResult.ANY_TYPE, null );
+                roomButton = roomButton.iterateNext();
+                if ( roomButton ) {
+                  roomButton.remove();
+                }
+              } );
+          } );
+      },
+      function ( error ) {
+        console.error( "Couldn't load tutorial names.", error );
+      } );
 }
 
 // Comply to the settings sent by the tutorial or room admin.
-function handleRemoteSettings( snap ) {
-  remoteSettings = snap.val();
-
-  changeScale( remoteSettings.scale );
-  changeModeMechanic( remoteSettings.mechanic );
+function handleRemoteSettings( val ) {
+  changeScale( val.scale );
+  changeModeMechanic( val.mechanic );
   if ( modeMechanic == 'Template' ) {
-    currentSequence = sequenceList[ remoteSettings.sequence ];
+    currentSequence = sequenceList[ val.sequence ];
   }
-  changeMode( 'Numpad' + remoteSettings.mode );
+  changeMode( 'Numpad' + val.mode );
 
   document.getElementById( 'tensionCheckBox' )
-    .checked = tensionBoxIsVisible = remoteSettings.tensionVisible;
+    .checked = tensionBoxIsVisible = val.tensionVisible;
   document.getElementById( 'tensionBox' )
     .style.display = ( tensionBoxIsVisible ) ? 'block' : 'none';
 }
@@ -2223,6 +2320,215 @@ function broadcastSettings() {
         console.error( "Error: couldn't broadcast settings.", error );
       } );
   }
+}
+
+
+// RECORDING FUNCTIONS
+
+// Start or stop the current recording.
+function toggleRecording() {
+  if ( recordingNow ) {
+    document.getElementById( 'recordButton' )
+      .innerHTML = 'Start recording';
+  } else {
+    if ( !isEmpty( recordedKeypresses ) ) {
+      if ( !confirm( 'This will delete the current recording.' ) ) {
+        return;
+      }
+    }
+
+    document.getElementById( 'recordButton' )
+      .innerHTML = 'Stop recording';
+
+    recordedKeypresses = {};
+    recordedKeypressesCount = 0;
+
+    recordingSettings = {
+      scale: currentScaleIndex,
+      mechanic: modeMechanic,
+      mode: currentModeIndex,
+      sequence: currentSequenceIndex,
+      tensionVisible: tensionBoxIsVisible
+    };
+  }
+
+  recordingNow = !recordingNow;
+}
+
+// Listen to the recording.
+function replayRecording() {
+
+  handleRemoteSettings( recordingSettings );
+
+  userUploadKeypressSequence = [];
+
+  Object.values( recordedKeypresses )
+    .forEach( function ( keypress ) {
+      userUploadKeypressSequence.push( keypress );
+    } );
+
+  let box = document.getElementById( 'roomsBox' );
+  while ( box.firstChild ) {
+    box.removeChild( box.firstChild );
+  }
+
+  let leaveButton = document.createElement( 'button' );
+  leaveButton.appendChild( document.createTextNode( 'Exit recording' ) );
+  leaveButton.addEventListener( 'click', ( event ) => {
+    exitTutorial();
+  } );
+  leaveButton.classList.add( 'leave' );
+  box.appendChild( leaveButton );
+
+  inUserUpload = true;
+
+  updateChatListener();
+
+  playedSequence = [];
+  remoteEvents = [];
+
+  clearTimeout( scheduledEvent );
+  scheduledEvent = null;
+  document.querySelectorAll( '.key' )
+    .forEach( function ( key ) {
+      handleNoteStop( key.dataset[ 'code' ] );
+    } );
+
+  if ( userUploadKeypressSequence ) {
+    userUploadKeypressSequence.forEach( function ( keypress ) {
+      listenForRemoteEvents( keypress, 0 );
+    } );
+  }
+
+}
+
+// Uploads the recording to DB.
+function uploadRecording() {
+  if ( isEmpty( recordedKeypresses ) ) {
+    return;
+  }
+  let uploadName = prompt( 'Enter the name of the recording' );
+  if ( !uploadName ) {
+    return;
+  }
+
+  firebase.database()
+    .ref( 'uploads/names' )
+    .once( 'value' )
+    .then( function ( snap ) {
+
+      let tutorials = snap.val();
+      if ( tutorials ) {
+        Object.keys( tutorials )
+          .forEach( function ( name ) {
+            if ( name == uploadName ) {
+              if ( tutorials[ name ].owner == userID ) {
+                if ( !confirm( 'You already uploaded a recording with this name. This will over-write it.' ) ) {
+                  return;
+                }
+              } else {
+                alert( 'Someone already picked that name!' );
+                return;
+              }
+            }
+          } );
+      }
+
+      let upload = {
+        owner: userID,
+        keypresses: recordedKeypresses,
+        settings: recordingSettings
+      };
+
+      console.log( upload );
+
+      firebase.database()
+        .ref( 'uploads/names/' + uploadName )
+        .set( {
+          owner: userID
+        } )
+        .then( function () {
+
+          firebase.database()
+            .ref( 'uploads/data/' + uploadName )
+            .set( upload )
+            .catch( function ( error ) {
+              console.error( "Error: couldn't upload recording.", error );
+
+              firebase.database()
+                .ref( 'uploads/names/' + uploadName )
+                .remove()
+                .catch( function ( error ) {
+                  console.error( "Error: couldn't roll back...", error );
+                } );
+            } );
+        }, function ( error ) {
+          console.error( "Error: couldn't upload recording.", error );
+        } );
+    }, function ( error ) {
+      console.error( "Error: couldn't retrieve upload names.", error );
+    } );
+}
+
+// Retrieve the data for one tutorial (in bunch) and store it in variables.
+// Update the graphic interface and start the first tutorial step.
+function loadUserUpload( name ) {
+
+  if ( roomName || !name || inTutorial || inUserUpload ) {
+    return;
+  }
+
+  firebase.database()
+    .ref( 'uploads/data/' + name )
+    .once( 'value' )
+    .then( function ( snap ) {
+
+      handleRemoteSettings( snap.child( 'settings' )
+        .val() );
+
+      userUploadKeypressSequence = [];
+
+      snap.child( 'keypresses' )
+        .forEach( function ( keypressSnap ) {
+          userUploadKeypressSequence.push( keypressSnap );
+        } );
+
+      let box = document.getElementById( 'roomsBox' );
+      while ( box.firstChild ) {
+        box.removeChild( box.firstChild );
+      }
+
+      let leaveButton = document.createElement( 'button' );
+      leaveButton.appendChild( document.createTextNode( 'Exit recording' ) );
+      leaveButton.addEventListener( 'click', ( event ) => {
+        exitTutorial();
+      } );
+      leaveButton.classList.add( 'leave' );
+      box.appendChild( leaveButton );
+
+      inUserUpload = true;
+
+      updateChatListener();
+
+      playedSequence = [];
+      remoteEvents = [];
+
+      clearTimeout( scheduledEvent );
+      scheduledEvent = null;
+      document.querySelectorAll( '.key' )
+        .forEach( function ( key ) {
+          handleNoteStop( key.dataset[ 'code' ] );
+        } );
+
+      if ( userUploadKeypressSequence ) {
+        userUploadKeypressSequence.forEach( function ( keypressSnap ) {
+          listenForRemoteEvents( keypressSnap.val(), 0 );
+        } );
+      }
+
+    }, function ( error ) {
+      console.error( "Error: couldn't load tutorial.", error );
+    } );
 }
 
 
@@ -2378,7 +2684,7 @@ function updateChatListener() {
           Promise.all( promises )
             .then( function () {
 
-              if ( !inTutorial ) {
+              if ( !inTutorial && !inUserUpload ) {
 
                 firebase.database()
                   .ref( 'messages/lobby' )
@@ -2451,7 +2757,7 @@ function sendMessage() {
   if ( !userID || !document.getElementById( 'writeMessage' )
     .value ) {
     return;
-  };
+  }
 
   let message = {
     user: userID,
@@ -2569,4 +2875,38 @@ function changeNickname() {
     document.getElementById( 'nicknameText' )
       .innerText = 'You are anonymous. Click here to change nickname.';
   }
+}
+
+
+// JAVASCRIPT IS A TERRIBLE LANGUAGE
+
+// The following allows to know if an object is empty.
+// Thanks, stackoverflow.
+
+// Speed up calls to hasOwnProperty
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isEmpty( obj ) {
+
+  // null and undefined are "empty"
+  if ( obj == null ) return true;
+
+  // Assume if it has a length property with a non-zero value
+  // that that property is correct.
+  if ( obj.length > 0 ) return false;
+  if ( obj.length === 0 ) return true;
+
+  // If it isn't an object at this point
+  // it is empty, but it can't be anything *but* empty
+  // Is it empty?  Depends on your application.
+  if ( typeof obj !== "object" ) return true;
+
+  // Otherwise, does it have any properties of its own?
+  // Note that this doesn't handle
+  // toString and valueOf enumeration bugs in IE < 9
+  for ( var key in obj ) {
+    if ( hasOwnProperty.call( obj, key ) ) return false;
+  }
+
+  return true;
 }
