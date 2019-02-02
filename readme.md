@@ -12,7 +12,7 @@ A live version of the application is hosted on [Firebase hosting](https://unifor
 
 ### Prerequisites
 
-To mess around with this project, you'll need Firebase Devtools:
+To tinker with this project, you'll need Firebase Devtools:
 [Here's how to get started.](https://firebase.google.com/docs/cli/)
 
 ## Built With

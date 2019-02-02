@@ -1,98 +1,173 @@
 // VARIABLE DECLARATIONS
 
 // These are for keeping track of what's going on.
+
+// refers to the index along the sequence displayed under the keyboard.
 var currentModeIndex = -1;
+// in Template mode, there are several available sequences.
 var currentSequenceIndex = 0;
+// Can be 'None', 'Free', 'Template'.
 var modeMechanic = 'None';
+// Option for hearing the chord upon selection of the mode.
 var playChordSelected = false;
+// 0 means no scale selected, 1 to 12 are C to B.
 var currentScaleIndex = 0;
-var scale = [];
-var selectedSequence = [];
+// The selected scale is stored for ease.
+var currentScale = [];
+// Same for the selected sequence in Template mode.
+var currentSequence = [];
+
 
 // These are for suggesting the harmonic sequence.
+
+// Memory of past selected modes. Max length can be modified.
 var playedSequence = [];
+// Tension of the previous selected mode.
 var previousTension = 0;
+// Consonance of a chord with respect to the previous is guessed
+// from short-memory prediction.
 var consonancePrediction = [];
+// Expectation of a chord with respect to the previous is guessed
+// from long-memory prediction.
 var expectationPrediction = [];
+// Probability of each chord to appear, in general.
 var firstChord;
+// Probability of each chord to appear after a given one.
 var secondChord;
+// Probability of each chord to appear after a given sequence of two.
 var thirdChord;
-var fourthChord;
+// So on...
 var fifthChord;
+var fourthChord;
 var sixthChord;
 var seventhChord;
 var eighthChord;
 var ninthChord;
 var tenthChord;
 
+
 // These are for playing sounds.
+
 var audioContext = new( window.AudioContext || window.webkitAudioContext );
 var compressor = audioContext.createDynamicsCompressor();
+// List of oscillators: there are only 25,
+// as many as there are notes on the keyboard.
 var oscList = [];
+// Each synth has a low pass filter in addition to the oscillator,
 var lpfList = [];
+// and a gain.
 var gainList = [];
 
+
 // These are constants for reference.
+
+// 25 frequencies of the available notes.
 var freqList = [];
+// 12 possible scales.
 var scaleList = [];
+// Some known chord sequences.
 var sequenceList = [];
 var numerals = [ 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII' ];
-var maxSequenceMemory = 8; // 9 means using tenthChord prediction... which almost crashed the browser
+// 9 means using tenthChord prediction... which almost crashes the browser.
+var maxSequenceMemory = 8;
+// Decides what "next chord"s are considered as dissonant.
 var consonanceThreshold = 100 / 14;
+// Decides what "next chord"s are considered as unexpected.
 var expectationThreshold = 100 / 14;
 
+
 // These are for networking.
+
+// Local user's own ID.
 var userID = null;
+// null unless in a room.
 var roomName = null;
+// null if anonymous.
 var myNickname = null;
+// Set when in a room of one's own creation.
 var iAmAdmin = false;
+// Time of the last local keypress.
 var previousLocalTimestamp = 0;
+// Array of heard keypresses from the room admin.
 var remoteEvents = [];
+// The next keypress scheduled for reproduction.
 var scheduledEvent = null;
+// This is used when entering a room to avoid
+// hearing what's been played before entering.
 var justEnteredRoom = false;
 
+
 // These are for tutorials.
+
+// true when "attending" a static tutorial.
 var inTutorial = false;
+// Loaded in bunch upon entering.
 var tutorialKeypressSequences = [];
+// Same as above.
 var tutorialMessages = [];
+// What step is being visualized.
 var tutorialStep = 0;
+// Total steps of the tutorial.
 var tutorialStepsCount = 0;
 
+
 // These are for handling the page visualization.
+
+// The chat overlay blocks the keyboard,
+// and displays all messages as well as the option
+// to send a message or change nickname.
 var chatOverlayIsVisible = false;
+// The tension visualizer if off by default.
 var tensionBoxIsVisible = false;
+// Contains rooms or tutorial commands, as well as the chat box.
 var onlineBoxIsVisible = true;
+// Usually hidden behind the page.
 var settingBoxIsVisible = false;
 
-// These are for hiding some debugging or incomplete features
+
+// These are some debugging, incomplete, or advanced features.
+
 var showConsonance = false;
 var showExpectation = true;
+// This delay is added to keypresses heard from the room admin.
 var remoteEventDelay = 500;
 
 
 // CALLING SETUP FUNCTIONS
 
+// Setting the size of the oscillator list.
 for ( let i = 0; i < 25; i++ ) {
   oscList[ i ] = null;
 }
+// Computing the frequency of all notes.
 createFreqList();
 
+// Populating the list of known scales.
 createScaleList();
-scale = scaleList[ 0 ];
+// None selected
+currentScale = scaleList[ 0 ];
 
+// Populating the list of known sequences.
 createSequenceList();
+// No modes shown.
 changeModeMechanic( 'None' );
 
+// Display the colored labels on keys.
 renderScale();
 
+// The compressor avoids buzzing when playing many notes.
 compressorSetUp();
 
+// Add buttons for tutorials and rooms.
 updateRoomBox();
 
+// Tune in on the lobby chat.
 updateChatListener();
 
+// Authentication is required for online features.
 logIn();
 
+// Load the files for sequence prediction.
 loadJSON( function ( response ) {
   firstChord = JSON.parse( response );
 }, './JSON/strict_no_layers_percentage.json' );
@@ -127,6 +202,7 @@ loadJSON( function ( response ) {
 
 // LOCAL EVENT LISTENERS
 
+// For mobile devices: listen to touch events on the keyboard, prevent the default action, see as mouse clicks.
 document.getElementById( 'keyboardBox' )
   .addEventListener( 'touchstart', touchToMouse );
 document.getElementById( 'keyboardBox' )
@@ -136,60 +212,6 @@ document.getElementById( 'keyboardBox' )
 document.getElementById( 'keyboardBox' )
   .addEventListener( 'selectstart', function ( e ) {
     e.preventDefault();
-  } );
-
-document.getElementById( 'chatBox' )
-  .addEventListener( 'mousedown', toggleChatOverlay );
-
-document.getElementById( 'writeMessage' )
-  .addEventListener( 'keyup',
-    function ( event ) {
-      event.preventDefault();
-      if ( event.code == 'Enter' ) {
-        sendMessage();
-      }
-    } );
-
-window.addEventListener( 'keydown', ( event ) => {
-  if ( chatOverlayIsVisible || event.repeat ) {
-    return;
-  };
-  if ( !event.code.startsWith( 'F' ) && !event.code == 'Escape' ) {
-    event.preventDefault();
-  }
-  handleLocalEvent( event.type, event.code, event.timeStamp );
-} );
-
-window.addEventListener( 'keyup', ( event ) => {
-  if ( chatOverlayIsVisible ) {
-    return;
-  };
-  if ( !event.code.startsWith( 'F' ) ) {
-    event.preventDefault();
-  }
-  handleLocalEvent( event.type, event.code, event.timeStamp );
-} );
-
-document.querySelectorAll( '.key' )
-  .forEach( function ( key ) {
-    key.addEventListener( 'mousedown', ( event ) => {
-      if ( chatOverlayIsVisible ) {
-        return;
-      }; // This might be overkill: the overlay would be over the keys
-      handleLocalEvent( 'keydown', key.dataset[ 'code' ], event.timeStamp );
-    } );
-    key.addEventListener( 'mouseup', ( event ) => {
-      if ( chatOverlayIsVisible ) {
-        return;
-      }; // This might be overkill: the overlay would be over the keys
-      handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
-    } );
-    key.addEventListener( 'mouseleave', ( event ) => {
-      if ( chatOverlayIsVisible ) {
-        return;
-      }; // This might be overkill: the overlay would be over the keys
-      handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
-    } );
   } );
 
 function touchToMouse( event ) {
@@ -217,7 +239,66 @@ function touchToMouse( event ) {
   event.preventDefault();
 }
 
-// This is called on every keydown or keyup event.
+// Clicking the chat box opens the chat overlay on the keyboard.
+document.getElementById( 'chatBox' )
+  .addEventListener( 'mousedown', toggleChatOverlay );
+
+// Pressing enter with the chat overlay present sends the message.
+document.getElementById( 'writeMessage' )
+  .addEventListener( 'keyup',
+    function ( event ) {
+      event.preventDefault();
+      if ( event.code == 'Enter' ) {
+        sendMessage();
+      }
+    } );
+
+// The entire window always listens to the keyboard.
+window.addEventListener( 'keydown', ( event ) => {
+  if ( chatOverlayIsVisible || event.repeat ) {
+    return;
+  };
+  if ( !event.code.startsWith( 'F' ) && !event.code == 'Escape' ) {
+    event.preventDefault();
+  }
+  handleLocalEvent( event.type, event.code, event.timeStamp );
+} );
+
+window.addEventListener( 'keyup', ( event ) => {
+  if ( chatOverlayIsVisible ) {
+    return;
+  };
+  if ( !event.code.startsWith( 'F' ) ) {
+    event.preventDefault();
+  }
+  handleLocalEvent( event.type, event.code, event.timeStamp );
+} );
+
+// All keys listen for clicks (or touches, by proxy).
+document.querySelectorAll( '.key' )
+  .forEach( function ( key ) {
+    key.addEventListener( 'mousedown', ( event ) => {
+      if ( chatOverlayIsVisible ) {
+        return;
+      }; // This might be overkill: the overlay would be over the keys
+      handleLocalEvent( 'keydown', key.dataset[ 'code' ], event.timeStamp );
+    } );
+    key.addEventListener( 'mouseup', ( event ) => {
+      if ( chatOverlayIsVisible ) {
+        return;
+      }; // This might be overkill: the overlay would be over the keys
+      handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
+    } );
+    key.addEventListener( 'mouseleave', ( event ) => {
+      if ( chatOverlayIsVisible ) {
+        return;
+      }; // This might be overkill: the overlay would be over the keys
+      handleLocalEvent( 'keyup', key.dataset[ 'code' ], event.timeStamp );
+    } );
+  } );
+
+// This is called on every keydown or keyup event on the window.
+// It decides between playing a note or performing another action.
 function handleLocalEvent( type, code, timestamp ) {
   if ( type == 'keydown' ) {
     switch ( true ) {
@@ -240,6 +321,7 @@ function handleLocalEvent( type, code, timestamp ) {
       case code == 'Space':
       case code.startsWith( 'Numpad' ):
       case code == 'Enter':
+      case code == 'Backspace':
         break;
       default:
         handleNoteStop( code );
@@ -269,6 +351,10 @@ function handleLocalEvent( type, code, timestamp ) {
 
 // REMOTE EVENT LISTENERS
 
+// When in a room (created by someone else), this is called for every keypress heard.
+// If no other keypresses are being handled, the new one is; otherwise it's pushed to the queue.
+// The first event of a series is reproduced with a delay, to ensure that the following events are heard in time.
+// The following events are scheduled based on their delay in relation to the previous, which is part of the DB entry.
 function listenForRemoteEvents( snap, delay ) {
   let remoteEvent = snap.val();
   remoteEvents.push( {
@@ -281,15 +367,27 @@ function listenForRemoteEvents( snap, delay ) {
   }
 }
 
+// This acts on heard keypresses from the room admin in the same way as handleLocalEvent,
+// and schedules the next queued keypress if present.
 function handleNextRemoteEvent() {
   if ( remoteEvents[ 0 ].type == 'keydown' ) {
-    if ( remoteEvents[ 0 ].code == 'Space' || remoteEvents[ 0 ].code.startsWith( 'Numpad' ) ) {
-      changeMode( remoteEvents[ 0 ].code );
-    } else {
-      handleNoteStart( remoteEvents[ 0 ].code );
-    };
-  } else {
-    handleNoteStop( remoteEvents[ 0 ].code );
+    switch ( true ) {
+      case remoteEvents[ 0 ].code == 'Space':
+      case remoteEvents[ 0 ].code.startsWith( 'Numpad' ):
+        changeMode( remoteEvents[ 0 ].code );
+        break;
+      default:
+        handleNoteStart( remoteEvents[ 0 ].code );
+    }
+  }
+  if ( remoteEvents[ 0 ].type == 'keyup' ) {
+    switch ( true ) {
+      case remoteEvents[ 0 ].code == 'Space':
+      case remoteEvents[ 0 ].code.startsWith( 'Numpad' ):
+        break;
+      default:
+        handleNoteStop( remoteEvents[ 0 ].code );
+    }
   }
 
   remoteEvents.shift();
@@ -302,8 +400,7 @@ function handleNextRemoteEvent() {
 }
 
 // Prevent all settings from being focused on:
-// this is to avoid unintentionally undoing the last setting change with each
-// spacebar press.
+// this is to avoid unintentionally undoing the last setting change with each spacebar press.
 document.querySelectorAll( 'input' )
   .forEach( function ( item ) {
     if ( item.id == 'writeMessage' ) {
@@ -314,6 +411,7 @@ document.querySelectorAll( 'input' )
     } )
   } );
 
+// If the connection drops, lock the online features box.
 firebase.database()
   .ref( '.info/connected' )
   .on( 'value', function ( snap ) {
@@ -344,6 +442,7 @@ firebase.database()
     chatOverlayIsVisible = false;
   } );
 
+// If login fails, lock the online features box.
 function logIn() {
   firebase.auth()
     .signInAnonymously()
@@ -359,6 +458,7 @@ function logIn() {
   }
 }
 
+// Upon authentication, set the userID var and retrieve nickname from DB.
 firebase.auth()
   .onAuthStateChanged( function ( user ) {
     if ( user ) {
@@ -439,8 +539,8 @@ function createScaleList() {
   scaleList[ 12 ] = [ 'B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#' ];
 }
 
-// Create a list of common cadenzas.
-// N.B. since they're indexes, you have to -1 from every element of the cadenza.
+// Create a list of common sequences.
+// N.B. since they're indexes, you have to -1 from every element of the sequence.
 function createSequenceList() {
   sequenceList[ 0 ] = [ 0, 1, 4 ];
   sequenceList[ 1 ] = [ 0, 3, 4 ];
@@ -454,8 +554,7 @@ function createSequenceList() {
   sequenceList[ 9 ] = [ 0, 4, 5, 2, 3, 0, 3, 4 ];
 }
 
-// Generic settings for the compressor.
-// It's there so the audio doesn't clip when playing multiple notes.
+// The compressor avoids buzzing when playing many notes.
 function compressorSetUp() {
   compressor.threshold.setValueAtTime( -10, audioContext.currentTime );
   compressor.knee.setValueAtTime( 10, audioContext.currentTime );
@@ -465,6 +564,7 @@ function compressorSetUp() {
   compressor.connect( audioContext.destination );
 }
 
+// To load JSON files as JS objects.
 function loadJSON( callback, filename ) {
   var xobj = new XMLHttpRequest();
   xobj.overrideMimeType( 'application/json' );
@@ -494,8 +594,7 @@ function handleNoteStart( code ) {
   button.classList.add( 'pressed' );
 }
 
-// Finds the key that was released, stops the corresponding synth, and resets
-// the interface.
+// Finds the key that was released, stops the corresponding synth, and resets the interface.
 function handleNoteStop( code ) {
   let button = document.querySelector( '[data-code="' + code + '"]' );
 
@@ -547,6 +646,9 @@ function stopTone( i ) {
   }
 }
 
+// Finds the lowest and highest versions of the chord's tonal on the keyboard,
+// the third and fifth between them, all keys corresponfing to those notes,
+// and simulates pressing them.
 function playChord( mode ) {
   if ( mode > 6 || playChordSelected == false ) {
     return;
@@ -618,7 +720,7 @@ function playChord( mode ) {
 
 // COLORED INTERFACE FUNCTIONS
 
-// Changes the scale in response to an action on the slider.
+// Changes the scale.
 function changeScale( value ) {
   if ( isNaN( value ) ) {
     return;
@@ -626,7 +728,7 @@ function changeScale( value ) {
   value = +value;
 
   if ( value < 13 && value >= 0 ) {
-    scale = scaleList[ value ];
+    currentScale = scaleList[ value ];
   } else {
     return;
   };
@@ -640,23 +742,23 @@ function changeScale( value ) {
   document.getElementById( 'scaleSlider' )
     .value = value;
 
-  if ( scale[ 0 ] ) {
+  if ( currentScale[ 0 ] ) {
     document.getElementById( 'scaleLabel' )
-      .innerText = 'Scale: ' + scale[ 0 ];
+      .innerText = 'Scale: ' + currentScale[ 0 ];
   } else {
     document.getElementById( 'scaleLabel' )
       .innerText = 'Scale: none';
   }
 }
 
-// Changes the mode according to the selected mechanic.
+// Changes the mode according to the selected mechanic and keypress.
 function changeMode( code ) {
   if ( modeMechanic == 'None' ) {
     return;
   };
 
   if ( code == 'Space' ) {
-    currentModeIndex = ( currentModeIndex + 1 ) % selectedSequence.length;
+    currentModeIndex = ( currentModeIndex + 1 ) % currentSequence.length;
   } else {
     let number = code.match( /\d+$/ );
 
@@ -665,7 +767,7 @@ function changeMode( code ) {
     };
 
     number = parseInt( number[ 0 ], 10 );
-    if ( number > selectedSequence.length ) {
+    if ( number > currentSequence.length ) {
       return;
     };
 
@@ -677,10 +779,10 @@ function changeMode( code ) {
 
   renderMode();
   handleChordProgression();
-  playChord( selectedSequence[ currentModeIndex ] );
+  playChord( currentSequence[ currentModeIndex ] );
 }
 
-// Changes the mode mechanic in response to an action on the tick boxes.
+// Changes the mode mechanic.
 function changeModeMechanic( value ) {
   modeMechanic = value;
   currentModeIndex = -1;
@@ -688,22 +790,26 @@ function changeModeMechanic( value ) {
 
   switch ( modeMechanic ) {
     case 'None':
-      selectedSequence = [];
+      currentSequence = [];
       document.getElementById( 'sequenceBox' )
         .style.display = 'none';
       break;
     case 'Free':
-      selectedSequence = [ 0, 1, 2, 3, 4, 5, 6 ];
+      currentSequence = [ 0, 1, 2, 3, 4, 5, 6 ];
       document.getElementById( 'sequenceBox' )
         .style.display = 'table';
       break;
     case 'Template':
-      selectedSequence = sequenceList[ 0 ];
+      currentSequence = sequenceList[ 0 ];
       document.getElementById( 'sequenceBox' )
         .style.display = 'table';
       break;
     default:
       return;
+  }
+
+  if ( modeMechanic != 'None' && currentScaleIndex == 0 ) {
+    changeScale( 1 );
   }
 
   playedSequence = [];
@@ -722,9 +828,8 @@ function changeModeMechanic( value ) {
   renderSequence();
 }
 
-// Clear the tags from all colored markers and assign them again according to
+// Clears the tags from all colored markers and assigns them again according to
 // the selected scale.
-// It includes the next function, renderMode.
 function renderScale() {
   // Remove color classes.
   let divs = document.querySelectorAll( '.mode' );
@@ -737,11 +842,11 @@ function renderScale() {
   } );
 
   [].forEach.call( document.getElementsByClassName( 'key' ), function ( key ) {
-    for ( i = 0; i < scale.length; i++ ) {
+    for ( i = 0; i < currentScale.length; i++ ) {
       let keyNote = key.getElementsByClassName( 'ENGnote' )[ 0 ];
       keyNote = keyNote.innerHTML;
       keyNote = keyNote.replace( '<small>#</small>', '#' );
-      if ( scale[ i ] == keyNote ) {
+      if ( currentScale[ i ] == keyNote ) {
         key.getElementsByClassName( 'mode' )[ 0 ].classList.add( numerals[ i ] );
       }
     }
@@ -750,7 +855,7 @@ function renderScale() {
   renderMode();
 }
 
-// Clear the highlights from all colored markers and assigns them again
+// Clears the highlights from all colored markers and assigns them again
 // according to the selected mode.
 function renderMode() {
   // Reset all markers on the keyboard to selected,
@@ -772,10 +877,10 @@ function renderMode() {
   }
 
   // Unselect every second, fourth, sixth, and seventh on the keyboard.
-  let markerlist = document.evaluate( '//div[text()="' + scale[ ( 1 + selectedSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + scale[ ( 3 + selectedSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + scale[ ( 5 + selectedSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + scale[ ( 6 + selectedSequence[ currentModeIndex ] ) % 7 ] +
+  let markerlist = document.evaluate( '//div[text()="' + currentScale[ ( 1 + currentSequence[ currentModeIndex ] ) % 7 ] +
+    '" or text()="' + currentScale[ ( 3 + currentSequence[ currentModeIndex ] ) % 7 ] +
+    '" or text()="' + currentScale[ ( 5 + currentSequence[ currentModeIndex ] ) % 7 ] +
+    '" or text()="' + currentScale[ ( 6 + currentSequence[ currentModeIndex ] ) % 7 ] +
     '"]', document,
     null, XPathResult.ANY_TYPE, null );
   let markers = [];
@@ -811,7 +916,7 @@ function renderSequence() {
       }
       currentModeIndex = -1;
 
-      selectedSequence = sequenceList[ currentSequenceIndex ];
+      currentSequence = sequenceList[ currentSequenceIndex ];
 
       renderSequence();
       handleChordProgression();
@@ -820,7 +925,7 @@ function renderSequence() {
   }
 
   // Add every element of the sequence.
-  for ( i = 0; i < selectedSequence.length; i++ ) {
+  for ( i = 0; i < currentSequence.length; i++ ) {
     let element = document.createElement( 'span' );
     let label = document.createElement( 'div' );
     let arrowFillC = document.createElement( 'div' );
@@ -831,7 +936,7 @@ function renderSequence() {
     label.id = 'mode' + i;
     label.classList.add( 'sequenceLabel' );
     label.classList.add( 'mode' );
-    label.classList.add( numerals[ selectedSequence[ i ] ] );
+    label.classList.add( numerals[ currentSequence[ i ] ] );
 
     arrowFillC.classList.add( 'percentageFill', 'consonance' );
     arrowOutlineC.classList.add( 'percentageOutline' );
@@ -839,7 +944,7 @@ function renderSequence() {
     arrowOutlineE.classList.add( 'percentageOutline' );
 
     element.classList.add( 'sequenceElement' );
-    element.dataset.mode = numerals[ selectedSequence[ i ] ];
+    element.dataset.mode = numerals[ currentSequence[ i ] ];
 
     ( function ( i ) {
       element.addEventListener( 'mousedown', ( event ) => {
@@ -856,7 +961,7 @@ function renderSequence() {
     arrowFillC.appendChild( arrowOutlineC );
     element.appendChild( arrowFillC );
 
-    label.appendChild( document.createTextNode( numerals[ selectedSequence[ i ] ] ) );
+    label.appendChild( document.createTextNode( numerals[ currentSequence[ i ] ] ) );
     element.appendChild( label );
 
     arrowFillE.appendChild( arrowOutlineE );
@@ -872,7 +977,7 @@ function renderSequence() {
       currentSequenceIndex = ( currentSequenceIndex + 1 ) % sequenceList.length;
       currentModeIndex = -1;
 
-      selectedSequence = sequenceList[ currentSequenceIndex ];
+      currentSequence = sequenceList[ currentSequenceIndex ];
 
       renderSequence();
       handleChordProgression();
@@ -883,6 +988,11 @@ function renderSequence() {
   renderMode();
 }
 
+// Shows the settings by skewing the entire keyboard page.
+// Actually, the real page is just hidden, and a clone is skewed:
+// This is to preserve the listeners on keys, which would be hard to restore.
+// N.B. the fake page is cloned yet again on the way back,
+// as CSS animations don't repeat.
 function skewPage() {
   let page = document.getElementById( 'page' );
 
@@ -917,6 +1027,8 @@ function skewPage() {
   settingBoxIsVisible = !settingBoxIsVisible;
 }
 
+// If changes occur on the (real) page while settings are open,
+// The fake skewed page is updated by making a new clone.
 function renderFakePage() {
   let fakePage = document.getElementById( 'fakePage' );
   if ( fakePage ) {
@@ -932,6 +1044,7 @@ function renderFakePage() {
   }
 }
 
+// Display the harmonic tension and feeling, or don't.
 function toggleTensionBox() {
   tensionBoxIsVisible = !tensionBoxIsVisible;
 
@@ -943,6 +1056,7 @@ function toggleTensionBox() {
   broadcastSettings();
 }
 
+// Display tutorial, rooms, and chat, or don't.
 function toggleOnlineBox() {
   onlineBoxIsVisible = !onlineBoxIsVisible;
 
@@ -952,6 +1066,7 @@ function toggleOnlineBox() {
   renderFakePage();
 }
 
+// Show the full chat blocking the keyboard, or don't.
 function toggleChatOverlay() {
   if ( chatOverlayIsVisible ) {
     document.getElementById( 'chatOverlay' )
@@ -981,6 +1096,8 @@ function toggleChatOverlay() {
 
 // TENSION AND FEELING FUNCTIONS
 
+// Display an animation next to the tension wave. It fades out.
+// Has to be replaced every time, as CSS animations don't repeat.
 function alertFeeling( feeling, intensity ) {
   let svg = document.getElementById( 'feelingSVG' );
   let wave = document.getElementById( 'feeling' );
@@ -1032,6 +1149,7 @@ function alertFeeling( feeling, intensity ) {
 
 }
 
+// Update the tension wave visualization.
 function changeTension( intensity ) {
   let svg = document.getElementById( 'tensionSVG' );
   let waveBack = document.getElementById( 'tensionBack' );
@@ -1078,6 +1196,8 @@ function changeTension( intensity ) {
   waveFront.points.replaceItem( highpoint2, 5 );
 }
 
+// A new chord has been played: push it on the queue, compute the tension,
+// get the predicitons for consonance and expectation.
 function handleChordProgression() {
   if ( currentModeIndex < 0 ) {
     playedSequence = [];
@@ -1086,11 +1206,11 @@ function handleChordProgression() {
   if ( !playedSequence ) {
     playedSequence = [];
   }
-  if ( playedSequence[ playedSequence.length - 1 ] == numerals[ selectedSequence[ currentModeIndex ] ] ) {
+  if ( playedSequence[ playedSequence.length - 1 ] == numerals[ currentSequence[ currentModeIndex ] ] ) {
     return;
   };
 
-  playedSequence.push( numerals[ selectedSequence[ currentModeIndex ] ] );
+  playedSequence.push( numerals[ currentSequence[ currentModeIndex ] ] );
 
   let expectation = null;
   if ( expectationPrediction ) {
@@ -1100,7 +1220,7 @@ function handleChordProgression() {
   /*
     let consonance = null;
     if ( consonancePrediction ) {
-      consonance = consonancePrediction[ numerals[ selectedSequence[ currentModeIndex ] ] ];
+      consonance = consonancePrediction[ numerals[ currentSequence[ currentModeIndex ] ] ];
     }
   */
 
@@ -1116,8 +1236,10 @@ function handleChordProgression() {
     case 'IV':
       tension = 3;
       break;
-    case 'V':
     case 'VII':
+      tension = 4;
+      break;
+    case 'V':
       tension = 5;
       break;
   }
@@ -1185,6 +1307,8 @@ function handleChordProgression() {
   }
 }
 
+// Get the next chord predictions by looking at the sequence in memory.
+// If too many prediction probabilities are null, try again w/ shorter memory.
 function getNextChord( consideredHistory ) {
 
   let playedSequenceString = playedSequence[ playedSequence.length - consideredHistory ];
@@ -1360,6 +1484,17 @@ function getNextChord( consideredHistory ) {
 
 // ROOM FUNCTIONS
 
+// Create a new room, of which you are admin.
+// First, an entry is made in the /rooms DB branch with the local user as owner.
+// On failure, nothing happens.
+// On success,
+// Entries are made for messages and settings,
+// and the local user's branch is updated with the room.
+// On any failure, all operations are rolled back, if possible.
+// On success,
+// room deletion is scheduled if the local user disconnects.
+// On any failure, all operations are rolled back, if possible.
+// On success, iAmAdmin is set to true and the online features box is updated.
 function createRoom() {
 
   if ( roomName || !userID ) {
@@ -1528,38 +1663,15 @@ function createRoom() {
       },
       function ( error ) {
         console.error( "Error: couldn't create room.", error );
-
-        let lastPromises = [];
-
-        lastPromises.push(
-          firebase.database()
-          .ref( 'rooms/' + roomName )
-          .remove()
-        );
-        lastPromises.push(
-          firebase.database()
-          .ref( 'messages/' + roomName )
-          .remove()
-        );
-        lastPromises.push(
-          firebase.database()
-          .ref( 'settings/' + roomName )
-          .remove()
-        );
-        lastPromises.push(
-          firebase.database()
-          .ref( 'keypresses/' + roomName )
-          .remove()
-        );
-
-        Promise.all( lastPromises )
-          .catch(
-            function ( error ) {
-              console.error( "Error: couldn't rollback...", error );
-            } );
       } );
 }
 
+// Join an existing room as spectator.
+// The local user's branch is updated with the room.
+// The online features box is updated.
+// Start listening to admin's keypresses, ignoring past ones.
+// Start listening to admin's settings and comply.
+// Listen to the room's presence in the list and leave if it is removed.
 function joinRoom( name ) {
 
   if ( roomName || !name || !userID ) {
@@ -1653,6 +1765,14 @@ function joinRoom( name ) {
       } );
 }
 
+// Leave the current room.
+// If spectating, stop listening to any branches related to the room;
+// only afterwards update the graphic interface.
+// If leaving the room as admin, confirmation is required;
+// all branches are removed except for the rooms/ branch:
+// that one is used by the DB to check that the removal requests come from admin.
+// After removing all branches, on success,
+// remove the /rooms branch and update the graphic interface.
 function leaveRoom() {
 
   if ( !roomName ) {
@@ -1767,6 +1887,11 @@ function leaveRoom() {
   }
 }
 
+
+// TUTORIAL FUNCTIONS
+
+// Retrieve the data for one tutorial (in bunch) and store it in variables.
+// Update the graphic interface and start the first tutorial step.
 function loadTutorial( name ) {
 
   if ( roomName || !name || inTutorial ) {
@@ -1777,6 +1902,39 @@ function loadTutorial( name ) {
     .ref( 'tutorials/data/' + name )
     .once( 'value' )
     .then( function ( snap ) {
+
+      tutorialStepsCount = snap.val()
+        .steps;
+
+      handleRemoteSettings( snap.child( 'settings' ) );
+
+      let i = 0;
+      tutorialKeypressSequences = [];
+      tutorialKeypressSequences[ 0 ] = [];
+
+      snap.child( 'keypresses' )
+        .forEach( function ( keypressSnap ) {
+          if ( keypressSnap.val()
+            .code == 'Enter' ) {
+            tutorialKeypressSequences[ ++i ] = [];
+          } else {
+            tutorialKeypressSequences[ i ].push( keypressSnap );
+          }
+        } );
+
+      i = 0;
+      tutorialMessages = [];
+
+      snap.child( 'messages' )
+        .forEach( function ( message ) {
+          if ( message.val()
+            .text ) {
+            tutorialMessages[ i++ ] = message.val()
+              .text;
+          } else {
+            tutorialMessages[ i++ ] = null;
+          }
+        } );
 
       let box = document.getElementById( 'roomsBox' );
       while ( box.firstChild ) {
@@ -1817,39 +1975,6 @@ function loadTutorial( name ) {
       previousButton.classList.add( 'step' );
       box.appendChild( previousButton );
 
-      tutorialStepsCount = snap.val()
-        .steps;
-
-      handleRemoteSettings( snap.child( 'settings' ) );
-
-      let i = 0;
-      tutorialKeypressSequences = [];
-      tutorialKeypressSequences[ 0 ] = [];
-
-      snap.child( 'keypresses' )
-        .forEach( function ( keypressSnap ) {
-          if ( keypressSnap.val()
-            .code == 'Enter' ) {
-            tutorialKeypressSequences[ ++i ] = [];
-          } else {
-            tutorialKeypressSequences[ i ].push( keypressSnap );
-          }
-        } );
-
-      i = 0;
-      tutorialMessages = [];
-
-      snap.child( 'messages' )
-        .forEach( function ( message ) {
-          if ( message.val()
-            .text ) {
-            tutorialMessages[ i++ ] = message.val()
-              .text;
-          } else {
-            tutorialMessages[ i++ ] = null;
-          }
-        } );
-
       inTutorial = true;
 
       updateChatListener();
@@ -1863,6 +1988,7 @@ function loadTutorial( name ) {
     } );
 }
 
+// Stop the current tutorial, any scheduled keypresses, and current notes.
 function exitTutorial() {
   if ( roomName || !inTutorial ) {
     return;
@@ -1881,6 +2007,7 @@ function exitTutorial() {
   updateChatListener();
 }
 
+// Skip to the next tutorial step, stopping any scheduled keypresses and current notes.
 function nextTutorialStep() {
   if ( !inTutorial || tutorialStep >= tutorialStepsCount - 1 ) {
     console.log( 'Not allowed' );
@@ -1919,6 +2046,7 @@ function nextTutorialStep() {
   }
 }
 
+// Restart the tutorial step, stopping any scheduled keypresses and current notes.
 function repeatTutorialStep() {
   if ( !inTutorial ) {
     return;
@@ -1939,6 +2067,7 @@ function repeatTutorialStep() {
   }
 }
 
+// Go back to the previous tutorial step, stopping any scheduled keypresses and current notes.
 function previousTutorialStep() {
   if ( !tutorialStep || !inTutorial ) {
     console.log( 'Not allowed' );
@@ -1970,6 +2099,10 @@ function previousTutorialStep() {
   }
 }
 
+
+// ROOM/TUTORIAL FUNCTIONS
+
+// Build the buttons for all tutorials and rooms.
 function updateRoomBox() {
   firebase.database()
     .ref( 'rooms' )
@@ -2057,13 +2190,14 @@ function updateRoomBox() {
     } );
 }
 
+// Comply to the settings sent by the tutorial or room admin.
 function handleRemoteSettings( snap ) {
   remoteSettings = snap.val();
 
   changeScale( remoteSettings.scale );
   changeModeMechanic( remoteSettings.mechanic );
   if ( modeMechanic == 'Template' ) {
-    selectedSequence = sequenceList[ remoteSettings.sequence ];
+    currentSequence = sequenceList[ remoteSettings.sequence ];
   }
   changeMode( 'Numpad' + remoteSettings.mode );
 
@@ -2073,6 +2207,7 @@ function handleRemoteSettings( snap ) {
     .style.display = ( tensionBoxIsVisible ) ? 'block' : 'none';
 }
 
+// As admin, send your settings to the DB.
 function broadcastSettings() {
   if ( roomName && iAmAdmin ) {
     firebase.database()
@@ -2093,6 +2228,13 @@ function broadcastSettings() {
 
 // CHAT FUNCTIONS
 
+// Empty the chat box and overlay, reset message listeners,
+// and listen to messages from a room / the lobby / none.
+// N.B. Firebase doesn't offer an option to cut all listeners from the DB.
+// In order to stop listening to any rooms' messages (in case that failed while leaving),
+// all room names are retrieved; however if the room was deleted, the listener won't be cut,
+// and if another room happens to be created with the same name, the listener will
+// keep adding that room's messages to the chat. I think.
 function updateChatListener() {
   let box = document.getElementById( 'chatBoxMessages' );
   let overlay = document.getElementById( 'chatOverlayMessages' );
@@ -2304,6 +2446,7 @@ function updateChatListener() {
   }
 }
 
+// Push a message to the lobby or current room.
 function sendMessage() {
   if ( !userID || !document.getElementById( 'writeMessage' )
     .value ) {
@@ -2340,6 +2483,8 @@ function sendMessage() {
     .value = '';
 }
 
+// Scroll to the bottom of the chat box and overlay
+// (needed to keep showing only the latest messages in the box).
 function updateChatScroll() {
   let element = document.getElementById( 'chatBox' );
   element.scrollTop = element.scrollHeight;
@@ -2347,6 +2492,7 @@ function updateChatScroll() {
   element.scrollTop = element.scrollHeight;
 }
 
+// Update all messages sent with the chosen nickname.
 function changeNickname() {
   myNickname = prompt( 'Enter your new nickname.' );
 
