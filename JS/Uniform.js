@@ -4,9 +4,9 @@
 
 // refers to the index along the sequence displayed under the keyboard.
 var currentModeIndex = -1;
-// in Template mode, there are several available sequences.
+// in Progression mode, there are several available sequences.
 var currentSequenceIndex = 0;
-// Can be 'None', 'Free', 'Template'.
+// Can be 'None', 'Free', 'Progression'.
 var modeMechanic = 'None';
 // Option for hearing the chord upon selection of the mode.
 var playChordSelected = false;
@@ -14,8 +14,12 @@ var playChordSelected = false;
 var currentScaleIndex = 0;
 // The selected scale is stored for ease.
 var currentScale = [];
-// Same for the selected sequence in Template mode.
+// Same for the selected sequence in Progression mode.
 var currentSequence = [];
+// If english note labels are displayed
+var engNotesShown = true;
+// If italian note labels are displayed
+var itaNotesShown = false;
 
 
 // These are for suggesting the harmonic sequence.
@@ -95,6 +99,10 @@ var scheduledEvent = null;
 // This is used when entering a room to avoid
 // hearing what's been played before entering.
 var justEnteredRoom = false;
+// The chat overlay blocks the keyboard,
+// and displays all messages as well as the option
+// to send a message or change nickname.
+var chatOverlayIsVisible = false;
 
 
 // These are for tutorials.
@@ -128,20 +136,6 @@ var inUserUpload = false;
 var userUploadKeypressSequence = [];
 
 
-// These are for handling the page visualization.
-
-// The chat overlay blocks the keyboard,
-// and displays all messages as well as the option
-// to send a message or change nickname.
-var chatOverlayIsVisible = false;
-// The tension visualizer if off by default.
-var tensionBoxIsVisible = false;
-// Contains rooms or tutorial commands, as well as the chat box.
-var onlineBoxIsVisible = true;
-// Usually hidden behind the page.
-var settingBoxIsVisible = false;
-
-
 // These are some debugging, incomplete, or advanced features.
 
 var showConsonance = false;
@@ -161,16 +155,13 @@ createFreqList();
 
 // Populating the list of known scales.
 createScaleList();
-// None selected
-currentScale = scaleList[ 0 ];
+// Select C scale.
+changeScale( 0 );
 
 // Populating the list of known sequences.
 createSequenceList();
 // No modes shown.
 changeModeMechanic( 'None' );
-
-// Display the colored labels on keys.
-renderScale();
 
 // The compressor avoids buzzing when playing many notes.
 compressorSetUp();
@@ -275,8 +266,11 @@ window.addEventListener( 'keydown', ( event ) => {
   if ( chatOverlayIsVisible || event.repeat ) {
     return;
   }
-  if ( !event.code.startsWith( 'F' ) && !event.code == 'Escape' ) {
-    event.preventDefault();
+  if ( !event.code.startsWith( 'F' ) && !( event.code == 'Escape' ) ) {
+    if ( event.stopPropagation ) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
   }
   handleLocalEvent( event.type, event.code, event.timeStamp );
 } );
@@ -285,8 +279,11 @@ window.addEventListener( 'keyup', ( event ) => {
   if ( chatOverlayIsVisible ) {
     return;
   }
-  if ( !event.code.startsWith( 'F' ) ) {
-    event.preventDefault();
+  if ( !event.code.startsWith( 'F' ) && !( event.code == 'Escape' ) ) {
+    if ( event.stopPropagation ) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
   }
   handleLocalEvent( event.type, event.code, event.timeStamp );
 } );
@@ -294,6 +291,9 @@ window.addEventListener( 'keyup', ( event ) => {
 // All keys listen for clicks (or touches, by proxy).
 document.querySelectorAll( '.key' )
   .forEach( function ( key ) {
+    if ( key.id == 'scaleSliderCursor' ) {
+      return;
+    }
     key.addEventListener( 'mousedown', ( event ) => {
       if ( chatOverlayIsVisible ) {
         return;
@@ -453,6 +453,8 @@ firebase.database()
         .style.display = 'none';
       document.getElementById( 'chatOverlay' )
         .style.display = 'none';
+      document.getElementById( 'dashedPointer' )
+        .style.display = 'block';
       chatOverlayIsVisible = false;
     } else {
       document.getElementById( 'offlineOverlay' )
@@ -470,6 +472,8 @@ firebase.database()
       .style.display = 'none';
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
+    document.getElementById( 'dashedPointer' )
+      .style.display = 'block';
     chatOverlayIsVisible = false;
   } );
 
@@ -503,15 +507,15 @@ firebase.auth()
 
           if ( myNickname ) {
             document.getElementById( 'nicknameText' )
-              .innerText = 'You are ' + myNickname + '. Click here to change nickname.';
+              .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
           } else {
             document.getElementById( 'nicknameText' )
-              .innerText = 'You are anonymous. Click here to change nickname.';
+              .innerHTML = 'You are anonymous. Click here to change nickname.';
           }
         }, function ( error ) {
           console.error( "Error: couldn't find nickname.", error );
           document.getElementById( 'nicknameText' )
-            .innerText = 'You are anonymous. Click here to change nickname.';
+            .innerHTML = 'You are anonymous. Click here to change nickname.';
         } );
 
       firebase.database()
@@ -546,18 +550,18 @@ function createFreqList() {
 // Create a list of all scales.
 function createScaleList() {
   scaleList[ 0 ] = [];
-  scaleList[ 1 ] = [ 'C', 'D', 'E', 'F', 'G', 'A', 'B' ];
-  scaleList[ 2 ] = [ 'C#', 'D#', 'F', 'F#', 'G#', 'A#', 'C' ];
-  scaleList[ 3 ] = [ 'D', 'E', 'F#', 'G', 'A', 'B', 'C#' ];
-  scaleList[ 4 ] = [ 'D#', 'F', 'G', 'G#', 'A#', 'C', 'D' ];
-  scaleList[ 5 ] = [ 'E', 'F#', 'G#', 'A', 'B', 'C#', 'D#' ];
-  scaleList[ 6 ] = [ 'F', 'G', 'A', 'A#', 'C', 'D', 'E' ];
-  scaleList[ 7 ] = [ 'F#', 'G#', 'A#', 'B', 'C#', 'D#', 'F' ];
-  scaleList[ 8 ] = [ 'G', 'A', 'B', 'C', 'D', 'E', 'F#' ];
-  scaleList[ 9 ] = [ 'G#', 'A#', 'C', 'C#', 'D#', 'F', 'G' ];
-  scaleList[ 10 ] = [ 'A', 'B', 'C#', 'D', 'E', 'F#', 'G#' ];
-  scaleList[ 11 ] = [ 'A#', 'C', 'D', 'D#', 'F', 'G', 'A' ];
-  scaleList[ 12 ] = [ 'B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#' ];
+  scaleList[ 1 ] = [ 'A', 'B', 'C#', 'D', 'E', 'F#', 'G#' ];
+  scaleList[ 2 ] = [ 'A#', 'C', 'D', 'D#', 'F', 'G', 'A' ];
+  scaleList[ 3 ] = [ 'B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#' ];
+  scaleList[ 4 ] = [ 'C', 'D', 'E', 'F', 'G', 'A', 'B' ];
+  scaleList[ 5 ] = [ 'C#', 'D#', 'F', 'F#', 'G#', 'A#', 'C' ];
+  scaleList[ 6 ] = [ 'D', 'E', 'F#', 'G', 'A', 'B', 'C#' ];
+  scaleList[ 7 ] = [ 'D#', 'F', 'G', 'G#', 'A#', 'C', 'D' ];
+  scaleList[ 8 ] = [ 'E', 'F#', 'G#', 'A', 'B', 'C#', 'D#' ];
+  scaleList[ 9 ] = [ 'F', 'G', 'A', 'A#', 'C', 'D', 'E' ];
+  scaleList[ 10 ] = [ 'F#', 'G#', 'A#', 'B', 'C#', 'D#', 'F' ];
+  scaleList[ 11 ] = [ 'G', 'A', 'B', 'C', 'D', 'E', 'F#' ];
+  scaleList[ 12 ] = [ 'G#', 'A#', 'C', 'C#', 'D#', 'F', 'G' ];
 }
 
 // Create a list of common sequences.
@@ -760,20 +764,9 @@ function changeScale( value ) {
 
   currentScaleIndex = value;
 
-  playedSequence = [];
+  resetChordProgression();
 
   renderScale();
-
-  document.getElementById( 'scaleSlider' )
-    .value = value;
-
-  if ( currentScale[ 0 ] ) {
-    document.getElementById( 'scaleLabel' )
-      .innerText = 'Scale: ' + currentScale[ 0 ];
-  } else {
-    document.getElementById( 'scaleLabel' )
-      .innerText = 'Scale: none';
-  }
 }
 
 // Changes the mode according to the selected mechanic and keypress.
@@ -820,33 +813,27 @@ function changeModeMechanic( value ) {
   switch ( modeMechanic ) {
     case 'None':
       currentSequence = [];
-      document.getElementById( 'sequenceBox' )
-        .style.display = 'none';
       break;
     case 'Free':
       currentSequence = [ 0, 1, 2, 3, 4, 5, 6 ];
-      document.getElementById( 'sequenceBox' )
-        .style.display = 'table';
       break;
-    case 'Template':
+    case 'Progression':
       currentSequence = sequenceList[ 0 ];
-      document.getElementById( 'sequenceBox' )
-        .style.display = 'table';
       break;
     default:
       return;
   }
 
   if ( modeMechanic != 'None' && currentScaleIndex == 0 ) {
-    changeScale( 1 );
+    changeScale( 4 );
   }
 
-  playedSequence = [];
+  resetChordProgression();
 
-  [].forEach.call( document.getElementById( 'mechanicCheckBoxes' )
+  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
     .childNodes,
     function ( box ) {
-      if ( box.type == 'input' ) {
+      if ( box.name == 'mode' ) {
         box.checked = false;
         if ( box.value == value ) {
           box.checked = true;
@@ -859,8 +846,10 @@ function changeModeMechanic( value ) {
 
 // Clears the tags from all colored markers and assigns them again according to
 // the selected scale.
-// Always calls renderMode().
+// Always calls renderSliderCursor(), renderMode().
 function renderScale() {
+  renderSlider();
+
   // Remove color classes.
   let divs = document.querySelectorAll( '.mode' );
   divs.forEach( function ( div ) {
@@ -874,10 +863,12 @@ function renderScale() {
   [].forEach.call( document.getElementsByClassName( 'key' ), function ( key ) {
     for ( i = 0; i < currentScale.length; i++ ) {
       let keyNote = key.getElementsByClassName( 'ENGnote' )[ 0 ];
-      keyNote = keyNote.innerHTML;
-      keyNote = keyNote.replace( '<small>#</small>', '#' );
-      if ( currentScale[ i ] == keyNote ) {
-        key.getElementsByClassName( 'mode' )[ 0 ].classList.add( numerals[ i ] );
+      if ( keyNote ) {
+        keyNote = keyNote.innerHTML;
+        keyNote = keyNote.replace( '<small>#</small>', '#' );
+        if ( currentScale[ i ] == keyNote ) {
+          key.getElementsByClassName( 'mode' )[ 0 ].classList.add( numerals[ i ] );
+        }
       }
     }
   } );
@@ -885,16 +876,87 @@ function renderScale() {
   renderMode();
 }
 
+// Displays the cursor for selecting the scale, in the right place.
+function renderSlider() {
+  let scaleSliderRange = document.getElementById( 'scaleSliderRange' );
+  let scaleSliderLabel = document.getElementById( 'scaleSliderLabel' );
+  let scaleSliderLabelInfo = document.getElementById( 'scaleSliderLabelInfo' );
+  let scaleSliderCursor = document.getElementById( 'scaleSliderCursor' );
+  let dashedPointer = document.getElementById( 'dashedPointer' );
+
+  scaleSliderRange.value = currentScaleIndex;
+
+  scaleSliderCursor.classList.add( 'I' );
+
+  if ( currentScaleIndex % 2 ) {
+    dashedPointer.style.height = 63 + 'px';
+    dashedPointer.style.transform = '';
+  } else {
+    dashedPointer.style.height = 122 + 'px';
+    dashedPointer.style.transform = 'rotate(0.005rad) translate(-1px)';
+  }
+
+  if ( currentScaleIndex ) {
+    scaleSliderLabel.innerHTML = 'Scale: ' + currentScale[ 0 ] + ' Major.';
+    scaleSliderLabelInfo.innerHTML = currentScale[ 0 ] + ' is the tonal (in green),' +
+      '<br>the note from which the scale is built.';
+  } else {
+    dashedPointer.style.height = 0 + 'px';
+    scaleSliderLabel.innerHTML = 'No scale selected.';
+    scaleSliderLabelInfo.innerHTML = 'Drag this button to select the<br>' +
+      'tonal of the scale to display.';
+  }
+
+  let pad = +window.getComputedStyle( document.getElementById( 'scaleBox' ) )
+    .getPropertyValue( 'margin-left' )
+    .match( /\d+/ )[ 0 ];
+
+  scaleSliderCursor.style.left = ( pad + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
+  scaleSliderLabel.style.left = ( pad + 75 + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
+  scaleSliderLabelInfo.style.left = ( pad + 75 + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
+}
 // Clears the highlights from all colored markers and assigns them again
 // according to the selected mode.
-// Always calls renderFakePage(), broadcastSettings().
-// (broadcastSettings is called here simply because this is called after any
-// setting change worth broadcasting - the exception is toggleTensionBox)
+// Always calls broadcastSettings().
 function renderMode() {
+
+  // (broadcastSettings is called here simply because this is called after any
+  // setting change worth broadcasting)
+  broadcastSettings();
+
+  if ( currentModeIndex < 0 ) {
+    return;
+  }
+
   // Reset all markers on the keyboard to selected,
   let divs = document.querySelectorAll( '.mode' );
   divs.forEach( function ( div ) {
     div.classList.remove( 'unselected' );
+  } );
+
+  // Unselect every second, fourth, sixth, and seventh on the keyboard.
+  let second = numerals[ ( 1 + currentSequence[ currentModeIndex ] ) % 7 ];
+  let fourth = numerals[ ( 3 + currentSequence[ currentModeIndex ] ) % 7 ];
+  let sixth = numerals[ ( 5 + currentSequence[ currentModeIndex ] ) % 7 ];
+  let seventh = numerals[ ( 6 + currentSequence[ currentModeIndex ] ) % 7 ];
+
+  let markerlist = document.evaluate(
+    "//div[contains(concat(' ', normalize-space(@class), ' '), ' " + second + " ')" +
+    " or contains(concat(' ', normalize-space(@class), ' '), ' " + fourth + " ')" +
+    " or contains(concat(' ', normalize-space(@class), ' '), ' " + sixth + " ')" +
+    " or contains(concat(' ', normalize-space(@class), ' '), ' " + seventh + " ')" +
+    "]", document, null, XPathResult.ANY_TYPE, null );
+  let markers = [];
+  markers[ 0 ] = markerlist.iterateNext();
+  while ( markers[ markers.length - 1 ] != null ) {
+    markers[ markers.length ] = markerlist.iterateNext();
+  }
+  markers.pop();
+
+  markers.forEach( function ( marker ) {
+    if ( marker.parentNode.getElementsByClassName( 'mode' )[ 0 ] ) {
+      marker.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'unselected' );
+    }
   } );
 
   // Reset all markers in the modeBox to unselected,
@@ -908,27 +970,10 @@ function renderMode() {
   if ( cursor != null ) {
     cursor.classList.remove( 'unselected' );
   }
-
-  // Unselect every second, fourth, sixth, and seventh on the keyboard.
-  let markerlist = document.evaluate( '//div[text()="' + currentScale[ ( 1 + currentSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + currentScale[ ( 3 + currentSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + currentScale[ ( 5 + currentSequence[ currentModeIndex ] ) % 7 ] +
-    '" or text()="' + currentScale[ ( 6 + currentSequence[ currentModeIndex ] ) % 7 ] +
-    '"]', document,
-    null, XPathResult.ANY_TYPE, null );
-  let markers = [];
-  markers[ 0 ] = markerlist.iterateNext();
-  while ( markers[ markers.length - 1 ] != null ) {
-    markers[ markers.length ] = markerlist.iterateNext();
+  cursor = document.querySelector( '[id="scaleSliderCursorMode"]' );
+  if ( cursor != null ) {
+    cursor.classList.remove( 'unselected' );
   }
-  markers.pop();
-
-  markers.forEach( function ( marker ) {
-    marker.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'unselected' );
-  } );
-  renderFakePage();
-
-  broadcastSettings();
 }
 
 // Change the sequence according to the selected mechanic.
@@ -940,9 +985,9 @@ function renderSequence() {
     box.removeChild( box.firstChild );
   }
 
-  if ( modeMechanic == 'Template' ) {
+  if ( modeMechanic == 'Progression' ) {
     let div = document.createElement( 'div' );
-    div.classList.add( 'leftArrow' );
+    div.classList.add( 'leftArrow', 'FLATgray' );
     div.addEventListener( 'click', ( event ) => {
       currentSequenceIndex = currentSequenceIndex - 1;
       if ( currentSequenceIndex < 0 ) {
@@ -972,9 +1017,9 @@ function renderSequence() {
     label.classList.add( 'mode' );
     label.classList.add( numerals[ currentSequence[ i ] ] );
 
-    arrowFillC.classList.add( 'percentageFill', 'consonance' );
+    arrowFillC.classList.add( 'percentageFill', 'FLATgray', 'consonance' );
     arrowOutlineC.classList.add( 'percentageOutline' );
-    arrowFillE.classList.add( 'percentageFill', 'expectation' );
+    arrowFillE.classList.add( 'percentageFill', 'FLATgray', 'expectation' );
     arrowOutlineE.classList.add( 'percentageOutline' );
 
     element.classList.add( 'sequenceElement' );
@@ -1004,9 +1049,9 @@ function renderSequence() {
     box.appendChild( element );
   }
 
-  if ( modeMechanic == 'Template' ) {
+  if ( modeMechanic == 'Progression' ) {
     let div = document.createElement( 'div' );
-    div.classList.add( 'rightArrow' );
+    div.classList.add( 'rightArrow', 'FLATgray' );
     div.addEventListener( 'click', ( event ) => {
       currentSequenceIndex = ( currentSequenceIndex + 1 ) % sequenceList.length;
       currentModeIndex = -1;
@@ -1022,97 +1067,21 @@ function renderSequence() {
   renderMode();
 }
 
-// Shows the settings by skewing the entire keyboard page.
-// Actually, the real page is just hidden, and a clone is skewed:
-// This is to preserve the listeners on keys, which would be hard to restore.
-// N.B. the fake page is cloned yet again on the way back,
-// as CSS animations don't repeat.
-function skewPage() {
-  let page = document.getElementById( 'page' );
-
-  if ( settingBoxIsVisible ) {
-
-    let fakePage = document.getElementById( 'fakePage' );
-    let fakePage2 = fakePage.cloneNode( true );
-    fakePage.parentNode.replaceChild( fakePage2, fakePage );
-
-    fakePage2.style.animation = 'skew 0.5s ease-in reverse';
-
-    window.setTimeout( function () {
-      page.style.display = 'block';
-      page.parentNode.removeChild( fakePage2 );
-    }, 500 );
-
-  } else {
-
-    let fakePage = page.cloneNode( true );
-    page.parentNode.appendChild( fakePage );
-
-    page.scrollTop = 0;
-    page.style.display = 'none';
-
-    fakePage.id = 'fakePage';
-    fakePage.style.animation = 'skew 0.5s ease-in forwards';
-    fakePage.scrollTop = 0;
-    fakePage.style.overflow = 'hidden';
-    fakePage.getElementsByClassName( 'menuIcon' )[ 0 ].classList.add( 'clickedMenuIcon' );
-  }
-
-  settingBoxIsVisible = !settingBoxIsVisible;
-}
-
-// If changes occur on the (real) page while settings are open,
-// The fake skewed page is updated by making a new clone.
-function renderFakePage() {
-  let fakePage = document.getElementById( 'fakePage' );
-  if ( fakePage ) {
-    let page = document.getElementById( 'page' );
-    let fakePage2 = page.cloneNode( true );
-    fakePage2.id = 'fakePage';
-    fakePage2.style.display = 'block';
-    fakePage2.style.animation = 'skew 0s forwards';
-    fakePage2.scrollTop = 0;
-    fakePage2.style.overflow = 'hidden';
-    fakePage2.getElementsByClassName( 'menuIcon' )[ 0 ].classList.add( 'clickedMenuIcon' );
-    fakePage.parentNode.replaceChild( fakePage2, fakePage );
-  }
-}
-
-// Display the harmonic tension and feeling, or don't.
-// Always calls renderFakePage(), broadcastSettings().
-function toggleTensionBox() {
-  tensionBoxIsVisible = !tensionBoxIsVisible;
-
-  document.getElementById( 'tensionBox' )
-    .style.display = ( tensionBoxIsVisible ) ? 'block' : 'none';
-
-  renderFakePage();
-
-  broadcastSettings();
-}
-
-// Display tutorial, rooms, and chat, or don't.
-// Always calls renderFakePage().
-function toggleOnlineBox() {
-  onlineBoxIsVisible = !onlineBoxIsVisible;
-
-  document.getElementById( 'onlineBox' )
-    .style.display = ( onlineBoxIsVisible ) ? 'block' : 'none';
-
-  renderFakePage();
-}
-
 // Show the full chat blocking the keyboard, or don't.
 function toggleChatOverlay() {
   if ( chatOverlayIsVisible ) {
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
+    document.getElementById( 'dashedPointer' )
+      .style.display = 'block';
     document.getElementById( 'viewChatText' )
       .innerHTML = 'Open full chat';
     chatOverlayIsVisible = false;
   } else {
     document.getElementById( 'chatOverlay' )
       .style.display = 'block';
+    document.getElementById( 'dashedPointer' )
+      .style.display = 'none';
     document.getElementById( 'viewChatText' )
       .innerHTML = 'Close full chat';
     if ( inTutorial || inUserUpload ) {
@@ -1129,6 +1098,27 @@ function toggleChatOverlay() {
   }
 }
 
+function showNoteLabels( value, checked ) {
+  switch ( value ) {
+    case 'eng':
+      engNotesShown = checked;
+      break;
+    case 'ita':
+      itaNotesShown = checked;
+      break;
+  }
+
+  let labels = document.getElementsByClassName( 'label' );
+  [].forEach.call( labels, function ( label ) {
+    if ( label.classList.contains( 'ENGnote' ) ) {
+      label.style.display = ( engNotesShown ) ? 'block' : 'none'
+    }
+    if ( label.classList.contains( 'ITAnote' ) ) {
+      label.style.display = ( itaNotesShown ) ? 'block' : 'none'
+    }
+  } );
+}
+
 
 // TENSION AND FEELING FUNCTIONS
 
@@ -1138,7 +1128,7 @@ function alertFeeling( feeling, intensity ) {
   let svg = document.getElementById( 'feelingSVG' );
   let wave = document.getElementById( 'feeling' );
 
-  wave.classList.add( 'standalone' );
+  wave.style.display = 'block';
 
   let lowpoint1 = svg.createSVGPoint();
   let lowpoint2 = svg.createSVGPoint();
@@ -1162,6 +1152,7 @@ function alertFeeling( feeling, intensity ) {
     wave.cloneNode( true ),
     wave
   );
+  wave = document.getElementById( 'feeling' );
 
   let text = document.getElementById( 'feelingText' );
   text.innerHTML = feeling;
@@ -1181,6 +1172,7 @@ function alertFeeling( feeling, intensity ) {
   text.style.opacity = 1;
   window.setTimeout( function () {
     text.style.opacity = 0;
+    wave.style.display = 'none';
   }, 2000 );
 }
 
@@ -1236,11 +1228,11 @@ function changeTension( intensity ) {
 // Always calls changeTension().
 function handleChordProgression() {
   if ( currentModeIndex < 0 ) {
-    playedSequence = [];
+    resetChordProgression();
     return;
   }
   if ( !playedSequence ) {
-    playedSequence = [];
+    resetChordProgression();
   }
   if ( playedSequence[ playedSequence.length - 1 ] == numerals[ currentSequence[ currentModeIndex ] ] ) {
     return;
@@ -1518,6 +1510,15 @@ function getNextChord( consideredHistory ) {
   return probabilities;
 }
 
+// Reset all variables related to handling tension and expectation.
+function resetChordProgression() {
+  previousTension = 0;
+  playedSequence = [];
+  consonancePrediction = [];
+  expectationPrediction = [];
+  changeTension( 0 );
+}
+
 
 // ROOM FUNCTIONS
 
@@ -1573,8 +1574,7 @@ function createRoom() {
             scale: currentScaleIndex,
             mechanic: modeMechanic,
             mode: currentModeIndex,
-            sequence: currentSequenceIndex,
-            tensionVisible: tensionBoxIsVisible
+            sequence: currentSequenceIndex
           } )
         );
 
@@ -1629,7 +1629,7 @@ function createRoom() {
                   leaveButton.addEventListener( 'click', ( event ) => {
                     leaveRoom()
                   } );
-                  leaveButton.classList.add( 'leave' );
+                  leaveButton.classList.add( 'V' );
 
                   box.appendChild( document.createTextNode( 'You are admin of room: ' + roomName ) );
                   box.appendChild( document.createElement( 'br' ) );
@@ -1637,7 +1637,7 @@ function createRoom() {
 
                   iAmAdmin = true;
 
-                  playedSequence = [];
+                  resetChordProgression();
 
                   updateChatListener();
                 }, function ( error ) {
@@ -1757,7 +1757,7 @@ function joinRoom( name ) {
   leaveButton.addEventListener( 'click', ( event ) => {
     leaveRoom()
   } );
-  leaveButton.classList.add( 'leave' );
+  leaveButton.classList.add( 'V' );
 
   box.appendChild( document.createTextNode( 'You are a guest in room: ' + roomName ) );
   box.appendChild( document.createElement( 'br' ) );
@@ -1780,7 +1780,7 @@ function joinRoom( name ) {
         listenForRemoteEvents( snap.val(), remoteEventDelay );
       } );
 
-  playedSequence = [];
+  resetChordProgression();
 
   updateChatListener();
 
@@ -1880,7 +1880,7 @@ function leaveRoom() {
 
         iAmAdmin = false;
 
-        playedSequence = [];
+        resetChordProgression();
 
         updateChatListener();
 
@@ -1931,7 +1931,7 @@ function leaveRoom() {
 
         roomName = null;
 
-        playedSequence = [];
+        resetChordProgression();
 
         updateChatListener();
 
@@ -2003,7 +2003,7 @@ function loadTutorial( name ) {
       leaveButton.addEventListener( 'click', ( event ) => {
         exitTutorial();
       } );
-      leaveButton.classList.add( 'leave' );
+      leaveButton.classList.add( 'V' );
       box.appendChild( leaveButton );
 
       box.appendChild( document.createElement( 'br' ) );
@@ -2013,7 +2013,7 @@ function loadTutorial( name ) {
       nextButton.addEventListener( 'click', ( event ) => {
         nextTutorialStep();
       } );
-      nextButton.classList.add( 'step' );
+      nextButton.classList.add( 'Xgray' );
       box.appendChild( nextButton );
 
       let repeatButton = document.createElement( 'button' );
@@ -2021,7 +2021,7 @@ function loadTutorial( name ) {
       repeatButton.addEventListener( 'click', ( event ) => {
         repeatTutorialStep();
       } );
-      repeatButton.classList.add( 'step' );
+      repeatButton.classList.add( 'Xgray' );
       box.appendChild( repeatButton );
 
       let previousButton = document.createElement( 'button' );
@@ -2029,14 +2029,14 @@ function loadTutorial( name ) {
       previousButton.addEventListener( 'click', ( event ) => {
         previousTutorialStep();
       } );
-      previousButton.classList.add( 'step' );
+      previousButton.classList.add( 'Xgray' );
       box.appendChild( previousButton );
 
       inTutorial = true;
 
       updateChatListener();
 
-      playedSequence = [];
+      resetChordProgression();
 
       tutorialStep = -1;
       nextTutorialStep();
@@ -2078,9 +2078,8 @@ function nextTutorialStep() {
     let overlay = document.getElementById( 'chatOverlayMessages' );
 
     let message = document.createElement( 'div' );
-    message.classList.add( 'message' );
+    message.classList.add( 'message', 'VII' );
 
-    message.classList.add( 'admin' );
     message.appendChild( document.createTextNode( tutorialMessages[ tutorialStep ] ) );
 
     box.appendChild( message );
@@ -2197,7 +2196,7 @@ function updateRoomBox() {
                 } );
               } )( tutorial );
 
-              tutorialButton.classList.add( 'tutorial' );
+              tutorialButton.classList.add( 'VII' );
 
               box.appendChild( tutorialButton );
             } );
@@ -2228,7 +2227,7 @@ function updateRoomBox() {
                     } );
                   } )( upload );
 
-                  uploadButton.classList.add( 'tutorial' );
+                  uploadButton.classList.add( 'III' );
 
                   box.appendChild( uploadButton );
                 } );
@@ -2245,7 +2244,7 @@ function updateRoomBox() {
             newButton.addEventListener( 'click', ( event ) => {
               createRoom();
             } );
-            newButton.classList.add( 'create' );
+            newButton.classList.add( 'I' );
 
             box.appendChild( newButton );
 
@@ -2293,15 +2292,10 @@ function updateRoomBox() {
 function handleRemoteSettings( val ) {
   changeScale( val.scale );
   changeModeMechanic( val.mechanic );
-  if ( modeMechanic == 'Template' ) {
+  if ( modeMechanic == 'Progression' ) {
     currentSequence = sequenceList[ val.sequence ];
   }
   changeMode( 'Numpad' + val.mode );
-
-  document.getElementById( 'tensionCheckBox' )
-    .checked = tensionBoxIsVisible = val.tensionVisible;
-  document.getElementById( 'tensionBox' )
-    .style.display = ( tensionBoxIsVisible ) ? 'block' : 'none';
 }
 
 // As admin, send your settings to the DB.
@@ -2313,8 +2307,7 @@ function broadcastSettings() {
         scale: currentScaleIndex,
         mechanic: modeMechanic,
         mode: currentModeIndex,
-        sequence: currentSequenceIndex,
-        tensionVisible: tensionBoxIsVisible
+        sequence: currentSequenceIndex
       } )
       .catch( function ( error ) {
         console.error( "Error: couldn't broadcast settings.", error );
@@ -2347,8 +2340,7 @@ function toggleRecording() {
       scale: currentScaleIndex,
       mechanic: modeMechanic,
       mode: currentModeIndex,
-      sequence: currentSequenceIndex,
-      tensionVisible: tensionBoxIsVisible
+      sequence: currentSequenceIndex
     };
   }
 
@@ -2377,14 +2369,14 @@ function replayRecording() {
   leaveButton.addEventListener( 'click', ( event ) => {
     exitTutorial();
   } );
-  leaveButton.classList.add( 'leave' );
+  leaveButton.classList.add( 'V' );
   box.appendChild( leaveButton );
 
   inUserUpload = true;
 
   updateChatListener();
 
-  playedSequence = [];
+  resetChordProgression();
   remoteEvents = [];
 
   clearTimeout( scheduledEvent );
@@ -2503,14 +2495,14 @@ function loadUserUpload( name ) {
       leaveButton.addEventListener( 'click', ( event ) => {
         exitTutorial();
       } );
-      leaveButton.classList.add( 'leave' );
+      leaveButton.classList.add( 'V' );
       box.appendChild( leaveButton );
 
       inUserUpload = true;
 
       updateChatListener();
 
-      playedSequence = [];
+      resetChordProgression();
       remoteEvents = [];
 
       clearTimeout( scheduledEvent );
@@ -2534,13 +2526,7 @@ function loadUserUpload( name ) {
 
 // CHAT FUNCTIONS
 
-// Empty the chat box and overlay, reset message listeners,
-// and listen to messages from a room / the lobby / none.
-// N.B. Firebase doesn't offer an option to cut all listeners from the DB.
-// In order to stop listening to any rooms' messages (in case that failed while leaving),
-// all room names are retrieved; however if the room was deleted, the listener won't be cut,
-// and if another room happens to be created with the same name, the listener will
-// keep adding that room's messages to the chat. I think.
+// Empty the chat box and overlay and listen to messages from a room / none.
 function updateChatListener() {
   let box = document.getElementById( 'chatBoxMessages' );
   let overlay = document.getElementById( 'chatOverlayMessages' );
@@ -2551,210 +2537,107 @@ function updateChatListener() {
     overlay.removeChild( overlay.firstChild );
   }
 
-  if ( roomName ) {
-
-    firebase.database()
-      .ref( 'rooms' )
-      .once( 'value' )
-      .then( function ( snapRoom ) {
-
-        let promises = [];
-
-        promises.push(
-          firebase.database()
-          .ref( 'messages/lobby' )
-          .off()
-        );
-        // Just to be sure
-        snapRoom.forEach( function ( room ) {
-          promises.push(
-            firebase.database()
-            .ref( 'messages/' + room.key )
-            .off()
-          );
-
-          Promise.all( promises )
-            .then( function () {
-              firebase.database()
-                .ref( 'messages/' + roomName )
-                .on( 'child_added', function ( snap ) {
-
-                  let message = document.createElement( 'div' );
-                  message.classList.add( 'message' );
-
-                  if ( snap.val()
-                    .admin ) {
-                    message.classList.add( 'admin' );
-                  }
-
-                  if ( snap.val()
-                    .nickname ) {
-                    message.appendChild( document.createTextNode( snap.val()
-                      .nickname + ' : ' + snap.val()
-                      .text ) );
-                  } else {
-                    if ( snap.val()
-                      .admin ) {
-                      message.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-                        .text ) );
-                    } else {
-                      message.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text ) );
-                    }
-                  }
-
-                  message.id = 'box' + snap.key;
-                  box.appendChild( message );
-                  let clone = message.cloneNode( true )
-                  clone.id = 'overlay' + snap.key;
-                  overlay.appendChild( clone );
-
-                  updateChatScroll();
-                }, function ( error ) {
-                  console.error( "Couldn't load room message.", error );
-                } );
-
-              firebase.database()
-                .ref( 'messages/' + roomName )
-                .on( 'child_changed', function ( snap ) {
-
-                  let boxMessage = document.getElementById( 'box' + snap.key );
-                  let overlayMessage = document.getElementById( 'overlay' + snap.key );
-
-                  boxMessage.removeChild( boxMessage.firstChild );
-                  overlayMessage.removeChild( overlayMessage.firstChild );
-
-                  if ( snap.val()
-                    .nickname ) {
-                    boxMessage.appendChild( document.createTextNode( snap.val()
-                      .nickname + ' : ' + snap.val()
-                      .text ) );
-                    overlayMessage.appendChild( document.createTextNode( snap.val()
-                      .nickname + ' : ' + snap.val()
-                      .text ) );
-                  } else {
-                    if ( snap.val()
-                      .admin ) {
-                      boxMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-                        .text ) );
-                      overlayMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-                        .text ) );
-                    } else {
-                      boxMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text ) );
-                      overlayMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text ) );
-                    }
-                  }
-
-                  updateChatScroll();
-
-                }, function ( error ) {
-                  console.error( "Couldn't load room message.", error );
-                } );
-            } );
-        } );
-      }, function ( error ) {
-        console.error( "Couldn't load room names.", error );
-      } );
-
-  } else {
-
-    firebase.database()
-      .ref( 'rooms' )
-      .once( 'value' )
-      .then( function ( snapRoom ) {
-
-          let promises = [];
-
-          promises.push(
-            firebase.database()
-            .ref( 'messages/lobby' )
-            .off()
-          );
-          // Just to be sure
-          snapRoom.forEach( function ( room ) {
-            promises.push(
-              firebase.database()
-              .ref( 'messages/' + room.key )
-              .off()
-            );
-          } );
-
-          Promise.all( promises )
-            .then( function () {
-
-              if ( !inTutorial && !inUserUpload ) {
-
-                firebase.database()
-                  .ref( 'messages/lobby' )
-                  .on( 'child_added', function ( snap ) {
-
-                    let message = document.createElement( 'div' );
-
-                    if ( snap.val()
-                      .nickname ) {
-                      t = document.createTextNode( snap.val()
-                        .nickname + ' : ' + snap.val()
-                        .text );
-                    } else {
-                      t = document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text );
-                    }
-
-                    message.appendChild( t );
-                    message.classList.add( 'message' );
-
-                    message.id = 'box' + snap.key;
-                    box.appendChild( message );
-                    let clone = message.cloneNode( true )
-                    clone.id = 'overlay' + snap.key;
-                    overlay.appendChild( clone );
-
-                    updateChatScroll();
-                  } );
-
-                firebase.database()
-                  .ref( 'messages/lobby' )
-                  .on( 'child_changed', function ( snap ) {
-
-                    let boxMessage = document.getElementById( 'box' + snap.key );
-                    let overlayMessage = document.getElementById( 'overlay' + snap.key );
-
-                    boxMessage.removeChild( boxMessage.firstChild );
-                    overlayMessage.removeChild( overlayMessage.firstChild );
-
-                    if ( snap.val()
-                      .nickname ) {
-                      boxMessage.appendChild( document.createTextNode( snap.val()
-                        .nickname + ' : ' + snap.val()
-                        .text ) );
-                      overlayMessage.appendChild( document.createTextNode( snap.val()
-                        .nickname + ' : ' + snap.val()
-                        .text ) );
-                    } else {
-                      boxMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text ) );
-                      overlayMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-                        .text ) );
-                    }
-
-                    updateChatScroll();
-                  } );
-              }
-            }, function ( error ) {
-              console.error( "Couldn't load room names.", error );
-            } );
-        },
-        function ( error ) {
-          console.error( "Couldn't load room names.", error );
-        } );
+  if ( !roomName && !inTutorial ) {
+    document.getElementById( 'chatBox' )
+      .style.display = 'none';
+    document.getElementById( 'chatOverlay' )
+      .style.display = 'none';
+    document.getElementById( 'dashedPointer' )
+      .style.display = 'block';
+    return;
   }
+
+  document.getElementById( 'chatBox' )
+    .style.display = 'block';
+
+  if ( !roomName ) {
+    return;
+  }
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .on( 'child_added', function ( snap ) {
+
+      let message = document.createElement( 'div' );
+      message.classList.add( 'message' );
+
+      if ( snap.val()
+        .admin ) {
+        message.classList.add( 'VII' );
+      } else {
+        message.classList.add( 'FLATwhite' );
+      }
+
+      if ( snap.val()
+        .nickname ) {
+        message.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+      } else {
+        if ( snap.val()
+          .admin ) {
+          message.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+        } else {
+          message.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+        }
+      }
+
+      message.id = 'box' + snap.key;
+      box.appendChild( message );
+      let clone = message.cloneNode( true )
+      clone.id = 'overlay' + snap.key;
+      overlay.appendChild( clone );
+
+      updateChatScroll();
+    }, function ( error ) {
+      console.error( "Couldn't load room message.", error );
+    } );
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .on( 'child_changed', function ( snap ) {
+
+      let boxMessage = document.getElementById( 'box' + snap.key );
+      let overlayMessage = document.getElementById( 'overlay' + snap.key );
+
+      boxMessage.removeChild( boxMessage.firstChild );
+      overlayMessage.removeChild( overlayMessage.firstChild );
+
+      if ( snap.val()
+        .nickname ) {
+        boxMessage.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+        overlayMessage.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+      } else {
+        if ( snap.val()
+          .admin ) {
+          boxMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+          overlayMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+        } else {
+          boxMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+          overlayMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+        }
+      }
+
+      updateChatScroll();
+
+    }, function ( error ) {
+      console.error( "Couldn't load room message.", error );
+    } );
 }
 
-// Push a message to the lobby or current room.
+// Push a message to the current room.
 function sendMessage() {
-  if ( !userID || !document.getElementById( 'writeMessage' )
+  if ( !roomName || !userID || !document.getElementById( 'writeMessage' )
     .value ) {
     return;
   }
@@ -2767,23 +2650,13 @@ function sendMessage() {
       .value
   }
 
-  if ( roomName ) {
-    firebase.database()
-      .ref( 'messages/' + roomName )
-      .push( message )
-      .catch( function ( error ) {
-        console.error( "Error: couldn't send message.", error );
-        return;
-      } );
-  } else {
-    firebase.database()
-      .ref( 'messages/lobby' )
-      .push( message )
-      .catch( function ( error ) {
-        console.error( "Error: couldn't send message.", error );
-        return;
-      } );
-  }
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .push( message )
+    .catch( function ( error ) {
+      console.error( "Error: couldn't send message.", error );
+      return;
+    } );
 
   document.getElementById( 'writeMessage' )
     .value = '';
@@ -2870,10 +2743,10 @@ function changeNickname() {
 
   if ( myNickname ) {
     document.getElementById( 'nicknameText' )
-      .innerText = 'You are ' + myNickname + '. Click here to change nickname.';
+      .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
   } else {
     document.getElementById( 'nicknameText' )
-      .innerText = 'You are anonymous. Click here to change nickname.';
+      .innerHTML = 'You are anonymous. Click here to change nickname.';
   }
 }
 

@@ -198,8 +198,7 @@
           "mechanic": "Free",
           "mode": -1,
           "scale": 0,
-          "sequence": 0,
-          "tensionVisible": false
+          "sequence": 0
         },
         "messages": {
           "Step01": {
@@ -2217,8 +2216,7 @@
           "mechanic": "Free",
           "mode": 0,
           "scale": 1,
-          "sequence": 0,
-          "tensionVisible": true
+          "sequence": 0
         },
         "messages": {
           "Step01": {

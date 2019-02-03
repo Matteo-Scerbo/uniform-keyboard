@@ -2,31 +2,30 @@
   "tutorials": {
     "names": {
       "tutorial_name": true
-    }
-  },
-  "data": {
-    "tutorial_name": {
-      "steps": "Number",
-      "keypresses": {
-        "Step01-001": {
-          "code": "String",
-          "timestamp": "Number",
-          "type": "String"
+    },
+    "data": {
+      "tutorial_name": {
+        "steps": "Number",
+        "keypresses": {
+          "Step01-001": {
+            "code": "String",
+            "timestamp": "Number",
+            "type": "String"
+          },
         },
-      },
-      "settings": {
-        "mechanic": "String",
-        "mode": "Number",
-        "scale": "Number",
-        "sequence": "Number",
-        "tensionVisible": "Boolean"
-      },
-      "messages": {
-        "Step01": {
-          "text": "String"
+        "settings": {
+          "mechanic": "String",
+          "mode": "Number",
+          "scale": "Number",
+          "sequence": "Number"
+        },
+        "messages": {
+          "Step01": {
+            "text": "String"
+          }
         }
       }
-    }
+    },
   },
   "uploads": {
     "names": {
@@ -46,8 +45,7 @@
           "mechanic": "String",
           "mode": "Number",
           "scale": "Number",
-          "sequence": "Number",
-          "tensionVisible": "Boolean"
+          "sequence": "Number"
         }
       }
     }
@@ -78,8 +76,7 @@
       "mechanic": "String",
       "mode": "Number",
       "scale": "Number",
-      "sequence": "Number",
-      "tensionVisible": "Boolean"
+      "sequence": "Number"
     }
   },
   "keypresses": {

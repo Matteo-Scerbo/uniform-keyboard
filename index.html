@@ -24,400 +24,420 @@
     </script>
 </head>
 
-<body>
+<body class="FLATblack" onresize="renderSlider()">
 
-  <form id="settingsBox">
-
-    <span>
-      <a href="https://github.com/Matteo-Scerbo/uniform-keyboard">GitHub Repository</a>
+  <form id="scaleBox" class="FLATblack">
+    <span id="scaleSlider">
+      <span id="scaleSliderCursor" class="white key">
+        <div id="scaleSliderCursorMode" class="mode I"></div>
+        <div id="dashedPointer" class="I"></div>
+      </span>
+      <p id="scaleSliderLabel"></p>
+      <p id="scaleSliderLabelInfo"></p>
+      <input id="scaleSliderRange" type="range" value="0" min="0" max="12" oninput="changeScale(this.value)">
     </span>
-
-    <span style="text-align: center">
-      <p id="scaleLabel">Scale: none</p>
-      <input id="scaleSlider" type="range" min="0" max="12" value="0" class="slider" oninput="changeScale(this.value)"></input>
-    </span>
-
-    <span id="mechanicCheckBoxes" style="text-align: center">
-      <p>Chord sequence:</p>
-      <input type="radio" name="mode" onchange="changeModeMechanic(this.value)" value="None" checked>None</input>
-      <input type="radio" name="mode" onchange="changeModeMechanic(this.value)" value="Free">Free</input>
-      <input type="radio" name="mode" onchange="changeModeMechanic(this.value)" value="Template">Template</input>
-    </span>
-
-    <span>
-      <input type="checkbox" name="play" onchange="playChordSelected = this.checked;">Play chords out loud</input>
-      <br>
-      <input id="tensionCheckBox" type="checkbox" name="tension" onchange="toggleTensionBox();">Display harmonic tension</input>
-      <br>
-      <input type="checkbox" name="chat" onchange="toggleOnlineBox();" checked>Show online features</input>
-    </span>
-
   </form>
 
-  <div id="page">
-    <div id="menuIcon" class="menuIcon" onclick="skewPage();">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <div class="settingsLabel" onclick="skewPage();">
-      Settings
+  <form id="scaleSettingsBox" class="FLATblack">
+    <input type="checkbox" name="mode" id="sb1" value="eng" onchange="showNoteLabels(this.value, this.checked)" checked />
+    <label for="sb1">English notes</label>
+    <br>
+    <input type="checkbox" name="mode" id="sb2" value="ita" onchange="showNoteLabels(this.value, this.checked)" />
+    <label for="sb2">Italian notes</label>
+  </form>
+
+  <div id="keyboardBox" class="FLATwhite">
+
+    <div id="chatOverlay" class="overlay">
+      <div id="chatOverlayMessages">
+        <!-- <p id="loadChatText" class="FLATwhite">Load older messages</p> -->
+      </div>
+      <div id="chatOverlayInput">
+        <input type="textbox" id="writeMessage" onblur="this.focus();"></input>
+        <button class="I" onclick="sendMessage();">Send</button>
+        <button class="V" onclick="toggleChatOverlay();">Close chat</button>
+        <p id="nicknameText" class="FLATwhite" onclick="changeNickname();">You are anonymous. Click here to change nickname.</p>
+      </div>
     </div>
 
-    <div id="keyboardBox">
+    <div data-id="0" data-code="Digit1" class="white key">
+      <div class="character label">1</div>
+      <div class="ITAnote label">La</div>
+      <div class="ENGnote label">A</div>
+      <div class="mode VI"></div>
+    </div>
+    <div data-id="2" data-code="Digit2" class="white key">
+      <div class="character label">2</div>
+      <div class="ITAnote label">Si</div>
+      <div class="ENGnote label">B</div>
+      <div class="mode VII"></div>
+    </div>
+    <div data-id="4" data-code="Digit3" class="black key">
+      <div class="character label">3</div>
+      <div class="ITAnote label">Do<small>#</small></div>
+      <div class="ENGnote label">C<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="6" data-code="Digit4" class="black key">
+      <div class="character label">4</div>
+      <div class="ITAnote label">Re<small>#</small></div>
+      <div class="ENGnote label">D<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="8" data-code="Digit5" class="white key">
+      <div class="character label">5</div>
+      <div class="ITAnote label">Fa</div>
+      <div class="ENGnote label">F</div>
+      <div class="mode IV"></div>
+    </div>
+    <div data-id="10" data-code="Digit6" class="white key">
+      <div class="character label">6</div>
+      <div class="ITAnote label">Sol</div>
+      <div class="ENGnote label">G</div>
+      <div class="mode V"></div>
+    </div>
+    <div data-id="12" data-code="Digit7" class="white key">
+      <div class="character label">7</div>
+      <div class="ITAnote label">La</div>
+      <div class="ENGnote label">A</div>
+      <div class="mode VI"></div>
+    </div>
+    <div data-id="14" data-code="Digit8" class="white key">
+      <div class="character label">8</div>
+      <div class="ITAnote label">Si</div>
+      <div class="ENGnote label">B</div>
+      <div class="mode VII"></div>
+    </div>
+    <div data-id="16" data-code="Digit9" class="black key">
+      <div class="character label">9</div>
+      <div class="ITAnote label">Do<small>#</small></div>
+      <div class="ENGnote label">C<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="18" data-code="Digit0" class="black key">
+      <div class="character label">0</div>
+      <div class="ITAnote label">Re<small>#</small></div>
+      <div class="ENGnote label">D<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="20" data-code="Minus" class="white key">
+      <div class="ITAnote label">Fa</div>
+      <div class="ENGnote label">F</div>
+      <div class="mode IV"></div>
+    </div>
+    <div data-id="22" data-code="Equal" class="white key">
+      <div class="ITAnote label">Sol</div>
+      <div class="ENGnote label">G</div>
+      <div class="mode V"></div>
+    </div>
 
-      <div id="chatOverlay" class="overlay">
-        <div id="chatOverlayMessages">
-          <!-- <p id="loadChatText">Load older messages</p> -->
+    </br>
+    <div style="width:25px; display:inline-block"></div>
+
+    <div data-id="1" data-code="KeyQ" class="black key">
+      <div class="character label">q</div>
+      <div class="ITAnote label">La<small>#</small></div>
+      <div class="ENGnote label">A<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="3" data-code="KeyW" class="white key">
+      <div class="character label">w</div>
+      <div class="ITAnote label">Do</div>
+      <div class="ENGnote label">C</div>
+      <div class="mode I"></div>
+    </div>
+    <div data-id="5" data-code="KeyE" class="white key">
+      <div class="character label">e</div>
+      <div class="ITAnote label">Re</div>
+      <div class="ENGnote label">D</div>
+      <div class="mode II"></div>
+    </div>
+    <div data-id="7" data-code="KeyR" class="white key">
+      <div class="character label">r</div>
+      <div class="ITAnote label">Mi</div>
+      <div class="ENGnote label">E</div>
+      <div class="mode III"></div>
+    </div>
+    <div data-id="9" data-code="KeyT" class="black key">
+      <div class="character label">t</div>
+      <div class="ITAnote label">Fa<small>#</small></div>
+      <div class="ENGnote label">F<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="11" data-code="KeyY" class="black key">
+      <div class="character label">y</div>
+      <div class="ITAnote label">Sol<small>#</small></div>
+      <div class="ENGnote label">G<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="13" data-code="KeyU" class="black key">
+      <div class="character label">u</div>
+      <div class="ITAnote label">La<small>#</small></div>
+      <div class="ENGnote label">A<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="15" data-code="KeyI" class="white key">
+      <div class="character label">i</div>
+      <div class="ITAnote label">Do</div>
+      <div class="ENGnote label">C</div>
+      <div class="mode I"></div>
+    </div>
+    <div data-id="17" data-code="KeyO" class="white key">
+      <div class="character label">o</div>
+      <div class="ITAnote label">Re</div>
+      <div class="ENGnote label">D</div>
+      <div class="mode II"></div>
+    </div>
+    <div data-id="19" data-code="KeyP" class="white key">
+      <div class="character label">p</div>
+      <div class="ITAnote label">Mi</div>
+      <div class="ENGnote label">E</div>
+      <div class="mode III"></div>
+    </div>
+    <div data-id="21" data-code="BracketLeft" class="black key">
+      <div class="ITAnote label">Fa<small>#</small></div>
+      <div class="ENGnote label">F<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="23" data-code="BracketRight" class="black key">
+      <div class="ITAnote label">Sol<small>#</small></div>
+      <div class="ENGnote label">G<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+
+    </br>
+    <div style="width:40px; display:inline-block"></div>
+
+    <div data-id="2" data-code="KeyA" class="white key">
+      <div class="character label">a</div>
+      <div class="ITAnote label">Si</div>
+      <div class="ENGnote label">B</div>
+      <div class="mode VII"></div>
+    </div>
+    <div data-id="4" data-code="KeyS" class="black key">
+      <div class="character label">s</div>
+      <div class="ITAnote label">Do<small>#</small></div>
+      <div class="ENGnote label">C<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="6" data-code="KeyD" class="black key">
+      <div class="character label">d</div>
+      <div class="ITAnote label">Re<small>#</small></div>
+      <div class="ENGnote label">D<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="8" data-code="KeyF" class="white key">
+      <div class="character label">f</div>
+      <div class="ITAnote label">Fa</div>
+      <div class="ENGnote label">F</div>
+      <div class="mode IV"></div>
+    </div>
+    <div data-id="10" data-code="KeyG" class="white key">
+      <div class="character label">g</div>
+      <div class="ITAnote label">Sol</div>
+      <div class="ENGnote label">G</div>
+      <div class="mode V"></div>
+    </div>
+    <div data-id="12" data-code="KeyH" class="white key">
+      <div class="character label">h</div>
+      <div class="ITAnote label">La</div>
+      <div class="ENGnote label">A</div>
+      <div class="mode VI"></div>
+    </div>
+    <div data-id="14" data-code="KeyJ" class="white key">
+      <div class="character label">j</div>
+      <div class="ITAnote label">Si</div>
+      <div class="ENGnote label">B</div>
+      <div class="mode VII"></div>
+    </div>
+    <div data-id="16" data-code="KeyK" class="black key">
+      <div class="character label">k</div>
+      <div class="ITAnote label">Do<small>#</small></div>
+      <div class="ENGnote label">C<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="18" data-code="KeyL" class="black key">
+      <div class="character label">l</div>
+      <div class="ITAnote label">Re<small>#</small></div>
+      <div class="ENGnote label">D<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="20" data-code="Semicolon" class="white key">
+      <div class="ITAnote label">Fa</div>
+      <div class="ENGnote label">F</div>
+      <div class="mode IV"></div>
+    </div>
+    <div data-id="22" data-code="Quote" class="white key">
+      <div class="ITAnote label">Sol</div>
+      <div class="ENGnote label">G</div>
+      <div class="mode V"></div>
+    </div>
+    <div data-id="24" data-code="Backslash" class="white key">
+      <div class="ITAnote label">La</div>
+      <div class="ENGnote label">A</div>
+      <div class="mode VI"></div>
+    </div>
+
+    </br>
+    <div style="width:70px; display:inline-block"></div>
+
+    <div data-id="3" data-code="KeyZ" class="white key">
+      <div class="character label">z</div>
+      <div class="ITAnote label">Do</div>
+      <div class="ENGnote label">C</div>
+      <div class="mode I"></div>
+    </div>
+    <div data-id="5" data-code="KeyX" class="white key">
+      <div class="character label">x</div>
+      <div class="ITAnote label">Re</div>
+      <div class="ENGnote label">D</div>
+      <div class="mode II"></div>
+    </div>
+    <div data-id="7" data-code="KeyC" class="white key">
+      <div class="character label">c</div>
+      <div class="ITAnote label">Mi</div>
+      <div class="ENGnote label">E</div>
+      <div class="mode III"></div>
+    </div>
+    <div data-id="9" data-code="KeyV" class="black key">
+      <div class="character label">v</div>
+      <div class="ITAnote label">Fa<small>#</small></div>
+      <div class="ENGnote label">F<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="11" data-code="KeyB" class="black key">
+      <div class="character label">b</div>
+      <div class="ITAnote label">Sol<small>#</small></div>
+      <div class="ENGnote label">G<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="13" data-code="KeyN" class="black key">
+      <div class="character label">n</div>
+      <div class="ITAnote label">La<small>#</small></div>
+      <div class="ENGnote label">A<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+    <div data-id="15" data-code="KeyM" class="white key">
+      <div class="character label">m</div>
+      <div class="ITAnote label">Do</div>
+      <div class="ENGnote label">C</div>
+      <div class="mode I"></div>
+    </div>
+    <div data-id="17" data-code="Comma" class="white key">
+      <div class="ITAnote label">Re</div>
+      <div class="ENGnote label">D</div>
+      <div class="mode II"></div>
+    </div>
+    <div data-id="19" data-code="Period" class="white key">
+      <div class="ITAnote label">Mi</div>
+      <div class="ENGnote label">E</div>
+      <div class="mode III"></div>
+    </div>
+    <div data-id="21" data-code="Slash" class="black key">
+      <div class="ITAnote label">Fa<small>#</small></div>
+      <div class="ENGnote label">F<small>#</small></div>
+      <div class="mode"></div>
+    </div>
+  </div>
+
+  <div id="modalBox">
+    <form id="mechanicSettingsBox" class="FLATblack">
+      <p>Mode selection:</p>
+      <input type="radio" name="mode" id="rb1" value="None" onchange="changeModeMechanic(this.value)" checked />
+      <label for="rb1">None</label>
+      <br>
+      <input type="radio" name="mode" id="rb2" value="Free" onchange="changeModeMechanic(this.value)" />
+      <label for="rb2">Free</label>
+      <br>
+      <input type="radio" name="mode" id="rb3" value="Progression" onchange="changeModeMechanic(this.value)" />
+      <label for="rb3">Progression</label>
+    </form>
+
+    <form id="playChordSettingsBox" class="FLATblack">
+      <input type="checkbox" name="play" id="cb1" onchange="playChordSelected = this.checked;" />
+      <label for="cb1">Play selected chord</label>
+    </form>
+
+    <div id="sequenceBox"></div>
+  </div>
+
+  <div id="accordion">
+    <details class="accordionElement FLATwhite">
+      <summary class="accordionBanner FLATblack">
+        <span class="accordionTitle">Harmonic tension</span>
+      </summary>
+      <div id="tensionBox">
+        <div class="indicator">
+          <svg class="I" id="tensionSVG" width="125px" height="100px">
+            <polyline id="tensionBack" class="back" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
+            <polyline id="tensionFront" class="front" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
+          </svg>
         </div>
-        <div id="chatOverlayInput">
-          <input type="textbox" id="writeMessage" onblur="this.focus();"></input>
-          <button class="create" onclick="sendMessage();">Send</button>
-          <button class="leave" onclick="toggleChatOverlay();">Close chat</button>
-          <p id="nicknameText" onclick="changeNickname();">You are anonymous. Click here to change nickname.</p>
+        <div class="indicator">
+          <svg class="III" id="feelingSVG" width="275px" height="100px">
+            <g>
+              <polyline id="feeling" class="standalone" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 270 50"></polyline>
+              <text id="feelingText" x="10" y="60"></text>
+            </g>
+          </svg>
         </div>
       </div>
+    </details>
+    <details class="accordionElement FLATwhite">
+      <summary class="accordionBanner FLATblack">
+        <span class="accordionTitle">Online features</span>
+      </summary>
+      <div id="onlineBox">
 
-      <div data-id="0" data-code="Digit1" class="white key">
-        <div class="character label">1</div>
-        <div class="ITAnote label">La</div>
-        <div class="ENGnote label">A</div>
-        <div class="mode VI"></div>
-      </div>
-      <div data-id="2" data-code="Digit2" class="white key">
-        <div class="character label">2</div>
-        <div class="ITAnote label">Si</div>
-        <div class="ENGnote label">B</div>
-        <div class="mode VII"></div>
-      </div>
-      <div data-id="4" data-code="Digit3" class="black key">
-        <div class="character label">3</div>
-        <div class="ITAnote label">Do<small>#</small></div>
-        <div class="ENGnote label">C<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="6" data-code="Digit4" class="black key">
-        <div class="character label">4</div>
-        <div class="ITAnote label">Re<small>#</small></div>
-        <div class="ENGnote label">D<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="8" data-code="Digit5" class="white key">
-        <div class="character label">5</div>
-        <div class="ITAnote label">Fa</div>
-        <div class="ENGnote label">F</div>
-        <div class="mode IV"></div>
-      </div>
-      <div data-id="10" data-code="Digit6" class="white key">
-        <div class="character label">6</div>
-        <div class="ITAnote label">Sol</div>
-        <div class="ENGnote label">G</div>
-        <div class="mode V"></div>
-      </div>
-      <div data-id="12" data-code="Digit7" class="white key">
-        <div class="character label">7</div>
-        <div class="ITAnote label">La</div>
-        <div class="ENGnote label">A</div>
-        <div class="mode VI"></div>
-      </div>
-      <div data-id="14" data-code="Digit8" class="white key">
-        <div class="character label">8</div>
-        <div class="ITAnote label">Si</div>
-        <div class="ENGnote label">B</div>
-        <div class="mode VII"></div>
-      </div>
-      <div data-id="16" data-code="Digit9" class="black key">
-        <div class="character label">9</div>
-        <div class="ITAnote label">Do<small>#</small></div>
-        <div class="ENGnote label">C<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="18" data-code="Digit0" class="black key">
-        <div class="character label">0</div>
-        <div class="ITAnote label">Re<small>#</small></div>
-        <div class="ENGnote label">D<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="20" data-code="Minus" class="white key">
-        <div class="ITAnote label">Fa</div>
-        <div class="ENGnote label">F</div>
-        <div class="mode IV"></div>
-      </div>
-      <div data-id="22" data-code="Equal" class="white key">
-        <div class="ITAnote label">Sol</div>
-        <div class="ENGnote label">G</div>
-        <div class="mode V"></div>
-      </div>
-
-      </br>
-      <div style="width:25px; display:inline-block"></div>
-
-      <div data-id="1" data-code="KeyQ" class="black key">
-        <div class="character label">q</div>
-        <div class="ITAnote label">La<small>#</small></div>
-        <div class="ENGnote label">A<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="3" data-code="KeyW" class="white key">
-        <div class="character label">w</div>
-        <div class="ITAnote label">Do</div>
-        <div class="ENGnote label">C</div>
-        <div class="mode I"></div>
-      </div>
-      <div data-id="5" data-code="KeyE" class="white key">
-        <div class="character label">e</div>
-        <div class="ITAnote label">Re</div>
-        <div class="ENGnote label">D</div>
-        <div class="mode II"></div>
-      </div>
-      <div data-id="7" data-code="KeyR" class="white key">
-        <div class="character label">r</div>
-        <div class="ITAnote label">Mi</div>
-        <div class="ENGnote label">E</div>
-        <div class="mode III"></div>
-      </div>
-      <div data-id="9" data-code="KeyT" class="black key">
-        <div class="character label">t</div>
-        <div class="ITAnote label">Fa<small>#</small></div>
-        <div class="ENGnote label">F<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="11" data-code="KeyY" class="black key">
-        <div class="character label">y</div>
-        <div class="ITAnote label">Sol<small>#</small></div>
-        <div class="ENGnote label">G<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="13" data-code="KeyU" class="black key">
-        <div class="character label">u</div>
-        <div class="ITAnote label">La<small>#</small></div>
-        <div class="ENGnote label">A<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="15" data-code="KeyI" class="white key">
-        <div class="character label">i</div>
-        <div class="ITAnote label">Do</div>
-        <div class="ENGnote label">C</div>
-        <div class="mode I"></div>
-      </div>
-      <div data-id="17" data-code="KeyO" class="white key">
-        <div class="character label">o</div>
-        <div class="ITAnote label">Re</div>
-        <div class="ENGnote label">D</div>
-        <div class="mode II"></div>
-      </div>
-      <div data-id="19" data-code="KeyP" class="white key">
-        <div class="character label">p</div>
-        <div class="ITAnote label">Mi</div>
-        <div class="ENGnote label">E</div>
-        <div class="mode III"></div>
-      </div>
-      <div data-id="21" data-code="BracketLeft" class="black key">
-        <div class="ITAnote label">Fa<small>#</small></div>
-        <div class="ENGnote label">F<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="23" data-code="BracketRight" class="black key">
-        <div class="ITAnote label">Sol<small>#</small></div>
-        <div class="ENGnote label">G<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-
-      </br>
-      <div style="width:40px; display:inline-block"></div>
-
-      <div data-id="2" data-code="KeyA" class="white key">
-        <div class="character label">a</div>
-        <div class="ITAnote label">Si</div>
-        <div class="ENGnote label">B</div>
-        <div class="mode VII"></div>
-      </div>
-      <div data-id="4" data-code="KeyS" class="black key">
-        <div class="character label">s</div>
-        <div class="ITAnote label">Do<small>#</small></div>
-        <div class="ENGnote label">C<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="6" data-code="KeyD" class="black key">
-        <div class="character label">d</div>
-        <div class="ITAnote label">Re<small>#</small></div>
-        <div class="ENGnote label">D<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="8" data-code="KeyF" class="white key">
-        <div class="character label">f</div>
-        <div class="ITAnote label">Fa</div>
-        <div class="ENGnote label">F</div>
-        <div class="mode IV"></div>
-      </div>
-      <div data-id="10" data-code="KeyG" class="white key">
-        <div class="character label">g</div>
-        <div class="ITAnote label">Sol</div>
-        <div class="ENGnote label">G</div>
-        <div class="mode V"></div>
-      </div>
-      <div data-id="12" data-code="KeyH" class="white key">
-        <div class="character label">h</div>
-        <div class="ITAnote label">La</div>
-        <div class="ENGnote label">A</div>
-        <div class="mode VI"></div>
-      </div>
-      <div data-id="14" data-code="KeyJ" class="white key">
-        <div class="character label">j</div>
-        <div class="ITAnote label">Si</div>
-        <div class="ENGnote label">B</div>
-        <div class="mode VII"></div>
-      </div>
-      <div data-id="16" data-code="KeyK" class="black key">
-        <div class="character label">k</div>
-        <div class="ITAnote label">Do<small>#</small></div>
-        <div class="ENGnote label">C<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="18" data-code="KeyL" class="black key">
-        <div class="character label">l</div>
-        <div class="ITAnote label">Re<small>#</small></div>
-        <div class="ENGnote label">D<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="20" data-code="Semicolon" class="white key">
-        <div class="ITAnote label">Fa</div>
-        <div class="ENGnote label">F</div>
-        <div class="mode IV"></div>
-      </div>
-      <div data-id="22" data-code="Quote" class="white key">
-        <div class="ITAnote label">Sol</div>
-        <div class="ENGnote label">G</div>
-        <div class="mode V"></div>
-      </div>
-      <div data-id="24" data-code="Backslash" class="white key">
-        <div class="ITAnote label">La</div>
-        <div class="ENGnote label">A</div>
-        <div class="mode VI"></div>
-      </div>
-
-      </br>
-      <div style="width:70px; display:inline-block"></div>
-
-      <div data-id="3" data-code="KeyZ" class="white key">
-        <div class="character label">z</div>
-        <div class="ITAnote label">Do</div>
-        <div class="ENGnote label">C</div>
-        <div class="mode I"></div>
-      </div>
-      <div data-id="5" data-code="KeyX" class="white key">
-        <div class="character label">x</div>
-        <div class="ITAnote label">Re</div>
-        <div class="ENGnote label">D</div>
-        <div class="mode II"></div>
-      </div>
-      <div data-id="7" data-code="KeyC" class="white key">
-        <div class="character label">c</div>
-        <div class="ITAnote label">Mi</div>
-        <div class="ENGnote label">E</div>
-        <div class="mode III"></div>
-      </div>
-      <div data-id="9" data-code="KeyV" class="black key">
-        <div class="character label">v</div>
-        <div class="ITAnote label">Fa<small>#</small></div>
-        <div class="ENGnote label">F<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="11" data-code="KeyB" class="black key">
-        <div class="character label">b</div>
-        <div class="ITAnote label">Sol<small>#</small></div>
-        <div class="ENGnote label">G<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="13" data-code="KeyN" class="black key">
-        <div class="character label">n</div>
-        <div class="ITAnote label">La<small>#</small></div>
-        <div class="ENGnote label">A<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-      <div data-id="15" data-code="KeyM" class="white key">
-        <div class="character label">m</div>
-        <div class="ITAnote label">Do</div>
-        <div class="ENGnote label">C</div>
-        <div class="mode I"></div>
-      </div>
-      <div data-id="17" data-code="Comma" class="white key">
-        <div class="ITAnote label">Re</div>
-        <div class="ENGnote label">D</div>
-        <div class="mode II"></div>
-      </div>
-      <div data-id="19" data-code="Period" class="white key">
-        <div class="ITAnote label">Mi</div>
-        <div class="ENGnote label">E</div>
-        <div class="mode III"></div>
-      </div>
-      <div data-id="21" data-code="Slash" class="black key">
-        <div class="ITAnote label">Fa<small>#</small></div>
-        <div class="ENGnote label">F<small>#</small></div>
-        <div class="mode"></div>
-      </div>
-    </div>
-
-    <div id="sequenceBox">
-    </div>
-
-    <div id="tensionBox">
-      <div class="indicator">
-        <svg class="I" id="tensionSVG" width="125px" height="100px">
-          <polyline id="tensionBack" class="back" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
-          <polyline id="tensionFront" class="front" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
-        </svg>
-      </div>
-      <div class="indicator">
-        <svg class="III" id="feelingSVG" width="275px" height="100px">
-          <g>
-            <polyline id="feeling" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 270 50"></polyline>
-            <text id="feelingText" x="10" y="60"></text>
-          </g>
-        </svg>
-      </div>
-    </div>
-
-    <div id="recordBox">
-      <button id="recordButton" class="create" onclick="toggleRecording();">Start recording</button>
-      <button class="" onclick="replayRecording();">Replay</button>
-      <button class="" onclick="uploadRecording();">Upload</button>
-    </div>
-
-    <div id="onlineBox">
-
-      <div id="authOverlay" class="overlay">
-        <div id="authOverlayText" class="overlayText">
-          Authentication failed.
+        <div id="authOverlay" class="overlay">
+          <div id="authOverlayText" class="overlayText FLATwhite">
+            Authentication failed.
+          </div>
+          <button class="I" onclick="logIn()">Retry</button>
         </div>
-        <button class="create" onclick="logIn()">Retry</button>
-      </div>
 
-      <div id="offlineOverlay" class="overlay">
-        <div id="offlineOverlayText" class="overlayText">
-          Connecting to server...
-        </div>
-      </div>
-
-      <div id="chatBox">
-        <div id="chatBoxFadeOutContainer">
-          <div id="chatBoxFadeOut">
-            <p id="viewChatText">Open full chat</p>
+        <div id="offlineOverlay" class="overlay">
+          <div id="offlineOverlayText" class="overlayText FLATwhite">
+            Connecting to server...
           </div>
         </div>
-        <br>
-        <br>
-        <div id="chatBoxMessages">
+
+        <div id="chatBox">
+          <div id="chatBoxFadeOutContainer">
+            <div id="chatBoxFadeOut">
+              <p id="viewChatText">Open full chat</p>
+            </div>
+          </div>
+          <br>
+          <br>
+          <div id="chatBoxMessages">
+          </div>
         </div>
+
+        <div id="roomsBox">
+          <button class="I" onclick="createRoom()">Create room</button>
+        </div>
+
       </div>
-
-      <div id="roomsBox">
-        <button class="create" onclick="createRoom()">Create room</button>
+    </details>
+    <details class="accordionElement FLATwhite">
+      <summary class="accordionBanner FLATblack">
+        <span class="accordionTitle">Recording</span>
+      </summary>
+      <div id="recordBox">
+        <button id="recordButton" class="V" onclick="toggleRecording();">Start recording</button>
+        <button class="VI" onclick="replayRecording();">Replay</button>
+        <button class="III" onclick="uploadRecording();">Upload</button>
       </div>
-
-    </div>
-
+    </details>
   </div>
+
+  <br>
+  <br>
+
+  <span style="position: fixed; left: 50%; margin-left: -65px; bottom: 10px; z-index: -5;">
+    <a href="https://github.com/Matteo-Scerbo/uniform-keyboard">GitHub Repository</a>
+  </span>
 
   <script src="./JS/Uniform.js"></script>
 
