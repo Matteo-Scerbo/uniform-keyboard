@@ -87,7 +87,7 @@ var userID = null;
 // null unless in a room.
 var roomName = null;
 // null if anonymous.
-var myNickname = null;
+var myDisplayName = null;
 // Set when in a room of one's own creation.
 var iAmAdmin = false;
 // Time of the last local keypress.
@@ -101,7 +101,7 @@ var scheduledEvent = null;
 var justEnteredRoom = false;
 // The chat overlay blocks the keyboard,
 // and displays all messages as well as the option
-// to send a message or change nickname.
+// to send a message or change displayName.
 var chatOverlayIsVisible = false;
 
 
@@ -117,6 +117,9 @@ var tutorialMessages = [];
 var tutorialStep = 0;
 // Total steps of the tutorial.
 var tutorialStepsCount = 0;
+// This can adjust the reproduction speed of tutorials or user uploads.
+// N.B. 0.5 means half speed, 2 means double speed.
+var playBackSpeed = 1;
 
 
 // These are for recording.
@@ -168,9 +171,6 @@ compressorSetUp();
 
 // Add buttons for tutorials and rooms.
 updateRoomBox();
-
-// Tune in on the lobby chat.
-updateChatListener();
 
 // Authentication is required for online features.
 logIn();
@@ -424,7 +424,7 @@ function handleNextRemoteEvent() {
   remoteEvents.shift();
 
   if ( remoteEvents[ 0 ] ) {
-    scheduledEvent = setTimeout( handleNextRemoteEvent, remoteEvents[ 0 ].timestamp );
+    scheduledEvent = setTimeout( handleNextRemoteEvent, remoteEvents[ 0 ].timestamp / playBackSpeed );
   } else {
     scheduledEvent = null;
   }
@@ -480,7 +480,7 @@ firebase.database()
       }
     }
   }, function ( error ) {
-    console.error( "Error: couldn't determine connection.", error );
+    console.error( "Couldn't determine connection.", error );
     document.getElementById( 'onlineOverlay' )
       .style.display = 'block';
     document.getElementById( 'onlineOverlayText' )
@@ -508,7 +508,7 @@ function logIn() {
   firebase.auth()
     .signInAnonymously()
     .catch( function ( error ) {
-      console.error( "Error: couldn't sign in.", error );
+      console.error( "Couldn't sign in.", error );
     } );
   if ( !userID ) {
     document.getElementById( 'onlineOverlay' )
@@ -523,40 +523,31 @@ function logIn() {
   }
 }
 
-// Upon authentication, set the userID var and retrieve nickname from DB.
+// Upon authentication, set the userID var and retrieve displayName from DB.
 firebase.auth()
   .onAuthStateChanged( function ( user ) {
     if ( user ) {
       userID = user.uid;
 
       firebase.database()
-        .ref( 'users/' + userID + '/nickname' )
+        .ref( 'users/' + userID + '/displayName' )
         .once( 'value' )
         .then( function ( snap ) {
-          myNickname = snap.val();
+          myDisplayName = snap.val();
 
-          if ( myNickname ) {
-            document.getElementById( 'nicknameText' )
-              .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
+          if ( myDisplayName ) {
+            document.getElementById( 'displayNameText' )
+              .innerHTML = 'You are ' + myDisplayName + '. Click here to change displayName.';
           } else {
-            document.getElementById( 'nicknameText' )
-              .innerHTML = 'You are anonymous. Click here to change nickname.';
+            document.getElementById( 'displayNameText' )
+              .innerHTML = 'You are anonymous. Click here to change displayName.';
           }
         }, function ( error ) {
-          console.error( "Error: couldn't find nickname.", error );
-          document.getElementById( 'nicknameText' )
-            .innerHTML = 'You are anonymous. Click here to change nickname.';
+          console.error( "Couldn't find displayName.", error );
+          document.getElementById( 'displayNameText' )
+            .innerHTML = 'You are anonymous. Click here to change displayName.';
         } );
 
-      firebase.database()
-        .ref( 'users/' + userID )
-        .update( {
-          room: 'lobby'
-        } )
-        .catch( function ( error ) {
-          console.error( "Error: couldn't update room.", error );
-          return;
-        } );
     } else {
       userID = null;
     }
@@ -1597,9 +1588,9 @@ function updateChatListener() {
       }
 
       if ( snap.val()
-        .nickname ) {
+        .displayName ) {
         message.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
+          .displayName + ' : ' + snap.val()
           .text ) );
       } else {
         if ( snap.val()
@@ -1620,7 +1611,10 @@ function updateChatListener() {
 
       updateChatScroll();
 
-      giveSnack( 'New message in the chat!', 'VII' );
+      if ( snap.val()
+        .user != userID ) {
+        giveSnack( 'New message in the chat!', 'VII' );
+      }
     }, function ( error ) {
       console.error( "Couldn't load room message.", error );
     } );
@@ -1636,12 +1630,12 @@ function updateChatListener() {
       overlayMessage.removeChild( overlayMessage.firstChild );
 
       if ( snap.val()
-        .nickname ) {
+        .displayName ) {
         boxMessage.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
+          .displayName + ' : ' + snap.val()
           .text ) );
         overlayMessage.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
+          .displayName + ' : ' + snap.val()
           .text ) );
       } else {
         if ( snap.val()
@@ -1674,7 +1668,7 @@ function sendMessage() {
 
   let message = {
     user: userID,
-    nickname: myNickname,
+    displayName: myDisplayName,
     admin: iAmAdmin,
     text: document.getElementById( 'writeMessage' )
       .value
@@ -1684,7 +1678,7 @@ function sendMessage() {
     .ref( 'messages/' + roomName )
     .push( message )
     .catch( function ( error ) {
-      console.error( "Error: couldn't send message.", error );
+      console.error( "Couldn't send message.", error );
       return;
     } );
 
@@ -1701,38 +1695,18 @@ function updateChatScroll() {
   element.scrollTop = element.scrollHeight;
 }
 
-// Update all messages sent with the chosen nickname.
-function changeNickname() {
-  myNickname = prompt( 'Enter your new nickname.' );
+// Update all messages sent with the chosen displayName.
+function changeDisplayName() {
+  myDisplayName = prompt( 'Enter your new displayName.' );
 
   firebase.database()
     .ref( 'users/' + userID )
     .update( {
-      nickname: myNickname
+      displayName: myDisplayName
     } )
     .catch( function ( error ) {
-      console.error( "Error: couldn't update nickname.", error );
+      console.error( "Couldn't update displayName.", error );
     } )
-
-  firebase.database()
-    .ref( 'messages/lobby' )
-    .orderByChild( 'user' )
-    .equalTo( userID )
-    .once( 'value' )
-    .then( function ( snap ) {
-      snap.forEach( function ( data ) {
-        firebase.database()
-          .ref( 'messages/lobby/' + data.key )
-          .update( {
-            nickname: myNickname
-          } )
-          .then( function () {
-            updateChatListener();
-          }, function ( error ) {
-            console.error( "Error: couldn't update nickname.", error );
-          } );
-      } );
-    } );
 
   firebase.database()
     .ref( 'rooms' )
@@ -1753,30 +1727,30 @@ function changeNickname() {
               firebase.database()
                 .ref( 'messages/' + roomName + '/' + message.key )
                 .update( {
-                  nickname: myNickname
+                  displayName: myDisplayName
                 } )
                 .then( function () {
 
                   updateChatListener();
 
                 }, function ( error ) {
-                  console.error( "Error: couldn't update nickname.", error );
+                  console.error( "Couldn't update displayName.", error );
                 } );
             } );
           }, function ( error ) {
-            console.error( "Error: couldn't update nickname.", error );
+            console.error( "Couldn't update displayName.", error );
           } );
       } );
     }, function ( error ) {
-      console.error( "Error: couldn't update nickname.", error );
+      console.error( "Couldn't update displayName.", error );
     } );
 
-  if ( myNickname ) {
-    document.getElementById( 'nicknameText' )
-      .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
+  if ( myDisplayName ) {
+    document.getElementById( 'displayNameText' )
+      .innerHTML = 'You are ' + myDisplayName + '. Click here to change displayName.';
   } else {
-    document.getElementById( 'nicknameText' )
-      .innerHTML = 'You are anonymous. Click here to change nickname.';
+    document.getElementById( 'displayNameText' )
+      .innerHTML = 'You are anonymous. Click here to change displayName.';
   }
 }
 
@@ -1811,6 +1785,7 @@ function createRoom() {
   if ( roomName || !userID ) {
     return;
   }
+
   roomName = prompt( 'Enter the room name' );
   if ( !roomName ) {
     return;
@@ -1825,17 +1800,10 @@ function createRoom() {
 
         promises.push(
           firebase.database()
-          .ref( 'users/' + userID )
-          .update( {
-            room: roomName
-          } )
-        );
-        promises.push(
-          firebase.database()
           .ref( 'messages/' + roomName )
           .push( {
             admin: true,
-            nickname: myNickname,
+            displayName: myDisplayName,
             user: userID,
             text: 'Created the room.'
           } )
@@ -1880,14 +1848,6 @@ function createRoom() {
                 .onDisconnect()
                 .remove()
               );
-              morePromises.push(
-                firebase.database()
-                .ref( 'users/' + userID )
-                .onDisconnect()
-                .update( {
-                  room: 'lobby'
-                } )
-              );
 
               Promise.all( morePromises )
                 .then( function () {
@@ -1908,13 +1868,21 @@ function createRoom() {
                   box.appendChild( document.createElement( 'br' ) );
                   box.appendChild( leaveButton );
 
+                  if ( myDisplayName ) {
+                    document.getElementById( 'displayNameText' )
+                      .innerHTML = 'You are ' + myDisplayName + '. Click here to change displayName.';
+                  } else {
+                    document.getElementById( 'displayNameText' )
+                      .innerHTML = 'You are Admin. Click here to change displayName.';
+                  }
+
                   iAmAdmin = true;
 
                   resetChordProgression();
 
                   updateChatListener();
                 }, function ( error ) {
-                  console.error( "Error: couldn't create room.", error );
+                  console.error( "Couldn't create room.", error );
 
                   let lastPromises = [];
 
@@ -1942,12 +1910,12 @@ function createRoom() {
                   Promise.all( lastPromises )
                     .catch(
                       function ( error ) {
-                        console.error( "Error: couldn't rollback...", error );
+                        console.error( "Couldn't rollback...", error );
                       } );
                 } );
             },
             function ( error ) {
-              console.error( "Error: couldn't create room.", error );
+              console.error( "Couldn't create room.", error );
 
               let lastPromises = [];
 
@@ -1975,12 +1943,12 @@ function createRoom() {
               Promise.all( lastPromises )
                 .catch(
                   function ( error ) {
-                    console.error( "Error: couldn't rollback...", error );
+                    console.error( "Couldn't rollback...", error );
                   } );
             } );
       },
       function ( error ) {
-        console.error( "Error: couldn't create room.", error );
+        console.error( "Couldn't create room.", error );
       } );
 }
 
@@ -1997,28 +1965,6 @@ function joinRoom( name ) {
   }
 
   roomName = name;
-
-  firebase.database()
-    .ref( 'users/' + userID )
-    .update( {
-      room: roomName
-    } )
-    .then( function () {
-
-      firebase.database()
-        .ref( 'users/' + userID )
-        .onDisconnect()
-        .update( {
-          room: 'lobby'
-        } )
-        .catch( function ( error ) {
-          console.error( "Error: couldn't update room.", error );
-        } );
-    }, function ( error ) {
-      console.error( "Error: couldn't enter room.", error );
-      roomName = null;
-      return;
-    } );
 
   let box = document.getElementById( 'roomsBox' );
   while ( box.firstChild ) {
@@ -2127,13 +2073,6 @@ function leaveRoom() {
       .ref( 'messages/' + roomName )
       .remove()
     );
-    promises.push(
-      firebase.database()
-      .ref( 'users/' + userID )
-      .update( {
-        room: 'lobby'
-      } )
-    );
 
     Promise.all( promises )
       .then( function () {
@@ -2142,7 +2081,7 @@ function leaveRoom() {
           .ref( 'rooms/' + roomName )
           .remove()
           .catch( function ( error ) {
-            console.error( "Error: couldn't delete room.", error );
+            console.error( "Couldn't delete room.", error );
           } );
 
         roomName = null;
@@ -2156,7 +2095,7 @@ function leaveRoom() {
         updateRoomBox();
 
       }, function ( error ) {
-        console.error( "Error: couldn't delete room.", error );
+        console.error( "Couldn't delete room.", error );
       } );
   } else {
 
@@ -2195,13 +2134,6 @@ function leaveRoom() {
       .ref( 'settings/' + roomName )
       .off( 'child_added' )
     );
-    promises.push(
-      firebase.database()
-      .ref( 'users/' + userID )
-      .update( {
-        room: 'lobby'
-      } )
-    );
 
     Promise.all( promises )
       .then( function () {
@@ -2215,7 +2147,7 @@ function leaveRoom() {
         updateRoomBox();
 
       }, function ( error ) {
-        console.error( "Error: couldn't leave room.", error );
+        console.error( "Couldn't leave room.", error );
       } );
   }
 }
@@ -2230,6 +2162,8 @@ function loadTutorial( name ) {
   if ( roomName || !name || inTutorial || inUserUpload ) {
     return;
   }
+
+  playBackSpeed = 1;
 
   firebase.database()
     .ref( 'tutorials/data/' + name )
@@ -2275,6 +2209,31 @@ function loadTutorial( name ) {
         box.removeChild( box.firstChild );
       }
 
+      let playBackSpeedDiv = document.createElement( 'div' );
+      let playBackSpeedText = document.createElement( 'h1' );
+      let playBackSpeedSlider = document.createElement( 'input' );
+
+      playBackSpeedDiv.id = 'playBackSpeedDiv';
+
+      playBackSpeedText.id = 'playBackSpeedText';
+      playBackSpeedText.appendChild( document.createTextNode( 'Playback speed: 1.0x' ) );
+
+      playBackSpeedSlider.id = 'playBackSpeedSlider';
+      playBackSpeedSlider.type = 'range';
+      playBackSpeedSlider.value = 10;
+      playBackSpeedSlider.min = 1;
+      playBackSpeedSlider.max = 20;
+      playBackSpeedSlider.addEventListener( 'mousemove', function () {
+        playBackSpeed = 0.1 * document.getElementById( 'playBackSpeedSlider' )
+          .value;
+        document.getElementById( 'playBackSpeedText' )
+          .innerHTML = 'Playback speed: ' + playBackSpeed.toFixed( 1 ) + 'x';
+      } );
+
+      playBackSpeedDiv.appendChild( playBackSpeedText );
+      playBackSpeedDiv.appendChild( playBackSpeedSlider );
+      box.appendChild( playBackSpeedDiv );
+
       let leaveButton = document.createElement( 'button' );
       leaveButton.appendChild( document.createTextNode( 'Exit tutorial' ) );
       leaveButton.addEventListener( 'click', ( event ) => {
@@ -2283,15 +2242,20 @@ function loadTutorial( name ) {
       leaveButton.classList.add( 'V' );
       box.appendChild( leaveButton );
 
-      box.appendChild( document.createElement( 'br' ) );
-
       let nextButton = document.createElement( 'button' );
+      let hoverLabel = document.createElement( 'span' );
+
+      hoverLabel.appendChild( document.createTextNode( 'No previous\nsteps.' ) );
+      hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
+
       nextButton.id = 'nextTutorialStepButton';
       nextButton.appendChild( document.createTextNode( 'Next step' ) );
       nextButton.addEventListener( 'click', ( event ) => {
         nextTutorialStep();
       } );
       nextButton.classList.add( 'I' );
+
+      nextButton.appendChild( hoverLabel );
       box.appendChild( nextButton );
 
       let repeatButton = document.createElement( 'button' );
@@ -2304,6 +2268,11 @@ function loadTutorial( name ) {
       box.appendChild( repeatButton );
 
       let previousButton = document.createElement( 'button' );
+      hoverLabel = document.createElement( 'span' );
+
+      hoverLabel.appendChild( document.createTextNode( 'No further\nsteps.' ) );
+      hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
+
       previousButton.id = 'previousTutorialStepButton';
       previousButton.disabled = true;
       previousButton.appendChild( document.createTextNode( 'Previous step' ) );
@@ -2311,6 +2280,8 @@ function loadTutorial( name ) {
         previousTutorialStep();
       } );
       previousButton.classList.add( 'III' );
+
+      previousButton.appendChild( hoverLabel );
       box.appendChild( previousButton );
 
       inTutorial = true;
@@ -2322,7 +2293,7 @@ function loadTutorial( name ) {
       tutorialStep = -1;
       nextTutorialStep();
     }, function ( error ) {
-      console.error( "Error: couldn't load tutorial.", error );
+      console.error( "Couldn't load tutorial.", error );
     } );
 }
 
@@ -2342,6 +2313,7 @@ function exitTutorial() {
     } );
 
   inTutorial = false;
+  inUserUpload = false;
   updateRoomBox();
   updateChatListener();
 }
@@ -2529,6 +2501,23 @@ function updateRoomBox() {
         userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
         box.appendChild( userUploadpar );
 
+        let uploadButton = document.createElement( 'button' );
+        let hoverLabel = document.createElement( 'span' );
+
+        hoverLabel.appendChild( document.createTextNode( 'You have to record something first.' ) );
+        hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
+
+        uploadButton.id = 'uploadRecordingButton';
+        uploadButton.disabled = isEmpty( recordedKeypresses );
+        uploadButton.appendChild( document.createTextNode( 'Upload recording' ) );
+        uploadButton.addEventListener( 'click', ( event ) => {
+          uploadRecording();
+        } );
+        uploadButton.classList.add( 'I' );
+
+        uploadButton.appendChild( hoverLabel );
+        box.appendChild( uploadButton );
+
         firebase.database()
           .ref( 'uploads/names' )
           .once( 'value' )
@@ -2565,7 +2554,7 @@ function updateRoomBox() {
               newButton.addEventListener( 'click', ( event ) => {
                 createRoom();
               } );
-              newButton.classList.add( 'I' );
+              newButton.classList.add( 'II' );
 
               box.appendChild( newButton );
 
@@ -2657,7 +2646,7 @@ function broadcastSettings() {
         sequence: selectedSequenceIndex
       } )
       .catch( function ( error ) {
-        console.error( "Error: couldn't broadcast settings.", error );
+        console.error( "Couldn't broadcast settings.", error );
       } );
   }
 }
@@ -2831,20 +2820,20 @@ function uploadRecording() {
             .ref( 'uploads/data/' + uploadName )
             .set( upload )
             .catch( function ( error ) {
-              console.error( "Error: couldn't upload recording.", error );
+              console.error( "Couldn't upload recording.", error );
 
               firebase.database()
                 .ref( 'uploads/names/' + uploadName )
                 .remove()
                 .catch( function ( error ) {
-                  console.error( "Error: couldn't roll back...", error );
+                  console.error( "Couldn't roll back...", error );
                 } );
             } );
         }, function ( error ) {
-          console.error( "Error: couldn't upload recording.", error );
+          console.error( "Couldn't upload recording.", error );
         } );
     }, function ( error ) {
-      console.error( "Error: couldn't retrieve upload names.", error );
+      console.error( "Couldn't retrieve upload names.", error );
     } );
 }
 
@@ -2929,8 +2918,12 @@ function handleImport() {
 // Update the graphic interface and start the first tutorial step.
 function loadUserUpload( name ) {
 
-  if ( roomName || !name || inTutorial || inUserUpload ) {
+  if ( roomName || !name || inTutorial ) {
     return;
+  }
+
+  if ( !inUserUpload ) {
+    playBackSpeed = 1;
   }
 
   firebase.database()
@@ -2953,6 +2946,31 @@ function loadUserUpload( name ) {
         box.removeChild( box.firstChild );
       }
 
+      let playBackSpeedDiv = document.createElement( 'div' );
+      let playBackSpeedText = document.createElement( 'h1' );
+      let playBackSpeedSlider = document.createElement( 'input' );
+
+      playBackSpeedDiv.id = 'playBackSpeedDiv';
+
+      playBackSpeedText.id = 'playBackSpeedText';
+      playBackSpeedText.appendChild( document.createTextNode( 'Playback speed: ' + playBackSpeed.toFixed( 1 ) + 'x' ) );
+
+      playBackSpeedSlider.id = 'playBackSpeedSlider';
+      playBackSpeedSlider.type = 'range';
+      playBackSpeedSlider.value = Math.round( 10 * playBackSpeed );
+      playBackSpeedSlider.min = 1;
+      playBackSpeedSlider.max = 20;
+      playBackSpeedSlider.addEventListener( 'mousemove', function () {
+        playBackSpeed = 0.1 * document.getElementById( 'playBackSpeedSlider' )
+          .value;
+        document.getElementById( 'playBackSpeedText' )
+          .innerHTML = 'Playback speed: ' + playBackSpeed.toFixed( 1 ) + 'x';
+      } );
+
+      playBackSpeedDiv.appendChild( playBackSpeedText );
+      playBackSpeedDiv.appendChild( playBackSpeedSlider );
+      box.appendChild( playBackSpeedDiv );
+
       let leaveButton = document.createElement( 'button' );
       leaveButton.appendChild( document.createTextNode( 'Exit recording' ) );
       leaveButton.addEventListener( 'click', ( event ) => {
@@ -2960,6 +2978,16 @@ function loadUserUpload( name ) {
       } );
       leaveButton.classList.add( 'V' );
       box.appendChild( leaveButton );
+
+      let repeatButton = document.createElement( 'button' );
+      repeatButton.appendChild( document.createTextNode( 'Repeat recording' ) );
+      ( function ( name ) {
+        repeatButton.addEventListener( 'click', ( event ) => {
+          loadUserUpload( name );
+        } );
+      } )( name );
+      repeatButton.classList.add( 'I' );
+      box.appendChild( repeatButton );
 
       inUserUpload = true;
 
@@ -2982,7 +3010,7 @@ function loadUserUpload( name ) {
       }
 
     }, function ( error ) {
-      console.error( "Error: couldn't load tutorial.", error );
+      console.error( "Couldn't load tutorial.", error );
     } );
 }
 

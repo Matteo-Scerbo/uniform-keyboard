@@ -11,17 +11,18 @@
   <script src="/__/firebase/5.7.0/firebase-database.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/5.7.1/firebase.js"></script>
+
   <script>
     var config = {
-        apiKey: "AIzaSyCL4fvuNs80YDoTmWKeyHB_qhfeO3UgG2c",
-        authDomain: "uniform-keyboard.firebaseapp.com",
-        databaseURL: "https://uniform-keyboard.firebaseio.com",
-        projectId: "uniform-keyboard",
-        storageBucket: "uniform-keyboard.appspot.com",
-        messagingSenderId: "178668849548"
-      };
-      firebase.initializeApp(config);
-    </script>
+      apiKey: "AIzaSyCL4fvuNs80YDoTmWKeyHB_qhfeO3UgG2c",
+      authDomain: "uniform-keyboard.firebaseapp.com",
+      databaseURL: "https://uniform-keyboard.firebaseio.com",
+      projectId: "uniform-keyboard",
+      storageBucket: "uniform-keyboard.appspot.com",
+      messagingSenderId: "178668849548"
+    };
+    firebase.initializeApp(config);
+  </script>
 </head>
 
 <body class="FLATblack" onresize="renderSlider()">
@@ -57,7 +58,7 @@
         <input type="textbox" id="writeMessage" onblur="this.focus();"></input>
         <button class="I" onclick="sendMessage();">Send</button>
         <button class="V" onclick="toggleChatOverlay();">Close chat</button>
-        <p id="nicknameText" class="FLATwhite" onclick="changeNickname();">You are anonymous. Click here to change nickname.</p>
+        <p id="displayNameText" class="FLATwhite" onclick="changeDisplayName();">You are anonymous. Click here to change display name.</p>
       </div>
     </div>
 
@@ -399,7 +400,7 @@
         </div>
 
         <div id="chatBox">
-          <div id="chatBoxFadeOutContainer">
+          <div id="chatBoxFadeOutContainer" class="FLATwhite">
             <div id="chatBoxFadeOut">
               <p id="viewChatText">Open full chat</p>
             </div>
@@ -422,13 +423,16 @@
       </summary>
       <div id="recordBox">
         <button id="recordButton" class="V" onclick="toggleRecording();">Start recording</button>
-        <button id="replayButton" class="VI" onclick="replayRecording();" disabled>Replay</button>
-        <button id="uploadRecordingButton" class="III" onclick="uploadRecording();" disabled>Upload</button>
-        <button id="exportRecordingButton" class="III" onclick="document.getElementById('exportRecordingAnchor').click();" disabled>
+        <button id="replayButton" class="I" onclick="replayRecording();" disabled>
+          Replay
+          <span class="hoverLabel FLATblack">You have to record something first.</span>
+        </button>
+        <button id="exportRecordingButton" class="VI" onclick="document.getElementById('exportRecordingAnchor').click();" disabled>
           Export as JSON file
           <a id="exportRecordingAnchor" href="#" download="recording.json"></a>
+          <span class="hoverLabel FLATblack">You have to record something first.</span>
         </button>
-        <button id="importRecordingButton" class="III" onclick="document.getElementById('importRecordingInput').click();">
+        <button id="importRecordingButton" class="VI" onclick="document.getElementById('importRecordingInput').click();">
           Import JSON file
           <input id="importRecordingInput" type="file" id="selectFiles" value="Import" onchange="handleImport();">
         </button>

@@ -215,7 +215,7 @@ h1 {
   margin: 2px;
 }
 
-#nicknameText {
+#displayNameText {
   color: var(--light);
   margin: 2px;
 }
@@ -494,7 +494,7 @@ label::before {
 
 #accordion {
   display: table;
-  margin: 10px auto;
+  margin: 0 auto;
   width: 800px;
   background-color: white;
 }
@@ -670,6 +670,7 @@ label::before {
 }
 
 button {
+  position: relative;
   padding: 10px 15px;
   border: 0;
   margin: 5px;
@@ -677,6 +678,7 @@ button {
   background-color: var(--dark);
   color: white;
   font-weight: bold;
+  outline: none;
 }
 
 button:hover {
@@ -689,10 +691,41 @@ button:active {
 
 button:disabled {
   cursor: not-allowed;
-  background: linear-gradient(to top right,
-    var(--dark), var(--dark) 40%,
-    #121a21 41%, #121a21 59%,
-    var(--dark) 60%);
+}
+
+button:disabled:hover {
+  opacity: 1;
+}
+
+.hoverLabel {
+  visibility: hidden;
+  width: 120px;
+  background-color: var(--dark);
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  white-space: normal;
+}
+
+.hoverLabel::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--dark) transparent transparent transparent;
+}
+
+button:disabled:hover>.hoverLabel {
+  visibility: visible;
 }
 
 .pulsating {
@@ -757,13 +790,13 @@ button:disabled {
 
 #onlineBox {
   position: relative;
-  min-height: 150px;
+  min-height: 125px;
   color: var(--dark);
 }
 
 #onlineOverlay {
   display: block;
-  min-height: 150px;
+  min-height: 125px;
 }
 
 #chatBox {
@@ -802,6 +835,84 @@ button:disabled {
 #roomsBox {
   overflow: auto;
   white-space: nowrap;
+}
+
+#playBackSpeedDiv {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 5px;
+}
+
+#playBackSpeedSlider {
+  margin: auto;
+  -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
+  height: 20px;
+  width: 200px;
+  cursor: pointer;
+  border-radius: 0;
+  float: right;
+}
+
+#playBackSpeedSlider::-webkit-slider-runnable-track {
+  background: var(--dark);
+}
+
+#playBackSpeedSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: white;
+  box-shadow: -100vw 0 0 100vw dodgerblue;
+  border: 2px solid black;
+}
+
+#playBackSpeedSlider::-moz-range-track {
+  height: 20px;
+  background: var(--dark);
+}
+
+#playBackSpeedSlider::-moz-range-thumb {
+  background: white;
+  height: 20px;
+  width: 20px;
+  border: 3px solid black;
+  border-radius: 0 !important;
+  box-shadow: -100vw 0 0 100vw dodgerblue;
+  box-sizing: border-box;
+}
+
+#playBackSpeedSlider::-ms-fill-lower {
+  background: dodgerblue;
+}
+
+#playBackSpeedSlider::-ms-thumb {
+  background: white;
+  border: 2px solid black;
+  height: 20px;
+  width: 20px;
+  box-sizing: border-box;
+}
+
+#playBackSpeedSlider::-ms-ticks-after {
+  display: none;
+}
+
+#playBackSpeedSlider::-ms-ticks-before {
+  display: none;
+}
+
+#playBackSpeedSlider::-ms-track {
+  background: var(--dark);
+  color: transparent;
+  height: 20px;
+  border: none;
+}
+
+#playBackSpeedSlider::-ms-tooltip {
+  display: none;
 }
 
 #recordBox {
