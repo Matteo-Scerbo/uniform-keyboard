@@ -458,6 +458,11 @@ firebase.database()
       document.getElementById( 'dashedPointer' )
         .style.display = 'block';
       chatOverlayIsVisible = false;
+      if ( roomName && iAmAdmin ) {
+        roomName = null;
+        updateChatListener();
+        updateRoomBox();
+      }
     } else {
       document.getElementById( 'onlineOverlay' )
         .style.display = 'none';
@@ -758,7 +763,7 @@ function playChord( mode ) {
 }
 
 
-// COLORED INTERFACE FUNCTIONS
+// INTERFACE FUNCTIONS
 
 // Changes the scale.
 // Always calls renderScale().
@@ -1110,6 +1115,7 @@ function toggleChatOverlay() {
   }
 }
 
+// Toggle the labels for eng/ita note names.
 function showNoteLabels( value, checked ) {
   switch ( value ) {
     case 'eng':
@@ -1130,6 +1136,7 @@ function showNoteLabels( value, checked ) {
     }
   } );
 }
+
 
 
 // TENSION AND FEELING FUNCTIONS
@@ -1532,6 +1539,233 @@ function resetChordProgression() {
 }
 
 
+// CHAT FUNCTIONS
+
+// Empty the chat box and overlay and listen to messages from a room / none.
+function updateChatListener() {
+  let box = document.getElementById( 'chatBoxMessages' );
+  let overlay = document.getElementById( 'chatOverlayMessages' );
+  while ( box.firstChild ) {
+    box.removeChild( box.firstChild );
+  }
+  while ( overlay.firstChild ) {
+    overlay.removeChild( overlay.firstChild );
+  }
+
+  if ( !roomName && !inTutorial ) {
+    document.getElementById( 'chatBox' )
+      .style.display = 'none';
+    document.getElementById( 'chatOverlay' )
+      .style.display = 'none';
+    document.getElementById( 'dashedPointer' )
+      .style.display = 'block';
+    return;
+  }
+
+  document.getElementById( 'chatBox' )
+    .style.display = 'block';
+
+  if ( !roomName ) {
+    return;
+  }
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .on( 'child_added', function ( snap ) {
+
+      let message = document.createElement( 'div' );
+      message.classList.add( 'message' );
+
+      if ( snap.val()
+        .admin ) {
+        message.classList.add( 'VII' );
+      } else {
+        message.classList.add( 'FLATwhite' );
+      }
+
+      if ( snap.val()
+        .nickname ) {
+        message.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+      } else {
+        if ( snap.val()
+          .admin ) {
+          message.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+        } else {
+          message.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+        }
+      }
+
+      message.id = 'box' + snap.key;
+      box.appendChild( message );
+      let clone = message.cloneNode( true )
+      clone.id = 'overlay' + snap.key;
+      overlay.appendChild( clone );
+
+      updateChatScroll();
+    }, function ( error ) {
+      console.error( "Couldn't load room message.", error );
+    } );
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .on( 'child_changed', function ( snap ) {
+
+      let boxMessage = document.getElementById( 'box' + snap.key );
+      let overlayMessage = document.getElementById( 'overlay' + snap.key );
+
+      boxMessage.removeChild( boxMessage.firstChild );
+      overlayMessage.removeChild( overlayMessage.firstChild );
+
+      if ( snap.val()
+        .nickname ) {
+        boxMessage.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+        overlayMessage.appendChild( document.createTextNode( snap.val()
+          .nickname + ' : ' + snap.val()
+          .text ) );
+      } else {
+        if ( snap.val()
+          .admin ) {
+          boxMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+          overlayMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
+            .text ) );
+        } else {
+          boxMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+          overlayMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
+            .text ) );
+        }
+      }
+
+      updateChatScroll();
+
+    }, function ( error ) {
+      console.error( "Couldn't load room message.", error );
+    } );
+}
+
+// Push a message to the current room.
+function sendMessage() {
+  if ( !roomName || !userID || !document.getElementById( 'writeMessage' )
+    .value ) {
+    return;
+  }
+
+  let message = {
+    user: userID,
+    nickname: myNickname,
+    admin: iAmAdmin,
+    text: document.getElementById( 'writeMessage' )
+      .value
+  }
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .push( message )
+    .catch( function ( error ) {
+      console.error( "Error: couldn't send message.", error );
+      return;
+    } );
+
+  document.getElementById( 'writeMessage' )
+    .value = '';
+}
+
+// Scroll to the bottom of the chat box and overlay
+// (needed to keep showing only the latest messages in the box).
+function updateChatScroll() {
+  let element = document.getElementById( 'chatBox' );
+  element.scrollTop = element.scrollHeight;
+  element = document.getElementById( 'chatOverlayMessages' );
+  element.scrollTop = element.scrollHeight;
+}
+
+// Update all messages sent with the chosen nickname.
+function changeNickname() {
+  myNickname = prompt( 'Enter your new nickname.' );
+
+  firebase.database()
+    .ref( 'users/' + userID )
+    .update( {
+      nickname: myNickname
+    } )
+    .catch( function ( error ) {
+      console.error( "Error: couldn't update nickname.", error );
+    } )
+
+  firebase.database()
+    .ref( 'messages/lobby' )
+    .orderByChild( 'user' )
+    .equalTo( userID )
+    .once( 'value' )
+    .then( function ( snap ) {
+      snap.forEach( function ( data ) {
+        firebase.database()
+          .ref( 'messages/lobby/' + data.key )
+          .update( {
+            nickname: myNickname
+          } )
+          .then( function () {
+            updateChatListener();
+          }, function ( error ) {
+            console.error( "Error: couldn't update nickname.", error );
+          } );
+      } );
+    } );
+
+  firebase.database()
+    .ref( 'rooms' )
+    .once( 'value' )
+    .then( function ( snapRoom ) {
+
+      snapRoom.forEach( function ( room ) {
+
+        firebase.database()
+          .ref( 'messages/' + room.key )
+          .orderByChild( 'user' )
+          .equalTo( userID )
+          .once( 'value' )
+          .then( function ( snapMessage ) {
+
+            snapMessage.forEach( function ( message ) {
+
+              firebase.database()
+                .ref( 'messages/' + roomName + '/' + message.key )
+                .update( {
+                  nickname: myNickname
+                } )
+                .then( function () {
+
+                  updateChatListener();
+
+                }, function ( error ) {
+                  console.error( "Error: couldn't update nickname.", error );
+                } );
+            } );
+          }, function ( error ) {
+            console.error( "Error: couldn't update nickname.", error );
+          } );
+      } );
+    }, function ( error ) {
+      console.error( "Error: couldn't update nickname.", error );
+    } );
+
+  if ( myNickname ) {
+    document.getElementById( 'nicknameText' )
+      .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
+  } else {
+    document.getElementById( 'nicknameText' )
+      .innerHTML = 'You are anonymous. Click here to change nickname.';
+  }
+}
+
+
 // ROOM FUNCTIONS
 
 // Create a new room, of which you are admin.
@@ -1808,28 +2042,23 @@ function joinRoom( name ) {
     .on( 'child_removed',
       function ( snap ) {
 
-        console.log( 'Leaving' );
-
         leaveRoom();
 
-        let box = document.getElementById( 'onlineBox' );
-        let overlay = document.createElement( 'div' );
-        let overlayText = document.createElement( 'div' );
+        let overlay = document.getElementById( 'onlineOverlay' );
 
-        overlay.id = 'kickedOverlay';
-        overlay.classList.add( 'overlay' );
         overlay.style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = 'You were kicked from the room.\n(admin disconnected)';
+        document.getElementById( 'onlineOverlayButton' )
+          .style.display = 'none';
+
         overlay.style.animation = 'fade 5s cubic-bezier(0.75, 0.25, 0.75, 0.25) forwards';
 
-        overlayText.classList.add( 'overlayText' );
-        overlayText.appendChild( document.createTextNode( 'You were kicked from the room.\n(admin disconnected)' ) );
-        overlay.appendChild( overlayText );
-        box.parentNode.appendChild( overlay );
+        overlay.parentNode.replaceChild( overlay.cloneNode( true ), overlay );
 
         window.setTimeout( function () {
-          document.getElementById( 'onlineBox' )
-            .parentNode
-            .removeChild( document.getElementById( 'kickedOverlay' ) );
+          overlay.style.display = 'none';
+          overlay.style.animation = '';
         }, 5000 );
       } );
 }
@@ -2022,27 +2251,31 @@ function loadTutorial( name ) {
       box.appendChild( document.createElement( 'br' ) );
 
       let nextButton = document.createElement( 'button' );
+      nextButton.id = 'nextTutorialStepButton';
       nextButton.appendChild( document.createTextNode( 'Next step' ) );
       nextButton.addEventListener( 'click', ( event ) => {
         nextTutorialStep();
       } );
-      nextButton.classList.add( 'Xgray' );
+      nextButton.classList.add( 'I' );
       box.appendChild( nextButton );
 
       let repeatButton = document.createElement( 'button' );
+      repeatButton.id = 'repeatTutorialStepButton';
       repeatButton.appendChild( document.createTextNode( 'Repeat step' ) );
       repeatButton.addEventListener( 'click', ( event ) => {
         repeatTutorialStep();
       } );
-      repeatButton.classList.add( 'Xgray' );
+      repeatButton.classList.add( 'II' );
       box.appendChild( repeatButton );
 
       let previousButton = document.createElement( 'button' );
+      previousButton.id = 'previousTutorialStepButton';
+      previousButton.disabled = true;
       previousButton.appendChild( document.createTextNode( 'Previous step' ) );
       previousButton.addEventListener( 'click', ( event ) => {
         previousTutorialStep();
       } );
-      previousButton.classList.add( 'Xgray' );
+      previousButton.classList.add( 'III' );
       box.appendChild( previousButton );
 
       inTutorial = true;
@@ -2085,6 +2318,21 @@ function nextTutorialStep() {
     return;
   }
   tutorialStep++;
+
+  if ( tutorialStep >= tutorialStepsCount - 1 ) {
+    document.getElementById( 'nextTutorialStepButton' )
+      .disabled = true;
+  } else {
+    document.getElementById( 'nextTutorialStepButton' )
+      .disabled = false;
+  }
+  if ( !tutorialStep ) {
+    document.getElementById( 'previousTutorialStepButton' )
+      .disabled = true;
+  } else {
+    document.getElementById( 'previousTutorialStepButton' )
+      .disabled = false;
+  }
 
   if ( tutorialMessages[ tutorialStep ] ) {
     let box = document.getElementById( 'chatBoxMessages' );
@@ -2145,6 +2393,21 @@ function previousTutorialStep() {
   }
   tutorialStep--;
 
+  if ( tutorialStep >= tutorialStepsCount - 1 ) {
+    document.getElementById( 'nextTutorialStepButton' )
+      .disabled = true;
+  } else {
+    document.getElementById( 'nextTutorialStepButton' )
+      .disabled = false;
+  }
+  if ( !tutorialStep ) {
+    document.getElementById( 'previousTutorialStepButton' )
+      .disabled = true;
+  } else {
+    document.getElementById( 'previousTutorialStepButton' )
+      .disabled = false;
+  }
+
   if ( tutorialMessages[ tutorialStep + 1 ] ) {
     let box = document.getElementById( 'chatBoxMessages' );
     let overlay = document.getElementById( 'chatOverlayMessages' );
@@ -2186,6 +2449,16 @@ function updateRoomBox() {
     box.removeChild( box.firstChild );
   }
 
+  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
+    .childNodes,
+    function ( box ) {
+      if ( box.name == 'mode' ) {
+        box.disabled = false;
+      }
+    } );
+  document.getElementById( 'scaleSliderRange' )
+    .disabled = false;
+
   firebase.database()
     .ref( 'tutorials/names' )
     .once( 'value' )
@@ -2226,83 +2499,109 @@ function updateRoomBox() {
           .once( 'value' )
           .then( function ( snapUploads ) {
 
-            let uploads = snapUploads.val();
-            if ( uploads ) {
-              Object.keys( uploads )
-                .forEach( function ( upload ) {
+              let uploads = snapUploads.val();
+              if ( uploads ) {
+                Object.keys( uploads )
+                  .forEach( function ( upload ) {
 
-                  let uploadButton = document.createElement( 'button' );
-                  uploadButton.appendChild( document.createTextNode( upload ) );
+                    let uploadButton = document.createElement( 'button' );
+                    uploadButton.appendChild( document.createTextNode( upload ) );
 
-                  ( function ( upload ) {
-                    uploadButton.addEventListener( 'click', ( event ) => {
-                      loadUserUpload( upload );
-                    } );
-                  } )( upload );
+                    ( function ( upload ) {
+                      uploadButton.addEventListener( 'click', ( event ) => {
+                        loadUserUpload( upload );
+                      } );
+                    } )( upload );
 
-                  uploadButton.classList.add( 'III' );
+                    uploadButton.classList.add( 'III' );
 
-                  box.appendChild( uploadButton );
-                } );
-            }
-
-            box.appendChild( document.createElement( 'br' ) );
-
-            let roompar = document.createElement( 'p' );
-            roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
-            box.appendChild( roompar );
-
-            let newButton = document.createElement( 'button' );
-            newButton.appendChild( document.createTextNode( 'Create room' ) );
-            newButton.addEventListener( 'click', ( event ) => {
-              createRoom();
-            } );
-            newButton.classList.add( 'I' );
-
-            box.appendChild( newButton );
-
-            firebase.database()
-              .ref( 'rooms' )
-              .on( 'child_added', function ( snapRoom ) {
-
-                if ( roomName || inTutorial || inUserUpload ) {
-                  return;
-                }
-
-                let roomButton = document.createElement( 'button' );
-                roomButton.appendChild( document.createTextNode( snapRoom.key ) );
-                ( function ( snapRoom ) {
-                  roomButton.addEventListener( 'click', ( event ) => {
-                    joinRoom( snapRoom.key )
+                    box.appendChild( uploadButton );
                   } );
-                } )( snapRoom );
+              }
 
-                let box = document.getElementById( 'roomsBox' );
-                box.appendChild( roomButton );
-              } );
+              box.appendChild( document.createElement( 'br' ) );
 
-            firebase.database()
-              .ref( 'rooms' )
-              .on( 'child_removed', function ( snapRoom ) {
-                if ( roomName ) {
-                  return;
-                }
-                let roomButton = document.evaluate( '//button[text()="' + snapRoom.key + '"]',
-                  document, null, XPathResult.ANY_TYPE, null );
-                roomButton = roomButton.iterateNext();
-                if ( roomButton ) {
-                  roomButton.remove();
-                }
+              let roompar = document.createElement( 'p' );
+              roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
+              box.appendChild( roompar );
+
+              let newButton = document.createElement( 'button' );
+              newButton.appendChild( document.createTextNode( 'Create room' ) );
+              newButton.addEventListener( 'click', ( event ) => {
+                createRoom();
               } );
-          } );
+              newButton.classList.add( 'I' );
+
+              box.appendChild( newButton );
+
+              firebase.database()
+                .ref( 'rooms' )
+                .on( 'child_added', function ( snapRoom ) {
+
+                  if ( roomName || inTutorial || inUserUpload ) {
+                    return;
+                  }
+
+                  let roomButton = document.createElement( 'button' );
+                  roomButton.classList.add( 'IV' );
+                  roomButton.appendChild( document.createTextNode( snapRoom.key ) );
+                  ( function ( snapRoom ) {
+                    roomButton.addEventListener( 'click', ( event ) => {
+                      joinRoom( snapRoom.key )
+                    } );
+                  } )( snapRoom );
+
+                  let box = document.getElementById( 'roomsBox' );
+                  box.appendChild( roomButton );
+                } );
+
+              firebase.database()
+                .ref( 'rooms' )
+                .on( 'child_removed', function ( snapRoom ) {
+                  if ( roomName ) {
+                    return;
+                  }
+                  let roomButton = document.evaluate( '//button[text()="' + snapRoom.key + '"]',
+                    document, null, XPathResult.ANY_TYPE, null );
+                  roomButton = roomButton.iterateNext();
+                  if ( roomButton ) {
+                    roomButton.remove();
+                  }
+                } );
+            },
+            function ( error ) {
+              console.error( "Couldn't load tutorial names.", error );
+              document.getElementById( 'onlineOverlay' )
+                .style.display = 'block';
+              document.getElementById( 'onlineOverlayText' )
+                .innerHTML = "Couldn't retrieve info from DB.";
+              document.getElementById( 'onlineOverlayButton' )
+                .style.display = 'none';
+            } );
       },
       function ( error ) {
         console.error( "Couldn't load tutorial names.", error );
+        document.getElementById( 'onlineOverlay' )
+          .style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = "Couldn't retrieve info from DB.";
+        document.getElementById( 'onlineOverlayButton' )
+          .style.display = 'none';
       } );
 }
 
 // Comply to the settings sent by the tutorial or room admin.
 function handleRemoteSettings( val ) {
+  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
+    .childNodes,
+    function ( box ) {
+      if ( box.name == 'mode' ) {
+        box.disabled = true;
+      }
+    } );
+  document.getElementById( 'scaleSliderRange' )
+    .disabled = true;
+
   changeScale( val.scale );
   changeModeMechanic( val.mechanic );
   if ( modeMechanic == 'Progression' ) {
@@ -2336,6 +2635,23 @@ function toggleRecording() {
   if ( recordingNow ) {
     document.getElementById( 'recordButton' )
       .innerHTML = 'Start recording';
+
+    if ( !isEmpty( recordedKeypresses ) ) {
+      document.getElementById( 'replayButton' )
+        .disabled = false;
+      document.getElementById( 'uploadRecordingButton' )
+        .disabled = false;
+    }
+
+    [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
+      .childNodes,
+      function ( box ) {
+        if ( box.name == 'mode' ) {
+          box.disabled = false;
+        }
+      } );
+    document.getElementById( 'scaleSliderRange' )
+      .disabled = false;
   } else {
     if ( !isEmpty( recordedKeypresses ) ) {
       if ( !confirm( 'This will delete the current recording.' ) ) {
@@ -2345,6 +2661,21 @@ function toggleRecording() {
 
     document.getElementById( 'recordButton' )
       .innerHTML = 'Stop recording';
+
+    document.getElementById( 'replayButton' )
+      .disabled = true;
+    document.getElementById( 'uploadRecordingButton' )
+      .disabled = true;
+
+    [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
+      .childNodes,
+      function ( box ) {
+        if ( box.name == 'mode' ) {
+          box.disabled = true;
+        }
+      } );
+    document.getElementById( 'scaleSliderRange' )
+      .disabled = true;
 
     recordedKeypresses = {};
     recordedKeypressesCount = 0;
@@ -2356,6 +2687,9 @@ function toggleRecording() {
       sequence: selectedSequenceIndex
     };
   }
+
+  document.getElementById( 'recordButton' )
+    .classList.toggle( 'pulsating' );
 
   recordingNow = !recordingNow;
 }
@@ -2534,233 +2868,6 @@ function loadUserUpload( name ) {
     }, function ( error ) {
       console.error( "Error: couldn't load tutorial.", error );
     } );
-}
-
-
-// CHAT FUNCTIONS
-
-// Empty the chat box and overlay and listen to messages from a room / none.
-function updateChatListener() {
-  let box = document.getElementById( 'chatBoxMessages' );
-  let overlay = document.getElementById( 'chatOverlayMessages' );
-  while ( box.firstChild ) {
-    box.removeChild( box.firstChild );
-  }
-  while ( overlay.firstChild ) {
-    overlay.removeChild( overlay.firstChild );
-  }
-
-  if ( !roomName && !inTutorial ) {
-    document.getElementById( 'chatBox' )
-      .style.display = 'none';
-    document.getElementById( 'chatOverlay' )
-      .style.display = 'none';
-    document.getElementById( 'dashedPointer' )
-      .style.display = 'block';
-    return;
-  }
-
-  document.getElementById( 'chatBox' )
-    .style.display = 'block';
-
-  if ( !roomName ) {
-    return;
-  }
-
-  firebase.database()
-    .ref( 'messages/' + roomName )
-    .on( 'child_added', function ( snap ) {
-
-      let message = document.createElement( 'div' );
-      message.classList.add( 'message' );
-
-      if ( snap.val()
-        .admin ) {
-        message.classList.add( 'VII' );
-      } else {
-        message.classList.add( 'FLATwhite' );
-      }
-
-      if ( snap.val()
-        .nickname ) {
-        message.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
-          .text ) );
-      } else {
-        if ( snap.val()
-          .admin ) {
-          message.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-            .text ) );
-        } else {
-          message.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-            .text ) );
-        }
-      }
-
-      message.id = 'box' + snap.key;
-      box.appendChild( message );
-      let clone = message.cloneNode( true )
-      clone.id = 'overlay' + snap.key;
-      overlay.appendChild( clone );
-
-      updateChatScroll();
-    }, function ( error ) {
-      console.error( "Couldn't load room message.", error );
-    } );
-
-  firebase.database()
-    .ref( 'messages/' + roomName )
-    .on( 'child_changed', function ( snap ) {
-
-      let boxMessage = document.getElementById( 'box' + snap.key );
-      let overlayMessage = document.getElementById( 'overlay' + snap.key );
-
-      boxMessage.removeChild( boxMessage.firstChild );
-      overlayMessage.removeChild( overlayMessage.firstChild );
-
-      if ( snap.val()
-        .nickname ) {
-        boxMessage.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
-          .text ) );
-        overlayMessage.appendChild( document.createTextNode( snap.val()
-          .nickname + ' : ' + snap.val()
-          .text ) );
-      } else {
-        if ( snap.val()
-          .admin ) {
-          boxMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-            .text ) );
-          overlayMessage.appendChild( document.createTextNode( 'Admin : ' + snap.val()
-            .text ) );
-        } else {
-          boxMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-            .text ) );
-          overlayMessage.appendChild( document.createTextNode( 'Anonymous : ' + snap.val()
-            .text ) );
-        }
-      }
-
-      updateChatScroll();
-
-    }, function ( error ) {
-      console.error( "Couldn't load room message.", error );
-    } );
-}
-
-// Push a message to the current room.
-function sendMessage() {
-  if ( !roomName || !userID || !document.getElementById( 'writeMessage' )
-    .value ) {
-    return;
-  }
-
-  let message = {
-    user: userID,
-    nickname: myNickname,
-    admin: iAmAdmin,
-    text: document.getElementById( 'writeMessage' )
-      .value
-  }
-
-  firebase.database()
-    .ref( 'messages/' + roomName )
-    .push( message )
-    .catch( function ( error ) {
-      console.error( "Error: couldn't send message.", error );
-      return;
-    } );
-
-  document.getElementById( 'writeMessage' )
-    .value = '';
-}
-
-// Scroll to the bottom of the chat box and overlay
-// (needed to keep showing only the latest messages in the box).
-function updateChatScroll() {
-  let element = document.getElementById( 'chatBox' );
-  element.scrollTop = element.scrollHeight;
-  element = document.getElementById( 'chatOverlayMessages' );
-  element.scrollTop = element.scrollHeight;
-}
-
-// Update all messages sent with the chosen nickname.
-function changeNickname() {
-  myNickname = prompt( 'Enter your new nickname.' );
-
-  firebase.database()
-    .ref( 'users/' + userID )
-    .update( {
-      nickname: myNickname
-    } )
-    .catch( function ( error ) {
-      console.error( "Error: couldn't update nickname.", error );
-    } )
-
-  firebase.database()
-    .ref( 'messages/lobby' )
-    .orderByChild( 'user' )
-    .equalTo( userID )
-    .once( 'value' )
-    .then( function ( snap ) {
-      snap.forEach( function ( data ) {
-        firebase.database()
-          .ref( 'messages/lobby/' + data.key )
-          .update( {
-            nickname: myNickname
-          } )
-          .then( function () {
-            updateChatListener();
-          }, function ( error ) {
-            console.error( "Error: couldn't update nickname.", error );
-          } );
-      } );
-    } );
-
-  firebase.database()
-    .ref( 'rooms' )
-    .once( 'value' )
-    .then( function ( snapRoom ) {
-
-      snapRoom.forEach( function ( room ) {
-
-        firebase.database()
-          .ref( 'messages/' + room.key )
-          .orderByChild( 'user' )
-          .equalTo( userID )
-          .once( 'value' )
-          .then( function ( snapMessage ) {
-
-            snapMessage.forEach( function ( message ) {
-
-              firebase.database()
-                .ref( 'messages/' + roomName + '/' + message.key )
-                .update( {
-                  nickname: myNickname
-                } )
-                .then( function () {
-
-                  updateChatListener();
-
-                }, function ( error ) {
-                  console.error( "Error: couldn't update nickname.", error );
-                } );
-            } );
-          }, function ( error ) {
-            console.error( "Error: couldn't update nickname.", error );
-          } );
-      } );
-    }, function ( error ) {
-      console.error( "Error: couldn't update nickname.", error );
-    } );
-
-  if ( myNickname ) {
-    document.getElementById( 'nicknameText' )
-      .innerHTML = 'You are ' + myNickname + '. Click here to change nickname.';
-  } else {
-    document.getElementById( 'nicknameText' )
-      .innerHTML = 'You are anonymous. Click here to change nickname.';
-  }
 }
 
 
