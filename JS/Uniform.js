@@ -458,10 +458,14 @@ firebase.database()
       document.getElementById( 'dashedPointer' )
         .style.display = 'block';
       chatOverlayIsVisible = false;
+
       if ( roomName && iAmAdmin ) {
         roomName = null;
         updateChatListener();
         updateRoomBox();
+      } else {
+        leaveRoom();
+        exitTutorial();
       }
     } else {
       document.getElementById( 'onlineOverlay' )
@@ -488,6 +492,15 @@ firebase.database()
     document.getElementById( 'dashedPointer' )
       .style.display = 'block';
     chatOverlayIsVisible = false;
+
+    if ( roomName && iAmAdmin ) {
+      roomName = null;
+      updateChatListener();
+      updateRoomBox();
+    } else {
+      leaveRoom();
+      exitTutorial();
+    }
   } );
 
 // If login fails, lock the online features box.
@@ -1606,6 +1619,8 @@ function updateChatListener() {
       overlay.appendChild( clone );
 
       updateChatScroll();
+
+      giveSnack();
     }, function ( error ) {
       console.error( "Couldn't load room message.", error );
     } );
@@ -1763,6 +1778,15 @@ function changeNickname() {
     document.getElementById( 'nicknameText' )
       .innerHTML = 'You are anonymous. Click here to change nickname.';
   }
+}
+
+// Show a notification.
+function giveSnack() {
+  let snack = document.getElementById( "snackbar" );
+  snack.classList.add( 'show' );
+  setTimeout( function () {
+    snack.classList.remove( 'show' );
+  }, 2000 );
 }
 
 
@@ -2132,6 +2156,14 @@ function leaveRoom() {
         console.error( "Error: couldn't delete room.", error );
       } );
   } else {
+
+    remoteEvents = [];
+    clearTimeout( scheduledEvent );
+    scheduledEvent = null;
+    document.querySelectorAll( '.key' )
+      .forEach( function ( key ) {
+        handleNoteStop( key.dataset[ 'code' ] );
+      } );
 
     let promises = [];
 
