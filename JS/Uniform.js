@@ -5,7 +5,7 @@
 // refers to the index along the sequence displayed under the keyboard.
 var currentModeIndex = -1;
 // in Progression mode, there are several available sequences.
-var currentSequenceIndex = 0;
+var selectedSequenceIndex = 0;
 // Can be 'None', 'Free', 'Progression'.
 var modeMechanic = 'None';
 // Option for hearing the chord upon selection of the mode.
@@ -15,7 +15,7 @@ var currentScaleIndex = 0;
 // The selected scale is stored for ease.
 var currentScale = [];
 // Same for the selected sequence in Progression mode.
-var currentSequence = [];
+var selectedSequence = [];
 // If english note labels are displayed
 var engNotesShown = true;
 // If italian note labels are displayed
@@ -447,9 +447,11 @@ firebase.database()
   .ref( '.info/connected' )
   .on( 'value', function ( snap ) {
     if ( !snap.val() ) {
-      document.getElementById( 'offlineOverlay' )
+      document.getElementById( 'onlineOverlay' )
         .style.display = 'block';
-      document.getElementById( 'authOverlay' )
+      document.getElementById( 'onlineOverlayText' )
+        .innerHTML = 'Server connection lost.';
+      document.getElementById( 'onlineOverlayButton' )
         .style.display = 'none';
       document.getElementById( 'chatOverlay' )
         .style.display = 'none';
@@ -457,18 +459,24 @@ firebase.database()
         .style.display = 'block';
       chatOverlayIsVisible = false;
     } else {
-      document.getElementById( 'offlineOverlay' )
+      document.getElementById( 'onlineOverlay' )
         .style.display = 'none';
       if ( !userID ) {
-        document.getElementById( 'authOverlay' )
+        document.getElementById( 'onlineOverlay' )
+          .style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = 'Authentication failed.';
+        document.getElementById( 'onlineOverlayButton' )
           .style.display = 'block';
       }
     }
   }, function ( error ) {
     console.error( "Error: couldn't determine connection.", error );
-    document.getElementById( 'offlineOverlay' )
+    document.getElementById( 'onlineOverlay' )
       .style.display = 'block';
-    document.getElementById( 'authOverlay' )
+    document.getElementById( 'onlineOverlayText' )
+      .innerHTML = 'Server connection lost.';
+    document.getElementById( 'onlineOverlayButton' )
       .style.display = 'none';
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
@@ -485,10 +493,14 @@ function logIn() {
       console.error( "Error: couldn't sign in.", error );
     } );
   if ( !userID ) {
-    document.getElementById( 'authOverlay' )
+    document.getElementById( 'onlineOverlay' )
+      .style.display = 'block';
+    document.getElementById( 'onlineOverlayText' )
+      .innerHTML = 'Authentication failed.';
+    document.getElementById( 'onlineOverlayButton' )
       .style.display = 'block';
   } else {
-    document.getElementById( 'authOverlay' )
+    document.getElementById( 'onlineOverlay' )
       .style.display = 'none';
   }
 }
@@ -777,7 +789,7 @@ function changeMode( code ) {
   }
 
   if ( code == 'Space' ) {
-    currentModeIndex = ( currentModeIndex + 1 ) % currentSequence.length;
+    currentModeIndex = ( currentModeIndex + 1 ) % selectedSequence.length;
   } else {
     let number = code.match( /\d+$/ );
 
@@ -786,7 +798,7 @@ function changeMode( code ) {
     }
 
     number = parseInt( number[ 0 ], 10 );
-    if ( number > currentSequence.length ) {
+    if ( number > selectedSequence.length ) {
       return;
     }
 
@@ -799,7 +811,7 @@ function changeMode( code ) {
   renderMode();
   handleChordProgression();
   if ( playChordSelected ) {
-    playChord( currentSequence[ currentModeIndex ] )
+    playChord( selectedSequence[ currentModeIndex ] )
   }
 }
 
@@ -808,17 +820,17 @@ function changeMode( code ) {
 function changeModeMechanic( value ) {
   modeMechanic = value;
   currentModeIndex = -1;
-  currentSequenceIndex = 0;
+  selectedSequenceIndex = 0;
 
   switch ( modeMechanic ) {
     case 'None':
-      currentSequence = [];
+      selectedSequence = [];
       break;
     case 'Free':
-      currentSequence = [ 0, 1, 2, 3, 4, 5, 6 ];
+      selectedSequence = [ 0, 1, 2, 3, 4, 5, 6 ];
       break;
     case 'Progression':
-      currentSequence = sequenceList[ 0 ];
+      selectedSequence = sequenceList[ 0 ];
       break;
     default:
       return;
@@ -924,21 +936,21 @@ function renderMode() {
   // setting change worth broadcasting)
   broadcastSettings();
 
-  if ( currentModeIndex < 0 ) {
-    return;
-  }
-
-  // Reset all markers on the keyboard to selected,
+  // Reset all markers to selected,
   let divs = document.querySelectorAll( '.mode' );
   divs.forEach( function ( div ) {
     div.classList.remove( 'unselected' );
   } );
 
-  // Unselect every second, fourth, sixth, and seventh on the keyboard.
-  let second = numerals[ ( 1 + currentSequence[ currentModeIndex ] ) % 7 ];
-  let fourth = numerals[ ( 3 + currentSequence[ currentModeIndex ] ) % 7 ];
-  let sixth = numerals[ ( 5 + currentSequence[ currentModeIndex ] ) % 7 ];
-  let seventh = numerals[ ( 6 + currentSequence[ currentModeIndex ] ) % 7 ];
+  if ( currentModeIndex < 0 ) {
+    return;
+  }
+
+  // Unselect every second, fourth, sixth, and seventh,
+  let second = numerals[ ( 1 + selectedSequence[ currentModeIndex ] ) % 7 ];
+  let fourth = numerals[ ( 3 + selectedSequence[ currentModeIndex ] ) % 7 ];
+  let sixth = numerals[ ( 5 + selectedSequence[ currentModeIndex ] ) % 7 ];
+  let seventh = numerals[ ( 6 + selectedSequence[ currentModeIndex ] ) % 7 ];
 
   let markerlist = document.evaluate(
     "//div[contains(concat(' ', normalize-space(@class), ' '), ' " + second + " ')" +
@@ -959,13 +971,13 @@ function renderMode() {
     }
   } );
 
-  // Reset all markers in the modeBox to unselected,
+  // Reset all markers IN THE MODEBOX to unselected,
   divs = document.querySelectorAll( '[id^="mode"]' );
   divs.forEach( function ( div ) {
     div.classList.add( 'unselected' );
   } );
 
-  // Select the cursor in the modeBox,
+  // Select the cursor IN THE MODEBOX.
   let cursor = document.querySelector( '[id="mode' + currentModeIndex + '"]' );
   if ( cursor != null ) {
     cursor.classList.remove( 'unselected' );
@@ -989,13 +1001,13 @@ function renderSequence() {
     let div = document.createElement( 'div' );
     div.classList.add( 'leftArrow', 'FLATgray' );
     div.addEventListener( 'click', ( event ) => {
-      currentSequenceIndex = currentSequenceIndex - 1;
-      if ( currentSequenceIndex < 0 ) {
-        currentSequenceIndex = sequenceList.length - 1
+      selectedSequenceIndex = selectedSequenceIndex - 1;
+      if ( selectedSequenceIndex < 0 ) {
+        selectedSequenceIndex = sequenceList.length - 1
       }
       currentModeIndex = -1;
 
-      currentSequence = sequenceList[ currentSequenceIndex ];
+      selectedSequence = sequenceList[ selectedSequenceIndex ];
 
       renderSequence();
       handleChordProgression();
@@ -1004,7 +1016,7 @@ function renderSequence() {
   }
 
   // Add every element of the sequence.
-  for ( i = 0; i < currentSequence.length; i++ ) {
+  for ( i = 0; i < selectedSequence.length; i++ ) {
     let element = document.createElement( 'span' );
     let label = document.createElement( 'div' );
     let arrowFillC = document.createElement( 'div' );
@@ -1015,7 +1027,7 @@ function renderSequence() {
     label.id = 'mode' + i;
     label.classList.add( 'sequenceLabel' );
     label.classList.add( 'mode' );
-    label.classList.add( numerals[ currentSequence[ i ] ] );
+    label.classList.add( numerals[ selectedSequence[ i ] ] );
 
     arrowFillC.classList.add( 'percentageFill', 'FLATgray', 'consonance' );
     arrowOutlineC.classList.add( 'percentageOutline' );
@@ -1023,7 +1035,7 @@ function renderSequence() {
     arrowOutlineE.classList.add( 'percentageOutline' );
 
     element.classList.add( 'sequenceElement' );
-    element.dataset.mode = numerals[ currentSequence[ i ] ];
+    element.dataset.mode = numerals[ selectedSequence[ i ] ];
 
     ( function ( i ) {
       element.addEventListener( 'mousedown', ( event ) => {
@@ -1040,7 +1052,7 @@ function renderSequence() {
     arrowFillC.appendChild( arrowOutlineC );
     element.appendChild( arrowFillC );
 
-    label.appendChild( document.createTextNode( numerals[ currentSequence[ i ] ] ) );
+    label.appendChild( document.createTextNode( numerals[ selectedSequence[ i ] ] ) );
     element.appendChild( label );
 
     arrowFillE.appendChild( arrowOutlineE );
@@ -1053,10 +1065,10 @@ function renderSequence() {
     let div = document.createElement( 'div' );
     div.classList.add( 'rightArrow', 'FLATgray' );
     div.addEventListener( 'click', ( event ) => {
-      currentSequenceIndex = ( currentSequenceIndex + 1 ) % sequenceList.length;
+      selectedSequenceIndex = ( selectedSequenceIndex + 1 ) % sequenceList.length;
       currentModeIndex = -1;
 
-      currentSequence = sequenceList[ currentSequenceIndex ];
+      selectedSequence = sequenceList[ selectedSequenceIndex ];
 
       renderSequence();
       handleChordProgression();
@@ -1234,11 +1246,11 @@ function handleChordProgression() {
   if ( !playedSequence ) {
     resetChordProgression();
   }
-  if ( playedSequence[ playedSequence.length - 1 ] == numerals[ currentSequence[ currentModeIndex ] ] ) {
+  if ( playedSequence[ playedSequence.length - 1 ] == numerals[ selectedSequence[ currentModeIndex ] ] ) {
     return;
   }
 
-  playedSequence.push( numerals[ currentSequence[ currentModeIndex ] ] );
+  playedSequence.push( numerals[ selectedSequence[ currentModeIndex ] ] );
 
   let expectation = null;
   if ( expectationPrediction ) {
@@ -1248,7 +1260,7 @@ function handleChordProgression() {
   /*
     let consonance = null;
     if ( consonancePrediction ) {
-      consonance = consonancePrediction[ numerals[ currentSequence[ currentModeIndex ] ] ];
+      consonance = consonancePrediction[ numerals[ selectedSequence[ currentModeIndex ] ] ];
     }
   */
 
@@ -1574,7 +1586,7 @@ function createRoom() {
             scale: currentScaleIndex,
             mechanic: modeMechanic,
             mode: currentModeIndex,
-            sequence: currentSequenceIndex
+            sequence: selectedSequenceIndex
           } )
         );
 
@@ -1812,10 +1824,11 @@ function joinRoom( name ) {
         overlayText.classList.add( 'overlayText' );
         overlayText.appendChild( document.createTextNode( 'You were kicked from the room.\n(admin disconnected)' ) );
         overlay.appendChild( overlayText );
-        box.appendChild( overlay );
+        box.parentNode.appendChild( overlay );
 
         window.setTimeout( function () {
           document.getElementById( 'onlineBox' )
+            .parentNode
             .removeChild( document.getElementById( 'kickedOverlay' ) );
         }, 5000 );
       } );
@@ -2293,7 +2306,7 @@ function handleRemoteSettings( val ) {
   changeScale( val.scale );
   changeModeMechanic( val.mechanic );
   if ( modeMechanic == 'Progression' ) {
-    currentSequence = sequenceList[ val.sequence ];
+    selectedSequence = sequenceList[ val.sequence ];
   }
   changeMode( 'Numpad' + val.mode );
 }
@@ -2307,7 +2320,7 @@ function broadcastSettings() {
         scale: currentScaleIndex,
         mechanic: modeMechanic,
         mode: currentModeIndex,
-        sequence: currentSequenceIndex
+        sequence: selectedSequenceIndex
       } )
       .catch( function ( error ) {
         console.error( "Error: couldn't broadcast settings.", error );
@@ -2340,7 +2353,7 @@ function toggleRecording() {
       scale: currentScaleIndex,
       mechanic: modeMechanic,
       mode: currentModeIndex,
-      sequence: currentSequenceIndex
+      sequence: selectedSequenceIndex
     };
   }
 

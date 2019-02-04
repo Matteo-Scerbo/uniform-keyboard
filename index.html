@@ -26,14 +26,15 @@
 
 <body class="FLATblack" onresize="renderSlider()">
 
+  <span id="scaleSliderCursor" class="white key">
+    <div id="scaleSliderCursorMode" class="mode I"></div>
+    <div id="dashedPointer" class="I"></div>
+  </span>
+  <p id="scaleSliderLabel"></p>
+  <p id="scaleSliderLabelInfo"></p>
+
   <form id="scaleBox" class="FLATblack">
     <span id="scaleSlider">
-      <span id="scaleSliderCursor" class="white key">
-        <div id="scaleSliderCursorMode" class="mode I"></div>
-        <div id="dashedPointer" class="I"></div>
-      </span>
-      <p id="scaleSliderLabel"></p>
-      <p id="scaleSliderLabelInfo"></p>
       <input id="scaleSliderRange" type="range" value="0" min="0" max="12" oninput="changeScale(this.value)">
     </span>
   </form>
@@ -363,7 +364,7 @@
 
   <div id="accordion">
     <details class="accordionElement FLATwhite">
-      <summary class="accordionBanner FLATblack">
+      <summary id="tensionBanner" class="accordionBanner FLATblack">
         <span class="accordionTitle">Harmonic tension</span>
       </summary>
       <div id="tensionBox">
@@ -384,22 +385,17 @@
       </div>
     </details>
     <details class="accordionElement FLATwhite">
-      <summary class="accordionBanner FLATblack">
+      <summary id="onlineBanner" class="accordionBanner FLATblack">
         <span class="accordionTitle">Online features</span>
       </summary>
+
       <div id="onlineBox">
 
-        <div id="authOverlay" class="overlay">
-          <div id="authOverlayText" class="overlayText FLATwhite">
-            Authentication failed.
-          </div>
-          <button class="I" onclick="logIn()">Retry</button>
-        </div>
-
-        <div id="offlineOverlay" class="overlay">
-          <div id="offlineOverlayText" class="overlayText FLATwhite">
+        <div id="onlineOverlay" class="overlay">
+          <div id="onlineOverlayText" class="overlayText FLATwhite">
             Connecting to server...
           </div>
+          <button id="onlineOverlayButton" class="I" onclick="logIn()">Retry</button>
         </div>
 
         <div id="chatBox">
@@ -421,7 +417,7 @@
       </div>
     </details>
     <details class="accordionElement FLATwhite">
-      <summary class="accordionBanner FLATblack">
+      <summary id="recordingBanner" class="accordionBanner FLATblack">
         <span class="accordionTitle">Recording</span>
       </summary>
       <div id="recordBox">

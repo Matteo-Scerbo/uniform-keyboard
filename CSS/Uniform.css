@@ -70,6 +70,10 @@ body {
   overflow: scroll;
 }
 
+p {
+  margin: 0;
+}
+
 #scaleBox {
   width: 800px;
   margin: 0 auto;
@@ -77,12 +81,14 @@ body {
   padding: 10px 25px;
   color: var(--dark);
   white-space: nowrap;
+  z-index: 2;
 }
 
 #scaleSlider {
   margin-left: -11px;
   margin-top: -25px;
   width: fit-content;
+  z-index: 2;
 }
 
 #scaleSliderRange {
@@ -90,6 +96,7 @@ body {
   margin-left: -19px;
   background: transparent;
   -webkit-appearance: none;
+  z-index: 2;
 }
 
 #scaleSliderRange:focus {
@@ -100,18 +107,21 @@ body {
   width: 100%;
   height: 80px;
   cursor: pointer;
+  z-index: 2;
 }
 
 #scaleSliderRange::-moz-range-track {
   width: 100%;
   height: 80px;
   cursor: pointer;
+  z-index: 2;
 }
 
 #scaleSliderRange::-webkit-slider-thumb {
   height: 54px;
   width: 56px;
   background: transparent;
+  z-index: 2;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: 24px;
@@ -121,6 +131,7 @@ body {
   height: 54px;
   width: 56px;
   background: transparent;
+  z-index: 2;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: 24px;
@@ -135,14 +146,12 @@ body {
   left: 100px;
   top: 10px;
   font-size: 150%;
-  z-index: -2;
 }
 
 #scaleSliderLabelInfo {
   position: absolute;
   left: 100px;
   top: 40px;
-  z-index: -2;
 }
 
 #scaleSliderCursor {
@@ -150,13 +159,14 @@ body {
   transform-origin: center center;
   left: 25px;
   top: 15px;
-  z-index: -1;
+  z-index: 1;
 }
 
 #dashedPointer {
   margin-left: 50%;
   margin-top: -15px;
   height: 63px;
+  width: 0;
   border-left: 2px dotted var(--dark);
   transform-origin: center center;
 }
@@ -177,191 +187,6 @@ body {
   border-radius: 50px;
   background-color: var(--dark);
   touch-action: none;
-  z-index: -2;
-}
-
-#accordion {
-  display: table;
-  margin: 10px auto;
-  width: 800px;
-}
-
-.accordionElement {
-  display: table;
-  margin: 10px auto;
-  background: var(--light);
-  border: 3px solid var(--light);
-  border-radius: 20px;
-  min-height: 30px;
-  max-height: 40px;
-  width: 800px;
-  -webkit-transition: all 0.3s;
-  -o-transition: all 0.3s;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.accordionElement[open] {
-  border-radius: 5px;
-  min-height: 80px;
-  max-height: 800px;
-  width: 850px;
-  -webkit-transition: all 0.6s;
-  -o-transition: all 0.6s;
-  transition: all 0.6s;
-}
-
-.accordionElement:hover {
-  border: 3px solid var(--dark);
-}
-
-.accordionElement ::-webkit-details-marker {
-  display: none;
-}
-
-.accordionElement+.accordionElement {
-  margin-top: 10px;
-}
-
-.accordionBanner {
-  color: var(--dark);
-  outline: none;
-  font-size: 20px;
-}
-
-.accordionBanner:after {
-  content: "➕";
-  float: left;
-}
-
-[open] .accordionBanner:after {
-  content: "➖";
-}
-
-.accordionTitle {
-  font-size: 20px;
-  padding: 5px;
-}
-
-#modalBox {
-  width: 850px;
-  margin: 0 auto;
-}
-
-#mechanicSettingsBox, #playChordSettingsBox {
-  padding: 10px;
-  color: var(--dark);
-  white-space: nowrap;
-}
-
-#mechanicSettingsBox {
-  float: left;
-  width: 60px;
-}
-
-#playChordSettingsBox {
-  float: right;
-  width: 0;
-  transform: translate(-1000%, -10px);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  z-index: -1;
-}
-
-label {
-  position: relative;
-  display: inline-block;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding-left: 30px;
-  padding-right: 10px;
-  line-height: 40px;
-  height: 25px;
-  cursor: pointer;
-}
-
-label::before {
-  content: " ";
-  position: absolute;
-  top: 6px;
-  left: 0;
-  display: block;
-  width: 25px;
-  height: 25px;
-  border: 2px solid var(--dark);
-  border-radius: 4px;
-  z-index: -1;
-}
-
-input[type="radio"]+label::before {
-  border-radius: 18px;
-}
-
-input[type="checkbox"]:checked+label,
-input[type="radio"]:checked+label {
-  padding-left: 10px;
-  color: #fff;
-}
-
-input[type="checkbox"]:checked+label::before,
-input[type="radio"]:checked+label::before {
-  width: 100%;
-  background: var(--light);
-}
-
-label,
-label::before {
-  -webkit-transition: .25s all ease;
-  -o-transition: .25s all ease;
-  transition: .25s all ease;
-}
-
-#sequenceBox {
-  height: fit-content;
-  display: table;
-  margin: 0 auto;
-  padding: 30px 0;
-}
-
-#recordBox {
-  margin: 10px 0;
-}
-
-#chatBox {
-  max-height: 150px;
-  overflow: hidden;
-  position: relative;
-  margin: 10px auto;
-  display: none;
-}
-
-#chatBoxFadeOut {
-  height: 50px;
-  background: linear-gradient(var(--light), transparent 50px);
-}
-
-#chatBoxFadeOutContainer {
-  height: 0;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-}
-
-.overlay {
-  position: absolute;
-  display: none;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.7);
-  cursor: default;
-  z-index: 1;
 }
 
 #chatOverlay {
@@ -375,79 +200,6 @@ label::before {
 #chatOverlayMessages {
   height: 80%;
   overflow: auto;
-}
-
-#offlineOverlay {}
-
-p {
-  margin: 0;
-}
-
-#loadChatText {
-  font-weight: bold;
-  text-align: center;
-  color: var(--light);
-  margin: 2px;
-}
-
-#viewChatText {
-  font-weight: bold;
-  text-align: center;
-}
-
-#nicknameText {
-  color: var(--light);
-  margin: 2px;
-}
-
-.overlayText {
-  position: absolute;
-  width: 90%;
-  margin: 5%;
-  text-align: center;
-  font-size: 50px;
-  color: var(--dark);
-}
-
-#feelingText {
-  opacity: 1;
-  -webkit-transition: 1s opacity;
-  -o-transition: 1s opacity;
-  transition: 1s opacity;
-  fill: var(--inside);
-  font-weight: bold;
-  font-size: 45px;
-}
-
-#longingText {
-  opacity: 0;
-  -webkit-transition: 0.5s;
-  -o-transition: 0.5s;
-  transition: 0.5s;
-  font-weight: bold;
-}
-
-#longingText:hover {
-  opacity: 1;
-}
-
-#anticipationText {
-  opacity: 0;
-  -webkit-transition: 0.5s;
-  -o-transition: 0.5s;
-  transition: 0.5s;
-  font-weight: bold;
-}
-
-#anticipationText:hover {
-  opacity: 1;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 250px;
-  background: var(--dark);
-  outline: none;
 }
 
 .key {
@@ -512,6 +264,100 @@ p {
   box-shadow: 0px 0px 0px 5px var(--outside) inset;
 }
 
+.unselected {
+  opacity: 0.6;
+  background-color: transparent;
+}
+
+#modalBox {
+  width: 850px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+#mechanicSettingsBox, #playChordSettingsBox {
+  padding: 10px;
+  color: var(--dark);
+  white-space: nowrap;
+}
+
+#mechanicSettingsBox {
+  float: left;
+  width: 60px;
+}
+
+#playChordSettingsBox {
+  float: right;
+  width: 0;
+  transform: translate(-1000%, -10px);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+input[type="range"] {
+  z-index: 2;
+}
+
+label {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 10px;
+  line-height: 40px;
+  height: 25px;
+  cursor: pointer;
+}
+
+label::before {
+  content: " ";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  display: block;
+  width: 25px;
+  height: 25px;
+  border: 2px solid var(--dark);
+  border-radius: 4px;
+  z-index: -1;
+}
+
+input[type="radio"]+label::before {
+  border-radius: 18px;
+}
+
+input[type="checkbox"]:checked+label,
+input[type="radio"]:checked+label {
+  padding-left: 10px;
+  color: white;
+}
+
+input[type="checkbox"]:checked+label::before,
+input[type="radio"]:checked+label::before {
+  width: 100%;
+  background: var(--light);
+}
+
+label,
+label::before {
+  -webkit-transition: .25s all ease;
+  -o-transition: .25s all ease;
+  transition: .25s all ease;
+}
+
+#sequenceBox {
+  height: fit-content;
+  display: table;
+  margin: 0 auto;
+  padding: 30px 0;
+}
+
 .sequenceElement {
   display: inline-block;
 }
@@ -521,11 +367,6 @@ p {
   height: 40px;
   margin: 15px;
   padding-top: 10px;
-}
-
-.unselected {
-  opacity: 0.6;
-  background-color: transparent;
 }
 
 .leftArrow {
@@ -623,6 +464,80 @@ p {
   transform: translate(-20px, -22px);
 }
 
+#accordion {
+  display: table;
+  margin: 10px auto;
+  width: 800px;
+  background-color: white;
+}
+
+.accordionElement {
+  margin: 10px auto;
+  background: var(--light);
+  border: 3px solid var(--light);
+  border-radius: 20px;
+  min-height: 30px;
+  max-height: 40px;
+  width: 800px;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.accordionElement[open] {
+  border-radius: 5px;
+  min-height: 80px;
+  max-height: 800px;
+  width: 850px;
+  -webkit-transition: all 0.6s;
+  -o-transition: all 0.6s;
+  transition: all 0.6s;
+}
+
+.accordionElement:hover {
+  border: 3px solid var(--dark);
+}
+
+.accordionElement ::-webkit-details-marker {
+  display: none;
+}
+
+.accordionElement+.accordionElement {
+  margin-top: 10px;
+}
+
+.accordionBanner {
+  color: var(--dark);
+  outline: none;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.accordionBanner:after {
+  content: "➕";
+  float: left;
+}
+
+[open] .accordionBanner:after {
+  content: "➖";
+}
+
+.accordionTitle {
+  font-size: 20px;
+  padding: 5px;
+}
+
+#feelingText {
+  opacity: 1;
+  -webkit-transition: 1s opacity;
+  -o-transition: 1s opacity;
+  transition: 1s opacity;
+  fill: var(--inside);
+  font-weight: bold;
+  font-size: 45px;
+}
+
 .indicator {
   display: inline;
   margin: 0 10px;
@@ -704,12 +619,26 @@ p {
   }
 }
 
-.message {
-  width: fit-content;
-  background: linear-gradient(var(--dark), var(--light) 10px);
+.overlay {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
   border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: default;
+  z-index: 2;
+}
+
+.overlayText {
+  position: absolute;
+  width: 90%;
+  margin: 5%;
+  text-align: center;
+  font-size: 50px;
+  color: var(--dark);
 }
 
 button {
@@ -728,6 +657,61 @@ button:hover {
 
 button:active {
   box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.2);
+}
+
+#onlineBox {
+  position: relative;
+}
+
+#onlineOverlay {}
+
+#chatBox {
+  max-height: 150px;
+  overflow: hidden;
+  position: relative;
+  margin: 10px auto;
+  display: none;
+}
+
+#chatBoxFadeOut {
+  height: 50px;
+  background: linear-gradient(var(--light), transparent 50px);
+}
+
+#chatBoxFadeOutContainer {
+  height: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+#loadChatText {
+  font-weight: bold;
+  text-align: center;
+  color: var(--light);
+  margin: 2px;
+}
+
+#viewChatText {
+  font-weight: bold;
+  text-align: center;
+}
+
+#nicknameText {
+  color: var(--light);
+  margin: 2px;
+}
+
+.message {
+  width: fit-content;
+  background: linear-gradient(var(--dark), var(--light) 10px);
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+
+#recordBox {
+  margin: 10px 0;
 }
 
 a {
