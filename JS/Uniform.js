@@ -1620,7 +1620,7 @@ function updateChatListener() {
 
       updateChatScroll();
 
-      giveSnack();
+      giveSnack( 'New message in the chat!', 'VII' );
     }, function ( error ) {
       console.error( "Couldn't load room message.", error );
     } );
@@ -1781,11 +1781,14 @@ function changeNickname() {
 }
 
 // Show a notification.
-function giveSnack() {
-  let snack = document.getElementById( "snackbar" );
+function giveSnack( text, color ) {
+  let snack = document.getElementById( 'snackbar' );
+  snack.innerHTML = text;
   snack.classList.add( 'show' );
+  snack.classList.add( color );
   setTimeout( function () {
     snack.classList.remove( 'show' );
+    snack.classList.remove( color );
   }, 2000 );
 }
 
@@ -2673,6 +2676,8 @@ function toggleRecording() {
         .disabled = false;
       document.getElementById( 'uploadRecordingButton' )
         .disabled = false;
+
+      prepareExport();
     }
 
     [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
@@ -2697,6 +2702,8 @@ function toggleRecording() {
     document.getElementById( 'replayButton' )
       .disabled = true;
     document.getElementById( 'uploadRecordingButton' )
+      .disabled = true;
+    document.getElementById( 'exportRecordingButton' )
       .disabled = true;
 
     [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
@@ -2839,6 +2846,83 @@ function uploadRecording() {
     }, function ( error ) {
       console.error( "Error: couldn't retrieve upload names.", error );
     } );
+}
+
+// Exports the recording as a JSON file.
+function prepareExport() {
+  if ( isEmpty( recordedKeypresses ) ) {
+    return;
+  }
+
+  let data = {
+    owner: userID,
+    keypresses: recordedKeypresses,
+    settings: recordingSettings
+  };
+
+  let dataString = "data:text/json;charset=utf-8," + encodeURIComponent( JSON.stringify( data ) );
+  let anchorElement = document.getElementById( 'exportRecordingAnchor' );
+  anchorElement.href = dataString;
+
+  document.getElementById( 'exportRecordingButton' )
+    .disabled = false;
+}
+
+// Load a user-provided JSON in memory
+function handleImport() {
+  let input = document.getElementById( 'importRecordingInput' )
+    .files;
+
+  if ( input.length <= 0 ) {
+    recordedKeypresses = {};
+    document.getElementById( 'replayButton' )
+      .disabled = true;
+    document.getElementById( 'uploadRecordingButton' )
+      .disabled = true;
+    document.getElementById( 'exportRecordingButton' )
+      .disabled = true;
+    return;
+  }
+
+  let fr = new FileReader();
+
+  fr.onload = function ( e ) {
+    let result = JSON.parse( e.target.result );
+
+    try {
+      recordedKeypresses = result[ 'keypresses' ];
+      recordingSettings = result[ 'settings' ];
+    } catch ( error ) {
+      console.error( 'Unsupported format.', error );
+      giveSnack( 'Unsupported format.', 'V' );
+      return;
+    }
+
+    if ( !recordedKeypresses || !recordingSettings ) {
+      giveSnack( 'Unsupported format.', 'V' );
+      return;
+    }
+
+    if ( isEmpty( recordedKeypresses ) ) {
+      document.getElementById( 'replayButton' )
+        .disabled = true;
+      document.getElementById( 'uploadRecordingButton' )
+        .disabled = true;
+      document.getElementById( 'exportRecordingButton' )
+        .disabled = true;
+    } else {
+      document.getElementById( 'replayButton' )
+        .disabled = false;
+      document.getElementById( 'uploadRecordingButton' )
+        .disabled = false;
+      document.getElementById( 'exportRecordingButton' )
+        .disabled = false;
+
+      replayRecording();
+    }
+  }
+
+  fr.readAsText( input.item( 0 ) );
 }
 
 // Retrieve the data for one tutorial (in bunch) and store it in variables.

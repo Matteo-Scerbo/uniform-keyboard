@@ -11,6 +11,7 @@
 .FLATblack {
   --light: #34495E;
   --dark: #2C3E50;
+  --darker: #121a21;
 }
 
 .I {
@@ -689,9 +690,9 @@ button:active {
 button:disabled {
   cursor: not-allowed;
   background: linear-gradient(to top right,
-    #2C3E50, #2C3E50 40%,
-    var(--dark) 41%, var(--dark) 59%,
-    #2C3E50 60%);
+    var(--dark), var(--dark) 40%,
+    #121a21 41%, #121a21 59%,
+    var(--dark) 60%);
 }
 
 .pulsating {
@@ -805,6 +806,10 @@ button:disabled {
 
 #recordBox {
   margin: 10px 0;
+}
+
+#exportRecordingAnchor, #importRecordingInput {
+  display: none;
 }
 
 a {

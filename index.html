@@ -424,6 +424,14 @@
         <button id="recordButton" class="V" onclick="toggleRecording();">Start recording</button>
         <button id="replayButton" class="VI" onclick="replayRecording();" disabled>Replay</button>
         <button id="uploadRecordingButton" class="III" onclick="uploadRecording();" disabled>Upload</button>
+        <button id="exportRecordingButton" class="III" onclick="document.getElementById('exportRecordingAnchor').click();" disabled>
+          Export as JSON file
+          <a id="exportRecordingAnchor" href="#" download="recording.json"></a>
+        </button>
+        <button id="importRecordingButton" class="III" onclick="document.getElementById('importRecordingInput').click();">
+          Import JSON file
+          <input id="importRecordingInput" type="file" id="selectFiles" value="Import" onchange="handleImport();">
+        </button>
       </div>
     </details>
   </div>
@@ -437,7 +445,7 @@
 
   <script src="./JS/Uniform.js"></script>
 
-  <div id="snackbar" class="VII">New message in the chat!</div>
+  <div id="snackbar">New message in the chat!</div>
 
 </body>
 
