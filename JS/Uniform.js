@@ -2464,7 +2464,7 @@ function updateRoomBox() {
     .once( 'value' )
     .then( function ( snapTutorials ) {
 
-        let tutorialpar = document.createElement( 'p' );
+        let tutorialpar = document.createElement( 'h1' );
         tutorialpar.appendChild( document.createTextNode( 'Tutorials:' ) );
         box.appendChild( tutorialpar );
 
@@ -2490,7 +2490,7 @@ function updateRoomBox() {
 
         box.appendChild( document.createElement( 'br' ) );
 
-        let userUploadpar = document.createElement( 'p' );
+        let userUploadpar = document.createElement( 'h1' );
         userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
         box.appendChild( userUploadpar );
 
@@ -2521,7 +2521,7 @@ function updateRoomBox() {
 
               box.appendChild( document.createElement( 'br' ) );
 
-              let roompar = document.createElement( 'p' );
+              let roompar = document.createElement( 'h1' );
               roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
               box.appendChild( roompar );
 

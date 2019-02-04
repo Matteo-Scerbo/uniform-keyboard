@@ -74,6 +74,11 @@ p {
   margin: 0;
 }
 
+h1 {
+  font-size: 125%;
+  margin: 0;
+}
+
 #scaleBox {
   width: 800px;
   margin: 0 auto;
@@ -752,6 +757,7 @@ button:disabled {
 #onlineBox {
   position: relative;
   min-height: 150px;
+  color: var(--dark);
 }
 
 #onlineOverlay {
