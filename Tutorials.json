@@ -2215,7 +2215,7 @@
         "settings": {
           "mechanic": "Free",
           "mode": 0,
-          "scale": 1,
+          "scale": 4,
           "sequence": 0
         },
         "messages": {

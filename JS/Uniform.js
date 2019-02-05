@@ -147,6 +147,134 @@ var showExpectation = true;
 var remoteEventDelay = 500;
 
 
+// These detect the browser agent and version.
+var BrowserDetect = {
+  init: function () {
+    this.browser = this.searchString( this.dataBrowser ) || "An unknown browser";
+    this.version = this.searchVersion( navigator.userAgent ) || this.searchVersion( navigator.appVersion ) || "an unknown version";
+    this.OS = this.searchString( this.dataOS ) || "an unknown OS";
+  },
+  searchString: function ( data ) {
+    for ( var i = 0; i < data.length; i++ ) {
+      var dataString = data[ i ].string;
+      var dataProp = data[ i ].prop;
+      this.versionSearchString = data[ i ].versionSearch || data[ i ].identity;
+      if ( dataString ) {
+        if ( dataString.indexOf( data[ i ].subString ) != -1 ) return data[ i ].identity;
+      } else if ( dataProp ) return data[ i ].identity;
+    }
+  },
+  searchVersion: function ( dataString ) {
+    var index = dataString.indexOf( this.versionSearchString );
+    if ( index == -1 ) return;
+    return parseFloat( dataString.substring( index + this.versionSearchString.length + 1 ) );
+  },
+  dataBrowser: [ {
+    string: navigator.userAgent,
+    subString: "Chrome",
+    identity: "Chrome"
+  }, {
+    string: navigator.userAgent,
+    subString: "OmniWeb",
+    versionSearch: "OmniWeb/",
+    identity: "OmniWeb"
+  }, {
+    string: navigator.vendor,
+    subString: "Apple",
+    identity: "Safari",
+    versionSearch: "Version"
+  }, {
+    prop: window.opera,
+    identity: "Opera",
+    versionSearch: "Version"
+  }, {
+    string: navigator.vendor,
+    subString: "iCab",
+    identity: "iCab"
+  }, {
+    string: navigator.vendor,
+    subString: "KDE",
+    identity: "Konqueror"
+  }, {
+    string: navigator.userAgent,
+    subString: "Firefox",
+    identity: "Firefox"
+  }, {
+    string: navigator.vendor,
+    subString: "Camino",
+    identity: "Camino"
+  }, {
+    string: navigator.userAgent,
+    subString: "Netscape",
+    identity: "Netscape"
+  }, {
+    string: navigator.userAgent,
+    subString: "MSIE",
+    identity: "Explorer",
+    versionSearch: "MSIE"
+  }, {
+    string: navigator.userAgent,
+    subString: "Gecko",
+    identity: "Mozilla",
+    versionSearch: "rv"
+  }, {
+    string: navigator.userAgent,
+    subString: "Mozilla",
+    identity: "Netscape",
+    versionSearch: "Mozilla"
+  } ],
+  dataOS: [ {
+    string: navigator.platform,
+    subString: "Win",
+    identity: "Windows"
+  }, {
+    string: navigator.platform,
+    subString: "Mac",
+    identity: "Mac"
+  }, {
+    string: navigator.userAgent,
+    subString: "iPhone",
+    identity: "iPhone/iPod"
+  }, {
+    string: navigator.platform,
+    subString: "Linux",
+    identity: "Linux"
+  } ]
+
+};
+BrowserDetect.init();
+
+var isMobile = {
+  Android: function () {
+    return navigator.userAgent.match( /Android/i );
+  },
+  BlackBerry: function () {
+    return navigator.userAgent.match( /BlackBerry/i );
+  },
+  iOS: function () {
+    return navigator.userAgent.match( /iPhone|iPad|iPod/i );
+  },
+  Opera: function () {
+    return navigator.userAgent.match( /Opera Mini/i );
+  },
+  Windows: function () {
+    return navigator.userAgent.match( /IEMobile/i );
+  },
+  any: function () {
+    return ( isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows() );
+  }
+};
+
+if ( isMobile.any() ) {
+  alert( 'Mobile browsers are not supported yet.' );
+}
+
+if ( BrowserDetect.browser != 'Chrome' &&
+  BrowserDetect.browser != 'Firefox' &&
+  BrowserDetect.browser != 'Safari' ) {
+  alert( 'Your browser might not be supported.' );
+}
+
 // CALLING SETUP FUNCTIONS
 
 // Setting the size of the oscillator list.
@@ -430,18 +558,6 @@ function handleNextRemoteEvent() {
   }
 }
 
-// Prevent all settings from being focused on:
-// this is to avoid unintentionally undoing the last setting change with each spacebar press.
-document.querySelectorAll( 'input' )
-  .forEach( function ( item ) {
-    if ( item.id == 'writeMessage' ) {
-      return;
-    }
-    item.addEventListener( 'focus', function () {
-      this.blur();
-    } )
-  } );
-
 // If the connection drops, lock the online features box.
 firebase.database()
   .ref( '.info/connected' )
@@ -455,8 +571,6 @@ firebase.database()
         .style.display = 'none';
       document.getElementById( 'chatOverlay' )
         .style.display = 'none';
-      document.getElementById( 'dashedPointer' )
-        .style.display = 'block';
       chatOverlayIsVisible = false;
 
       if ( roomName && iAmAdmin ) {
@@ -489,8 +603,6 @@ firebase.database()
       .style.display = 'none';
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
-    document.getElementById( 'dashedPointer' )
-      .style.display = 'block';
     chatOverlayIsVisible = false;
 
     if ( roomName && iAmAdmin ) {
@@ -867,7 +979,7 @@ function changeModeMechanic( value ) {
 
 // Clears the tags from all colored markers and assigns them again according to
 // the selected scale.
-// Always calls renderSliderCursor(), renderMode().
+// Always calls renderSlider(), renderMode().
 function renderScale() {
   renderSlider();
 
@@ -932,6 +1044,7 @@ function renderSlider() {
     .getPropertyValue( 'margin-left' )
     .match( /\d+/ )[ 0 ];
 
+  dashedPointer.style.left = ( pad + 3 + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
   scaleSliderCursor.style.left = ( pad + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
   scaleSliderLabel.style.left = ( pad + 75 + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
   scaleSliderLabelInfo.style.left = ( pad + 75 + ( scaleSliderRange.value / scaleSliderRange.max ) * 375 ) + 'px';
@@ -1093,16 +1206,12 @@ function toggleChatOverlay() {
   if ( chatOverlayIsVisible ) {
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
-    document.getElementById( 'dashedPointer' )
-      .style.display = 'block';
     document.getElementById( 'viewChatText' )
       .innerHTML = 'Open full chat';
     chatOverlayIsVisible = false;
   } else {
     document.getElementById( 'chatOverlay' )
       .style.display = 'block';
-    document.getElementById( 'dashedPointer' )
-      .style.display = 'none';
     document.getElementById( 'viewChatText' )
       .innerHTML = 'Close full chat';
     if ( inTutorial || inUserUpload ) {
@@ -1561,8 +1670,6 @@ function updateChatListener() {
       .style.display = 'none';
     document.getElementById( 'chatOverlay' )
       .style.display = 'none';
-    document.getElementById( 'dashedPointer' )
-      .style.display = 'block';
     return;
   }
 
@@ -2245,7 +2352,7 @@ function loadTutorial( name ) {
       let nextButton = document.createElement( 'button' );
       let hoverLabel = document.createElement( 'span' );
 
-      hoverLabel.appendChild( document.createTextNode( 'No previous\nsteps.' ) );
+      hoverLabel.appendChild( document.createTextNode( 'No further\nsteps.' ) );
       hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
 
       nextButton.id = 'nextTutorialStepButton';
@@ -2270,7 +2377,7 @@ function loadTutorial( name ) {
       let previousButton = document.createElement( 'button' );
       hoverLabel = document.createElement( 'span' );
 
-      hoverLabel.appendChild( document.createTextNode( 'No further\nsteps.' ) );
+      hoverLabel.appendChild( document.createTextNode( 'No previous\nsteps.' ) );
       hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
 
       previousButton.id = 'previousTutorialStepButton';
@@ -2475,6 +2582,9 @@ function updateRoomBox() {
         tutorialpar.appendChild( document.createTextNode( 'Tutorials:' ) );
         box.appendChild( tutorialpar );
 
+        let tutorialdiv = document.createElement( 'div' );
+        tutorialdiv.style.whiteSpace = 'nowrap';
+        tutorialdiv.style.overflow = 'auto';
         let tutorials = snapTutorials.val();
         if ( tutorials ) {
           Object.keys( tutorials )
@@ -2491,15 +2601,20 @@ function updateRoomBox() {
 
               tutorialButton.classList.add( 'VII' );
 
-              box.appendChild( tutorialButton );
+              tutorialdiv.appendChild( tutorialButton );
             } );
         }
+        box.appendChild( tutorialdiv );
 
         box.appendChild( document.createElement( 'br' ) );
 
         let userUploadpar = document.createElement( 'h1' );
         userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
         box.appendChild( userUploadpar );
+
+        let uploadsdiv = document.createElement( 'div' );
+        uploadsdiv.style.whiteSpace = 'nowrap';
+        uploadsdiv.style.overflow = 'auto';
 
         let uploadButton = document.createElement( 'button' );
         let hoverLabel = document.createElement( 'span' );
@@ -2516,13 +2631,12 @@ function updateRoomBox() {
         uploadButton.classList.add( 'I' );
 
         uploadButton.appendChild( hoverLabel );
-        box.appendChild( uploadButton );
+        uploadsdiv.appendChild( uploadButton );
 
         firebase.database()
           .ref( 'uploads/names' )
           .once( 'value' )
           .then( function ( snapUploads ) {
-
               let uploads = snapUploads.val();
               if ( uploads ) {
                 Object.keys( uploads )
@@ -2539,15 +2653,21 @@ function updateRoomBox() {
 
                     uploadButton.classList.add( 'III' );
 
-                    box.appendChild( uploadButton );
+                    uploadsdiv.appendChild( uploadButton );
                   } );
               }
+              box.appendChild( uploadsdiv );
 
               box.appendChild( document.createElement( 'br' ) );
 
               let roompar = document.createElement( 'h1' );
               roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
               box.appendChild( roompar );
+
+              let roomsdiv = document.createElement( 'div' );
+              roomsdiv.id = 'roomsdiv';
+              roomsdiv.style.whiteSpace = 'nowrap';
+              roomsdiv.style.overflow = 'auto';
 
               let newButton = document.createElement( 'button' );
               newButton.appendChild( document.createTextNode( 'Create room' ) );
@@ -2556,8 +2676,8 @@ function updateRoomBox() {
               } );
               newButton.classList.add( 'II' );
 
-              box.appendChild( newButton );
-
+              roomsdiv.appendChild( newButton );
+              box.appendChild( roomsdiv );
               firebase.database()
                 .ref( 'rooms' )
                 .on( 'child_added', function ( snapRoom ) {
@@ -2575,7 +2695,7 @@ function updateRoomBox() {
                     } );
                   } )( snapRoom );
 
-                  let box = document.getElementById( 'roomsBox' );
+                  let box = document.getElementById( 'roomsdiv' );
                   box.appendChild( roomButton );
                 } );
 
@@ -2746,6 +2866,14 @@ function replayRecording() {
   } );
   leaveButton.classList.add( 'V' );
   box.appendChild( leaveButton );
+
+  let repeatButton = document.createElement( 'button' );
+  repeatButton.appendChild( document.createTextNode( 'Repeat recording' ) );
+  repeatButton.addEventListener( 'click', ( event ) => {
+    replayRecording();
+  } );
+  repeatButton.classList.add( 'I' );
+  box.appendChild( repeatButton );
 
   inUserUpload = true;
 

@@ -11,7 +11,6 @@
 .FLATblack {
   --light: #34495E;
   --dark: #2C3E50;
-  --darker: #121a21;
 }
 
 .I {
@@ -91,8 +90,9 @@ h1 {
 }
 
 #scaleSlider {
+  position: absolute;
   margin-left: -11px;
-  margin-top: -25px;
+  margin-top: 16px;
   width: fit-content;
   z-index: 2;
 }
@@ -127,24 +127,27 @@ h1 {
   height: 54px;
   width: 56px;
   background: transparent;
-  z-index: 2;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: 24px;
+  z-index: 2;
 }
 
 #scaleSliderRange::-moz-range-thumb {
   height: 54px;
   width: 56px;
   background: transparent;
-  z-index: 2;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: 24px;
+  border: 0;
+  outline: none;
+  z-index: 2;
 }
 
 #scaleSliderRange::-moz-focus-outer {
   border: 0;
+  outline: none;
 }
 
 #scaleSliderLabel {
@@ -152,12 +155,14 @@ h1 {
   left: 100px;
   top: 10px;
   font-size: 150%;
+  z-index: -1;
 }
 
 #scaleSliderLabelInfo {
   position: absolute;
   left: 100px;
   top: 40px;
+  z-index: -1;
 }
 
 #scaleSliderCursor {
@@ -165,16 +170,22 @@ h1 {
   transform-origin: center center;
   left: 25px;
   top: 15px;
-  z-index: 1;
+  z-index: -1;
 }
 
 #dashedPointer {
-  margin-left: 50%;
-  margin-top: -15px;
+  position: absolute;
+  transform-origin: center center;
+  left: 3px;
+  top: 14px;
+  height: 0;
+  margin-left: 25px;
+  margin-top: 45px;
   height: 63px;
   width: 0;
   border-left: 2px dotted var(--dark);
   transform-origin: center center;
+  z-index: 1;
 }
 
 #scaleSettingsBox {
@@ -313,7 +324,7 @@ h1 {
 input[type="checkbox"],
 input[type="radio"] {
   position: absolute;
-  opacity: 0;
+  visibility: hidden;
   z-index: -1;
 }
 
@@ -527,10 +538,6 @@ label::before {
   border: 3px solid var(--dark);
 }
 
-.accordionElement ::-webkit-details-marker {
-  display: none;
-}
-
 .accordionElement+.accordionElement {
   margin-top: 10px;
 }
@@ -540,20 +547,11 @@ label::before {
   outline: none;
   font-size: 20px;
   line-height: 30px;
-}
-
-.accordionBanner:after {
-  content: "➕";
-  float: left;
-}
-
-[open] .accordionBanner:after {
-  content: "➖";
+  margin-left: 10px;
 }
 
 .accordionTitle {
   font-size: 20px;
-  padding: 5px;
 }
 
 #feelingText {
@@ -833,7 +831,6 @@ button:disabled:hover>.hoverLabel {
 }
 
 #roomsBox {
-  overflow: auto;
   white-space: nowrap;
 }
 
