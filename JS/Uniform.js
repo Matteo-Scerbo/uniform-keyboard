@@ -1873,6 +1873,18 @@ function giveSnack( text, color ) {
   }, 2000 );
 }
 
+function disableSettings( bool ) {
+  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
+    .childNodes,
+    function ( box ) {
+      if ( box.name == 'mode' ) {
+        box.disabled = bool;
+      }
+    } );
+  document.getElementById( 'scaleSliderRange' )
+    .disabled = bool;
+}
+
 
 // ROOM FUNCTIONS
 
@@ -2110,6 +2122,8 @@ function joinRoom( name ) {
 
   updateChatListener();
 
+  disableSettings( true );
+
   firebase.database()
     .ref( 'settings/' + roomName )
     .on( 'child_added',
@@ -2279,6 +2293,8 @@ function loadTutorial( name ) {
 
       tutorialStepsCount = snap.val()
         .steps;
+
+      disableSettings( true );
 
       handleRemoteSettings( snap.child( 'settings' )
         .val() );
@@ -2563,15 +2579,7 @@ function updateRoomBox() {
     box.removeChild( box.firstChild );
   }
 
-  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
-    .childNodes,
-    function ( box ) {
-      if ( box.name == 'mode' ) {
-        box.disabled = false;
-      }
-    } );
-  document.getElementById( 'scaleSliderRange' )
-    .disabled = false;
+  disableSettings( false );
 
   firebase.database()
     .ref( 'tutorials/names' )
@@ -2736,22 +2744,16 @@ function updateRoomBox() {
 
 // Comply to the settings sent by the tutorial or room admin.
 function handleRemoteSettings( val ) {
-  [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
-    .childNodes,
-    function ( box ) {
-      if ( box.name == 'mode' ) {
-        box.disabled = true;
-      }
-    } );
-  document.getElementById( 'scaleSliderRange' )
-    .disabled = true;
-
   changeScale( val.scale );
+
   changeModeMechanic( val.mechanic );
   if ( modeMechanic == 'Progression' ) {
+    selectedSequenceIndex = val.sequence;
     selectedSequence = sequenceList[ val.sequence ];
   }
-  changeMode( 'Numpad' + val.mode );
+  renderSequence();
+
+  changeMode( 'Numpad' + ( val.mode + 1 ) );
 }
 
 // As admin, send your settings to the DB.
@@ -2789,15 +2791,7 @@ function toggleRecording() {
       prepareExport();
     }
 
-    [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
-      .childNodes,
-      function ( box ) {
-        if ( box.name == 'mode' ) {
-          box.disabled = false;
-        }
-      } );
-    document.getElementById( 'scaleSliderRange' )
-      .disabled = false;
+    disableSettings( false );
   } else {
     if ( !isEmpty( recordedKeypresses ) ) {
       if ( !confirm( 'This will delete the current recording.' ) ) {
@@ -2815,15 +2809,7 @@ function toggleRecording() {
     document.getElementById( 'exportRecordingButton' )
       .disabled = true;
 
-    [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
-      .childNodes,
-      function ( box ) {
-        if ( box.name == 'mode' ) {
-          box.disabled = true;
-        }
-      } );
-    document.getElementById( 'scaleSliderRange' )
-      .disabled = true;
+    disableSettings( true );
 
     recordedKeypresses = {};
     recordedKeypressesCount = 0;
@@ -2853,31 +2839,6 @@ function replayRecording() {
     .forEach( function ( keypress ) {
       userUploadKeypressSequence.push( keypress );
     } );
-
-  let box = document.getElementById( 'roomsBox' );
-  while ( box.firstChild ) {
-    box.removeChild( box.firstChild );
-  }
-
-  let leaveButton = document.createElement( 'button' );
-  leaveButton.appendChild( document.createTextNode( 'Exit recording' ) );
-  leaveButton.addEventListener( 'click', ( event ) => {
-    exitTutorial();
-  } );
-  leaveButton.classList.add( 'V' );
-  box.appendChild( leaveButton );
-
-  let repeatButton = document.createElement( 'button' );
-  repeatButton.appendChild( document.createTextNode( 'Repeat recording' ) );
-  repeatButton.addEventListener( 'click', ( event ) => {
-    replayRecording();
-  } );
-  repeatButton.classList.add( 'I' );
-  box.appendChild( repeatButton );
-
-  inUserUpload = true;
-
-  updateChatListener();
 
   resetChordProgression();
   remoteEvents = [];
@@ -3058,6 +3019,8 @@ function loadUserUpload( name ) {
     .ref( 'uploads/data/' + name )
     .once( 'value' )
     .then( function ( snap ) {
+
+      disableSettings( true );
 
       handleRemoteSettings( snap.child( 'settings' )
         .val() );
