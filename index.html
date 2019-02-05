@@ -38,6 +38,7 @@
   <form id="scaleBox" class="FLATblack">
     <span id="scaleSlider">
       <input id="scaleSliderRange" type="range" value="0" min="0" max="12" oninput="changeScale(this.value)">
+      <span class="hoverLabelBelow FLATblack">You can't change the scale now.</span>
     </span>
   </form>
 
@@ -426,16 +427,16 @@
         <button id="recordButton" class="V" onclick="toggleRecording();">Start recording</button>
         <button id="replayButton" class="I" onclick="replayRecording();" disabled>
           Replay
-          <span class="hoverLabel FLATblack">You have to record something first.</span>
+          <span class="hoverLabelAbove FLATblack">You have to record something first.</span>
         </button>
         <button id="exportRecordingButton" class="VI" onclick="document.getElementById('exportRecordingAnchor').click();" disabled>
           Export as JSON file
           <a id="exportRecordingAnchor" href="#" download="recording.json"></a>
-          <span class="hoverLabel FLATblack">You have to record something first.</span>
+          <span class="hoverLabelAbove FLATblack">You have to record something first.</span>
         </button>
         <button id="importRecordingButton" class="VI" onclick="document.getElementById('importRecordingInput').click();">
           Import JSON file
-          <input id="importRecordingInput" type="file" id="selectFiles" value="Import" onchange="handleImport();">
+          <input id="importRecordingInput" type="file" value="Import" onchange="handleImport();">
         </button>
       </div>
     </details>

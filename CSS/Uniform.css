@@ -76,7 +76,7 @@ p {
 
 h1 {
   font-size: 125%;
-  margin: 0;
+  margin: 0 10px;
 }
 
 #scaleBox {
@@ -695,7 +695,8 @@ button:disabled:hover {
   opacity: 1;
 }
 
-.hoverLabel {
+.hoverLabelAbove,
+.hoverLabelBelow {
   visibility: hidden;
   width: 120px;
   background-color: var(--dark);
@@ -705,24 +706,38 @@ button:disabled:hover {
   padding: 5px;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
+  white-space: normal;
   left: 50%;
   margin-left: -60px;
-  white-space: normal;
 }
 
-.hoverLabel::after {
+.hoverLabelAbove {
+  bottom: 125%;
+}
+
+.hoverLabelBelow {
+  top: 0;
+}
+
+.hoverLabelAbove::after {
   content: " ";
   position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
   border-width: 5px;
   border-style: solid;
   border-color: var(--dark) transparent transparent transparent;
+  left: 50%;
+  margin-left: -5px;
 }
 
-button:disabled:hover>.hoverLabel {
+.hoverLabelAbove::after {
+  top: 100%;
+}
+
+button:disabled:hover>.hoverLabelAbove {
+  visibility: visible;
+}
+
+input:disabled:hover+.hoverLabelBelow {
   visibility: visible;
 }
 

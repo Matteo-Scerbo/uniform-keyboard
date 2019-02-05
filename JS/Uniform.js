@@ -1729,8 +1729,6 @@ function updateChatListener() {
         .user != userID ) {
         giveSnack( 'New message in the chat!', 'VII' );
       }
-    }, function ( error ) {
-      console.error( "Couldn't load room message.", error );
     } );
 
   firebase.database()
@@ -1768,8 +1766,6 @@ function updateChatListener() {
 
       updateChatScroll();
 
-    }, function ( error ) {
-      console.error( "Couldn't load room message.", error );
     } );
 }
 
@@ -1880,6 +1876,7 @@ function giveSnack( text, color ) {
   }, 2000 );
 }
 
+// Disable or enable mode mechanic checkboxes and scale slider.
 function disableSettings( bool ) {
   [].forEach.call( document.getElementById( 'mechanicSettingsBox' )
     .childNodes,
@@ -1890,6 +1887,26 @@ function disableSettings( bool ) {
     } );
   document.getElementById( 'scaleSliderRange' )
     .disabled = bool;
+}
+
+// Show an overlay on the onlineBox that slowly fades out.
+function fadeOutOverlay( text ) {
+  let overlay = document.getElementById( 'onlineOverlay' );
+
+  overlay.style.display = 'block';
+  document.getElementById( 'onlineOverlayText' )
+    .innerHTML = text;
+  document.getElementById( 'onlineOverlayButton' )
+    .style.display = 'none';
+
+  overlay.style.animation = 'fade 5s cubic-bezier(0.75, 0.25, 0.75, 0.25) forwards';
+
+  overlay.parentNode.replaceChild( overlay.cloneNode( true ), overlay );
+
+  window.setTimeout( function () {
+    overlay.style.display = 'none';
+    overlay.style.animation = '';
+  }, 5000 );
 }
 
 
@@ -2044,6 +2061,13 @@ function createRoom() {
                       function ( error ) {
                         console.error( "Couldn't rollback...", error );
                       } );
+
+                  document.getElementById( 'onlineOverlay' )
+                    .style.display = 'block';
+                  document.getElementById( 'onlineOverlayText' )
+                    .innerHTML = "Couldn't create room.\nPlease reload the page.";
+                  document.getElementById( 'onlineOverlayButton' )
+                    .style.display = 'none';
                 } );
             },
             function ( error ) {
@@ -2077,10 +2101,24 @@ function createRoom() {
                   function ( error ) {
                     console.error( "Couldn't rollback...", error );
                   } );
+
+              document.getElementById( 'onlineOverlay' )
+                .style.display = 'block';
+              document.getElementById( 'onlineOverlayText' )
+                .innerHTML = "Couldn't create room.\nPlease reload the page.";
+              document.getElementById( 'onlineOverlayButton' )
+                .style.display = 'none';
             } );
       },
       function ( error ) {
         console.error( "Couldn't create room.", error );
+
+        document.getElementById( 'onlineOverlay' )
+          .style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = "Couldn't create room.\nPlease reload the page.";
+        document.getElementById( 'onlineOverlayButton' )
+          .style.display = 'none';
       } );
 }
 
@@ -2157,22 +2195,7 @@ function joinRoom( name ) {
 
         leaveRoom();
 
-        let overlay = document.getElementById( 'onlineOverlay' );
-
-        overlay.style.display = 'block';
-        document.getElementById( 'onlineOverlayText' )
-          .innerHTML = 'You were kicked from the room.\n(admin disconnected)';
-        document.getElementById( 'onlineOverlayButton' )
-          .style.display = 'none';
-
-        overlay.style.animation = 'fade 5s cubic-bezier(0.75, 0.25, 0.75, 0.25) forwards';
-
-        overlay.parentNode.replaceChild( overlay.cloneNode( true ), overlay );
-
-        window.setTimeout( function () {
-          overlay.style.display = 'none';
-          overlay.style.animation = '';
-        }, 5000 );
+        fadeOutOverlay( 'You were kicked from the room.\n(admin disconnected)' );
       } );
 }
 
@@ -2222,6 +2245,13 @@ function leaveRoom() {
           .remove()
           .catch( function ( error ) {
             console.error( "Couldn't delete room.", error );
+
+            document.getElementById( 'onlineOverlay' )
+              .style.display = 'block';
+            document.getElementById( 'onlineOverlayText' )
+              .innerHTML = "Couldn't delete room.\nPlease reload the page.";
+            document.getElementById( 'onlineOverlayButton' )
+              .style.display = 'none';
           } );
 
         roomName = null;
@@ -2236,6 +2266,13 @@ function leaveRoom() {
 
       }, function ( error ) {
         console.error( "Couldn't delete room.", error );
+
+        document.getElementById( 'onlineOverlay' )
+          .style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = "Couldn't delete room.\nPlease reload the page.";
+        document.getElementById( 'onlineOverlayButton' )
+          .style.display = 'none';
       } );
   } else {
 
@@ -2288,6 +2325,13 @@ function leaveRoom() {
 
       }, function ( error ) {
         console.error( "Couldn't leave room.", error );
+
+        document.getElementById( 'onlineOverlay' )
+          .style.display = 'block';
+        document.getElementById( 'onlineOverlayText' )
+          .innerHTML = "Couldn't leave room.\nPlease reload the page.";
+        document.getElementById( 'onlineOverlayButton' )
+          .style.display = 'none';
       } );
   }
 }
@@ -2302,6 +2346,8 @@ function loadTutorial( name ) {
   if ( roomName || !name || inTutorial || inUserUpload ) {
     return;
   }
+
+  window.scrollTo( 0, 0 );
 
   playBackSpeed = 1;
 
@@ -2385,10 +2431,10 @@ function loadTutorial( name ) {
       box.appendChild( leaveButton );
 
       let nextButton = document.createElement( 'button' );
-      let hoverLabel = document.createElement( 'span' );
+      let hoverLabelAbove = document.createElement( 'span' );
 
-      hoverLabel.appendChild( document.createTextNode( 'No further\nsteps.' ) );
-      hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
+      hoverLabelAbove.appendChild( document.createTextNode( 'No further\nsteps.' ) );
+      hoverLabelAbove.classList.add( 'hoverLabelAbove', 'FLATblack' );
 
       nextButton.id = 'nextTutorialStepButton';
       nextButton.appendChild( document.createTextNode( 'Next step' ) );
@@ -2397,7 +2443,7 @@ function loadTutorial( name ) {
       } );
       nextButton.classList.add( 'I' );
 
-      nextButton.appendChild( hoverLabel );
+      nextButton.appendChild( hoverLabelAbove );
       box.appendChild( nextButton );
 
       let repeatButton = document.createElement( 'button' );
@@ -2410,10 +2456,10 @@ function loadTutorial( name ) {
       box.appendChild( repeatButton );
 
       let previousButton = document.createElement( 'button' );
-      hoverLabel = document.createElement( 'span' );
+      hoverLabelAbove = document.createElement( 'span' );
 
-      hoverLabel.appendChild( document.createTextNode( 'No previous\nsteps.' ) );
-      hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
+      hoverLabelAbove.appendChild( document.createTextNode( 'No previous\nsteps.' ) );
+      hoverLabelAbove.classList.add( 'hoverLabelAbove', 'FLATblack' );
 
       previousButton.id = 'previousTutorialStepButton';
       previousButton.disabled = true;
@@ -2423,7 +2469,7 @@ function loadTutorial( name ) {
       } );
       previousButton.classList.add( 'III' );
 
-      previousButton.appendChild( hoverLabel );
+      previousButton.appendChild( hoverLabelAbove );
       box.appendChild( previousButton );
 
       inTutorial = true;
@@ -2436,6 +2482,8 @@ function loadTutorial( name ) {
       nextTutorialStep();
     }, function ( error ) {
       console.error( "Couldn't load tutorial.", error );
+
+      fadeOutOverlay( "Couldn't load tutorial.\nTry again later or reload the page." );
     } );
 }
 
@@ -2590,6 +2638,9 @@ function updateRoomBox() {
     .ref( 'rooms' )
     .off( 'child_added' );
   firebase.database()
+    .ref( 'uploads/names' )
+    .off( 'child_added' );
+  firebase.database()
     .ref( 'rooms' )
     .off( 'child_removed' );
 
@@ -2606,18 +2657,68 @@ function updateRoomBox() {
 
   disableSettings( false );
 
+  let tutorialpar = document.createElement( 'h1' );
+  tutorialpar.appendChild( document.createTextNode( 'Tutorials:' ) );
+  box.appendChild( tutorialpar );
+
+  let tutorialdiv = document.createElement( 'div' );
+  tutorialdiv.id = 'tutorialdiv';
+  tutorialdiv.style.whiteSpace = 'nowrap';
+  tutorialdiv.style.overflow = 'auto';
+  box.appendChild( tutorialdiv );
+
+  box.appendChild( document.createElement( 'br' ) );
+
+  let userUploadpar = document.createElement( 'h1' );
+  userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
+  box.appendChild( userUploadpar );
+
+  let uploadButton = document.createElement( 'button' );
+  let hoverLabelAbove = document.createElement( 'span' );
+  hoverLabelAbove.appendChild( document.createTextNode( 'You have to record something first.' ) );
+  hoverLabelAbove.classList.add( 'hoverLabelAbove', 'FLATblack' );
+  uploadButton.id = 'uploadRecordingButton';
+  uploadButton.disabled = ( isEmpty( recordedKeypresses ) && !recordingNow );
+  uploadButton.appendChild( document.createTextNode( 'Upload recording' ) );
+  uploadButton.addEventListener( 'click', ( event ) => {
+    uploadRecording();
+  } );
+  uploadButton.classList.add( 'I' );
+  uploadButton.appendChild( hoverLabelAbove );
+  box.appendChild( uploadButton );
+
+  let uploadsdiv = document.createElement( 'div' );
+  uploadsdiv.id = 'uploadsdiv';
+  uploadsdiv.style.whiteSpace = 'nowrap';
+  uploadsdiv.style.overflow = 'auto';
+  box.appendChild( uploadsdiv );
+
+  box.appendChild( document.createElement( 'br' ) );
+
+  let roompar = document.createElement( 'h1' );
+  roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
+  box.appendChild( roompar );
+
+  let newButton = document.createElement( 'button' );
+  newButton.appendChild( document.createTextNode( 'Create room' ) );
+  newButton.addEventListener( 'click', ( event ) => {
+    createRoom();
+  } );
+  newButton.classList.add( 'II' );
+
+  box.appendChild( newButton );
+
+  let roomsdiv = document.createElement( 'div' );
+  roomsdiv.id = 'roomsdiv';
+  roomsdiv.style.whiteSpace = 'nowrap';
+  roomsdiv.style.overflow = 'auto';
+  box.appendChild( roomsdiv );
+
   firebase.database()
     .ref( 'tutorials/names' )
     .once( 'value' )
     .then( function ( snapTutorials ) {
 
-        let tutorialpar = document.createElement( 'h1' );
-        tutorialpar.appendChild( document.createTextNode( 'Tutorials:' ) );
-        box.appendChild( tutorialpar );
-
-        let tutorialdiv = document.createElement( 'div' );
-        tutorialdiv.style.whiteSpace = 'nowrap';
-        tutorialdiv.style.overflow = 'auto';
         let tutorials = snapTutorials.val();
         if ( tutorials ) {
           Object.keys( tutorials )
@@ -2637,126 +2738,6 @@ function updateRoomBox() {
               tutorialdiv.appendChild( tutorialButton );
             } );
         }
-        box.appendChild( tutorialdiv );
-
-        box.appendChild( document.createElement( 'br' ) );
-
-        let userUploadpar = document.createElement( 'h1' );
-        userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
-        box.appendChild( userUploadpar );
-
-        let uploadButton = document.createElement( 'button' );
-        let hoverLabel = document.createElement( 'span' );
-
-        hoverLabel.appendChild( document.createTextNode( 'You have to record something first.' ) );
-        hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
-
-        uploadButton.id = 'uploadRecordingButton';
-        uploadButton.disabled = ( isEmpty( recordedKeypresses ) && !recordingNow );
-        uploadButton.appendChild( document.createTextNode( 'Upload recording' ) );
-        uploadButton.addEventListener( 'click', ( event ) => {
-          uploadRecording();
-        } );
-        uploadButton.classList.add( 'I' );
-
-        uploadButton.appendChild( hoverLabel );
-        box.appendChild( uploadButton );
-
-        firebase.database()
-          .ref( 'uploads/names' )
-          .once( 'value' )
-          .then( function ( snapUploads ) {
-
-              let uploadsdiv = document.createElement( 'div' );
-              uploadsdiv.style.whiteSpace = 'nowrap';
-              uploadsdiv.style.overflow = 'auto';
-
-              let uploads = snapUploads.val();
-              if ( uploads ) {
-                Object.keys( uploads )
-                  .forEach( function ( upload ) {
-
-                    let uploadButton = document.createElement( 'button' );
-                    uploadButton.appendChild( document.createTextNode( upload ) );
-
-                    ( function ( upload ) {
-                      uploadButton.addEventListener( 'click', ( event ) => {
-                        loadUserUpload( upload );
-                      } );
-                    } )( upload );
-
-                    uploadButton.classList.add( 'III' );
-
-                    uploadsdiv.appendChild( uploadButton );
-                  } );
-              }
-              box.appendChild( uploadsdiv );
-
-              box.appendChild( document.createElement( 'br' ) );
-
-              let roompar = document.createElement( 'h1' );
-              roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
-              box.appendChild( roompar );
-
-              let newButton = document.createElement( 'button' );
-              newButton.appendChild( document.createTextNode( 'Create room' ) );
-              newButton.addEventListener( 'click', ( event ) => {
-                createRoom();
-              } );
-              newButton.classList.add( 'II' );
-
-              box.appendChild( newButton );
-
-              let roomsdiv = document.createElement( 'div' );
-              roomsdiv.id = 'roomsdiv';
-              roomsdiv.style.whiteSpace = 'nowrap';
-              roomsdiv.style.overflow = 'auto';
-              box.appendChild( roomsdiv );
-
-              firebase.database()
-                .ref( 'rooms' )
-                .on( 'child_added', function ( snapRoom ) {
-
-                  if ( roomName || inTutorial || inUserUpload ) {
-                    return;
-                  }
-
-                  let roomButton = document.createElement( 'button' );
-                  roomButton.classList.add( 'IV' );
-                  roomButton.appendChild( document.createTextNode( snapRoom.key ) );
-                  ( function ( snapRoom ) {
-                    roomButton.addEventListener( 'click', ( event ) => {
-                      joinRoom( snapRoom.key )
-                    } );
-                  } )( snapRoom );
-
-                  let box = document.getElementById( 'roomsdiv' );
-                  box.appendChild( roomButton );
-                } );
-
-              firebase.database()
-                .ref( 'rooms' )
-                .on( 'child_removed', function ( snapRoom ) {
-                  if ( roomName ) {
-                    return;
-                  }
-                  let roomButton = document.evaluate( '//button[text()="' + snapRoom.key + '"]',
-                    document, null, XPathResult.ANY_TYPE, null );
-                  roomButton = roomButton.iterateNext();
-                  if ( roomButton ) {
-                    roomButton.remove();
-                  }
-                } );
-            },
-            function ( error ) {
-              console.error( "Couldn't load tutorial names.", error );
-              document.getElementById( 'onlineOverlay' )
-                .style.display = 'block';
-              document.getElementById( 'onlineOverlayText' )
-                .innerHTML = "Couldn't retrieve info from DB.\nPlease reload the page.";
-              document.getElementById( 'onlineOverlayButton' )
-                .style.display = 'none';
-            } );
       },
       function ( error ) {
         console.error( "Couldn't load tutorial names.", error );
@@ -2767,6 +2748,62 @@ function updateRoomBox() {
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
+
+  firebase.database()
+    .ref( 'uploads/names' )
+    .on( 'child_added', function ( snapUpload ) {
+
+      if ( roomName || inTutorial || inUserUpload ) {
+        return;
+      }
+
+      let uploadButton = document.createElement( 'button' );
+      uploadButton.classList.add( 'III' );
+      uploadButton.appendChild( document.createTextNode( snapUpload.key ) );
+      ( function ( snapUpload ) {
+        uploadButton.addEventListener( 'click', ( event ) => {
+          loadUserUpload( snapUpload.key )
+        } );
+      } )( snapUpload );
+
+      let box = document.getElementById( 'uploadsdiv' );
+      box.appendChild( uploadButton );
+    } );
+
+  firebase.database()
+    .ref( 'rooms' )
+    .on( 'child_added', function ( snapRoom ) {
+
+      if ( roomName || inTutorial || inUserUpload ) {
+        return;
+      }
+
+      let roomButton = document.createElement( 'button' );
+      roomButton.classList.add( 'IV' );
+      roomButton.appendChild( document.createTextNode( snapRoom.key ) );
+      ( function ( snapRoom ) {
+        roomButton.addEventListener( 'click', ( event ) => {
+          joinRoom( snapRoom.key )
+        } );
+      } )( snapRoom );
+
+      let box = document.getElementById( 'roomsdiv' );
+      box.appendChild( roomButton );
+    } );
+
+  firebase.database()
+    .ref( 'rooms' )
+    .on( 'child_removed', function ( snapRoom ) {
+      if ( roomName ) {
+        return;
+      }
+      let roomButton = document.evaluate( '//button[text()="' + snapRoom.key + '"]',
+        document, null, XPathResult.ANY_TYPE, null );
+      roomButton = roomButton.iterateNext();
+      if ( roomButton ) {
+        roomButton.remove();
+      }
+    } );
 }
 
 // Comply to the settings sent by the tutorial or room admin.
@@ -2867,6 +2904,8 @@ function replayRecording() {
   if ( !inUserUpload ) {
     playBackSpeed = 1;
   }
+
+  window.scrollTo( 0, 0 );
 
   disableSettings( true );
 
@@ -3011,12 +3050,18 @@ function uploadRecording() {
                 .catch( function ( error ) {
                   console.error( "Couldn't roll back...", error );
                 } );
+
+              fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
             } );
         }, function ( error ) {
           console.error( "Couldn't upload recording.", error );
+
+          fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
         } );
     }, function ( error ) {
       console.error( "Couldn't retrieve upload names.", error );
+
+      fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
     } );
 }
 
@@ -3042,8 +3087,11 @@ function prepareExport() {
 
 // Load a user-provided JSON in memory
 function handleImport() {
-  let input = document.getElementById( 'importRecordingInput' )
-    .files;
+  let input = document.getElementById( 'importRecordingInput' );
+  // So onchange will be triggered even by the same file
+  input.parentNode.innerHTML = 'Import JSON file <input id="importRecordingInput" type="file" value="Import" onchange="handleImport();">';
+
+  let files = input.files;
 
   if ( input.length <= 0 ) {
     recordedKeypresses = {};
@@ -3100,7 +3148,7 @@ function handleImport() {
     }
   }
 
-  fr.readAsText( input.item( 0 ) );
+  fr.readAsText( files.item( 0 ) );
 }
 
 // Retrieve the data for one tutorial (in bunch) and store it in variables.
@@ -3208,6 +3256,8 @@ function loadUserUpload( name ) {
 
     }, function ( error ) {
       console.error( "Couldn't load tutorial.", error );
+
+      fadeOutOverlay( "Couldn't load recording.\nTry again later or reload the page." );
     } );
 }
 
