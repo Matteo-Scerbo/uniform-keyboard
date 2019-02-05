@@ -1971,6 +1971,12 @@ function createRoom() {
               Promise.all( morePromises )
                 .then( function () {
 
+                  if ( !document.getElementById( 'onlineDetails' )
+                    .open ) {
+                    document.getElementById( 'onlineBanner' )
+                      .click();
+                  }
+
                   let box = document.getElementById( 'roomsBox' );
                   while ( box.firstChild ) {
                     box.removeChild( box.firstChild );
@@ -2084,6 +2090,12 @@ function joinRoom( name ) {
   }
 
   roomName = name;
+
+  if ( !document.getElementById( 'onlineDetails' )
+    .open ) {
+    document.getElementById( 'onlineBanner' )
+      .click();
+  }
 
   let box = document.getElementById( 'roomsBox' );
   while ( box.firstChild ) {
@@ -2579,6 +2591,12 @@ function updateRoomBox() {
     box.removeChild( box.firstChild );
   }
 
+  if ( !document.getElementById( 'onlineDetails' )
+    .open ) {
+    document.getElementById( 'onlineBanner' )
+      .click();
+  }
+
   disableSettings( false );
 
   firebase.database()
@@ -2620,10 +2638,6 @@ function updateRoomBox() {
         userUploadpar.appendChild( document.createTextNode( 'User uploads:' ) );
         box.appendChild( userUploadpar );
 
-        let uploadsdiv = document.createElement( 'div' );
-        uploadsdiv.style.whiteSpace = 'nowrap';
-        uploadsdiv.style.overflow = 'auto';
-
         let uploadButton = document.createElement( 'button' );
         let hoverLabel = document.createElement( 'span' );
 
@@ -2639,12 +2653,17 @@ function updateRoomBox() {
         uploadButton.classList.add( 'I' );
 
         uploadButton.appendChild( hoverLabel );
-        uploadsdiv.appendChild( uploadButton );
+        box.appendChild( uploadButton );
 
         firebase.database()
           .ref( 'uploads/names' )
           .once( 'value' )
           .then( function ( snapUploads ) {
+
+              let uploadsdiv = document.createElement( 'div' );
+              uploadsdiv.style.whiteSpace = 'nowrap';
+              uploadsdiv.style.overflow = 'auto';
+
               let uploads = snapUploads.val();
               if ( uploads ) {
                 Object.keys( uploads )
@@ -2672,11 +2691,6 @@ function updateRoomBox() {
               roompar.appendChild( document.createTextNode( 'Live rooms:' ) );
               box.appendChild( roompar );
 
-              let roomsdiv = document.createElement( 'div' );
-              roomsdiv.id = 'roomsdiv';
-              roomsdiv.style.whiteSpace = 'nowrap';
-              roomsdiv.style.overflow = 'auto';
-
               let newButton = document.createElement( 'button' );
               newButton.appendChild( document.createTextNode( 'Create room' ) );
               newButton.addEventListener( 'click', ( event ) => {
@@ -2684,8 +2698,14 @@ function updateRoomBox() {
               } );
               newButton.classList.add( 'II' );
 
-              roomsdiv.appendChild( newButton );
+              box.appendChild( newButton );
+
+              let roomsdiv = document.createElement( 'div' );
+              roomsdiv.id = 'roomsdiv';
+              roomsdiv.style.whiteSpace = 'nowrap';
+              roomsdiv.style.overflow = 'auto';
               box.appendChild( roomsdiv );
+
               firebase.database()
                 .ref( 'rooms' )
                 .on( 'child_added', function ( snapRoom ) {
@@ -2830,6 +2850,11 @@ function toggleRecording() {
 
 // Listen to the recording.
 function replayRecording() {
+  if ( !inUserUpload ) {
+    playBackSpeed = 1;
+  }
+
+  disableSettings( true );
 
   handleRemoteSettings( recordingSettings );
 
@@ -2856,6 +2881,61 @@ function replayRecording() {
     } );
   }
 
+  if ( !document.getElementById( 'onlineDetails' )
+    .open ) {
+    document.getElementById( 'onlineBanner' )
+      .click();
+  }
+
+  let box = document.getElementById( 'roomsBox' );
+  while ( box.firstChild ) {
+    box.removeChild( box.firstChild );
+  }
+
+  let playBackSpeedDiv = document.createElement( 'div' );
+  let playBackSpeedText = document.createElement( 'h1' );
+  let playBackSpeedSlider = document.createElement( 'input' );
+
+  playBackSpeedDiv.id = 'playBackSpeedDiv';
+
+  playBackSpeedText.id = 'playBackSpeedText';
+  playBackSpeedText.appendChild( document.createTextNode( 'Playback speed: ' + playBackSpeed.toFixed( 1 ) + 'x' ) );
+
+  playBackSpeedSlider.id = 'playBackSpeedSlider';
+  playBackSpeedSlider.type = 'range';
+  playBackSpeedSlider.value = Math.round( 10 * playBackSpeed );
+  playBackSpeedSlider.min = 1;
+  playBackSpeedSlider.max = 20;
+  playBackSpeedSlider.addEventListener( 'mousemove', function () {
+    playBackSpeed = 0.1 * document.getElementById( 'playBackSpeedSlider' )
+      .value;
+    document.getElementById( 'playBackSpeedText' )
+      .innerHTML = 'Playback speed: ' + playBackSpeed.toFixed( 1 ) + 'x';
+  } );
+
+  playBackSpeedDiv.appendChild( playBackSpeedText );
+  playBackSpeedDiv.appendChild( playBackSpeedSlider );
+  box.appendChild( playBackSpeedDiv );
+
+  let leaveButton = document.createElement( 'button' );
+  leaveButton.appendChild( document.createTextNode( 'Exit recording' ) );
+  leaveButton.addEventListener( 'click', ( event ) => {
+    exitTutorial();
+  } );
+  leaveButton.classList.add( 'V' );
+  box.appendChild( leaveButton );
+
+  let repeatButton = document.createElement( 'button' );
+  repeatButton.appendChild( document.createTextNode( 'Repeat recording' ) );
+  repeatButton.addEventListener( 'click', ( event ) => {
+    replayRecording();
+  } );
+  repeatButton.classList.add( 'I' );
+  box.appendChild( repeatButton );
+
+  inUserUpload = true;
+
+  updateChatListener();
 }
 
 // Uploads the recording to DB.
@@ -3032,6 +3112,28 @@ function loadUserUpload( name ) {
           userUploadKeypressSequence.push( keypressSnap );
         } );
 
+      resetChordProgression();
+      remoteEvents = [];
+
+      clearTimeout( scheduledEvent );
+      scheduledEvent = null;
+      document.querySelectorAll( '.key' )
+        .forEach( function ( key ) {
+          handleNoteStop( key.dataset[ 'code' ] );
+        } );
+
+      if ( userUploadKeypressSequence ) {
+        userUploadKeypressSequence.forEach( function ( keypressSnap ) {
+          listenForRemoteEvents( keypressSnap.val(), 0 );
+        } );
+      }
+
+      if ( !document.getElementById( 'onlineDetails' )
+        .open ) {
+        document.getElementById( 'onlineBanner' )
+          .click();
+      }
+
       let box = document.getElementById( 'roomsBox' );
       while ( box.firstChild ) {
         box.removeChild( box.firstChild );
@@ -3083,22 +3185,6 @@ function loadUserUpload( name ) {
       inUserUpload = true;
 
       updateChatListener();
-
-      resetChordProgression();
-      remoteEvents = [];
-
-      clearTimeout( scheduledEvent );
-      scheduledEvent = null;
-      document.querySelectorAll( '.key' )
-        .forEach( function ( key ) {
-          handleNoteStop( key.dataset[ 'code' ] );
-        } );
-
-      if ( userUploadKeypressSequence ) {
-        userUploadKeypressSequence.forEach( function ( keypressSnap ) {
-          listenForRemoteEvents( keypressSnap.val(), 0 );
-        } );
-      }
 
     }, function ( error ) {
       console.error( "Couldn't load tutorial.", error );
