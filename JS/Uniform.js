@@ -566,7 +566,7 @@ firebase.database()
       document.getElementById( 'onlineOverlay' )
         .style.display = 'block';
       document.getElementById( 'onlineOverlayText' )
-        .innerHTML = 'Server connection lost.';
+        .innerHTML = 'Waiting for server connection.';
       document.getElementById( 'onlineOverlayButton' )
         .style.display = 'none';
       document.getElementById( 'chatOverlay' )
@@ -598,7 +598,7 @@ firebase.database()
     document.getElementById( 'onlineOverlay' )
       .style.display = 'block';
     document.getElementById( 'onlineOverlayText' )
-      .innerHTML = 'Server connection lost.';
+      .innerHTML = 'Waiting for server connection.';
     document.getElementById( 'onlineOverlayButton' )
       .style.display = 'none';
     document.getElementById( 'chatOverlay' )
@@ -2746,7 +2746,7 @@ function updateRoomBox() {
               document.getElementById( 'onlineOverlay' )
                 .style.display = 'block';
               document.getElementById( 'onlineOverlayText' )
-                .innerHTML = "Couldn't retrieve info from DB.";
+                .innerHTML = "Couldn't retrieve info from DB.\nPlease reload the page.";
               document.getElementById( 'onlineOverlayButton' )
                 .style.display = 'none';
             } );
@@ -2756,7 +2756,7 @@ function updateRoomBox() {
         document.getElementById( 'onlineOverlay' )
           .style.display = 'block';
         document.getElementById( 'onlineOverlayText' )
-          .innerHTML = "Couldn't retrieve info from DB.";
+          .innerHTML = "Couldn't retrieve info from DB.\nPlease reload the page.";
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
