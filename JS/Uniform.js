@@ -270,8 +270,7 @@ if ( isMobile.any() ) {
 }
 
 if ( BrowserDetect.browser != 'Chrome' &&
-  BrowserDetect.browser != 'Firefox' &&
-  BrowserDetect.browser != 'Safari' ) {
+  BrowserDetect.browser != 'Firefox' ) {
   alert( 'Your browser might not be supported.' );
 }
 
