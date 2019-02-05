@@ -1681,6 +1681,14 @@ function updateChatListener() {
 
   firebase.database()
     .ref( 'messages/' + roomName )
+    .off( 'child_added' );
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
+    .off( 'child_changed' );
+
+  firebase.database()
+    .ref( 'messages/' + roomName )
     .on( 'child_added', function ( snap ) {
 
       let message = document.createElement( 'div' );
