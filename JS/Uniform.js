@@ -142,7 +142,7 @@ var userUploadKeypressSequence = [];
 // These are some debugging, incomplete, or advanced features.
 
 var showConsonance = false;
-var showExpectation = true;
+var showExpectation = false;
 // This delay is added to keypresses heard from the room admin.
 var remoteEventDelay = 500;
 
