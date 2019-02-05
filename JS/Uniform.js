@@ -2652,7 +2652,7 @@ function updateRoomBox() {
         hoverLabel.classList.add( 'hoverLabel', 'FLATblack' );
 
         uploadButton.id = 'uploadRecordingButton';
-        uploadButton.disabled = isEmpty( recordedKeypresses );
+        uploadButton.disabled = ( isEmpty( recordedKeypresses ) && !recordingNow );
         uploadButton.appendChild( document.createTextNode( 'Upload recording' ) );
         uploadButton.addEventListener( 'click', ( event ) => {
           uploadRecording();
@@ -2805,6 +2805,7 @@ function broadcastSettings() {
 
 // Start or stop the current recording.
 function toggleRecording() {
+
   if ( recordingNow ) {
     document.getElementById( 'recordButton' )
       .innerHTML = 'Start recording';
@@ -2812,8 +2813,12 @@ function toggleRecording() {
     if ( !isEmpty( recordedKeypresses ) ) {
       document.getElementById( 'replayButton' )
         .disabled = false;
-      document.getElementById( 'uploadRecordingButton' )
+      document.getElementById( 'exportRecordingButton' )
         .disabled = false;
+      if ( document.getElementById( 'uploadRecordingButton' ) ) {
+        document.getElementById( 'uploadRecordingButton' )
+          .disabled = false;
+      }
 
       prepareExport();
     }
@@ -2831,10 +2836,12 @@ function toggleRecording() {
 
     document.getElementById( 'replayButton' )
       .disabled = true;
-    document.getElementById( 'uploadRecordingButton' )
-      .disabled = true;
     document.getElementById( 'exportRecordingButton' )
       .disabled = true;
+    if ( document.getElementById( 'uploadRecordingButton' ) ) {
+      document.getElementById( 'uploadRecordingButton' )
+        .disabled = true;
+    }
 
     disableSettings( true );
 
@@ -3042,10 +3049,12 @@ function handleImport() {
     recordedKeypresses = {};
     document.getElementById( 'replayButton' )
       .disabled = true;
-    document.getElementById( 'uploadRecordingButton' )
-      .disabled = true;
     document.getElementById( 'exportRecordingButton' )
       .disabled = true;
+    if ( document.getElementById( 'uploadRecordingButton' ) ) {
+      document.getElementById( 'uploadRecordingButton' )
+        .disabled = true;
+    }
     return;
   }
 
@@ -3071,17 +3080,21 @@ function handleImport() {
     if ( isEmpty( recordedKeypresses ) ) {
       document.getElementById( 'replayButton' )
         .disabled = true;
-      document.getElementById( 'uploadRecordingButton' )
-        .disabled = true;
       document.getElementById( 'exportRecordingButton' )
         .disabled = true;
+      if ( document.getElementById( 'uploadRecordingButton' ) ) {
+        document.getElementById( 'uploadRecordingButton' )
+          .disabled = true;
+      }
     } else {
       document.getElementById( 'replayButton' )
         .disabled = false;
-      document.getElementById( 'uploadRecordingButton' )
-        .disabled = false;
       document.getElementById( 'exportRecordingButton' )
         .disabled = false;
+      if ( document.getElementById( 'uploadRecordingButton' ) ) {
+        document.getElementById( 'uploadRecordingButton' )
+          .disabled = false;
+      }
 
       replayRecording();
     }
