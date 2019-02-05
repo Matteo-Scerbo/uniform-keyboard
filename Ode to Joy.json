@@ -1,0 +1,311 @@
+{
+  "owner": "5xkl2OepLYPGQU9vm2wXiSriMAG2",
+  "keypresses": {
+    "00000": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 0
+    },
+    "00001": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00002": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00003": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00004": {
+      "code": "Minus",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00005": {
+      "code": "Minus",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00006": {
+      "code": "Equal",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00007": {
+      "code": "Equal",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00008": {
+      "code": "Equal",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00009": {
+      "code": "Equal",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00010": {
+      "code": "Minus",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00011": {
+      "code": "Minus",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00012": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00013": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00014": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00015": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00016": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00017": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00018": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00019": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00020": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00021": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00022": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00023": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00024": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00025": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 650
+    },
+    "00026": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00027": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 150
+    },
+    "00028": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00029": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 900
+    },
+    "00030": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00031": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00032": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00033": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00034": {
+      "code": "Minus",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00035": {
+      "code": "Minus",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00036": {
+      "code": "Equal",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00037": {
+      "code": "Equal",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00038": {
+      "code": "Equal",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00039": {
+      "code": "Equal",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00040": {
+      "code": "Minus",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00041": {
+      "code": "Minus",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00042": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00043": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00044": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00045": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00046": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00047": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00048": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00049": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00050": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00051": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00052": {
+      "code": "KeyP",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00053": {
+      "code": "KeyP",
+      "type": "keyup",
+      "timestamp": 400
+    },
+    "00054": {
+      "code": "KeyO",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00055": {
+      "code": "KeyO",
+      "type": "keyup",
+      "timestamp": 600
+    },
+    "00056": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00057": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 150
+    },
+    "00058": {
+      "code": "KeyI",
+      "type": "keydown",
+      "timestamp": 100
+    },
+    "00059": {
+      "code": "KeyI",
+      "type": "keyup",
+      "timestamp": 900
+    }
+  },
+  "settings": {
+    "scale": 4,
+    "mechanic": "None",
+    "mode": -1,
+    "sequence": 0
+  }
+}
