@@ -149,20 +149,18 @@
 
   "$room_name": {
     ".read": true,
-    // To be modified if only readable by users in the room
     ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
 
     "$push_id": {
       ".write": "( !data.exists() && auth.uid == newData.child('user').val() ) ||
         (data.exists() && auth.uid == data.child('user').val())
       ",
-      // To be modified if only writeable by users in the room
       ".validate": "newData.hasChildren(['user', 'text'])",
       ".indexOn": ["user"],
 
       "admin": {
         ".validate": "newData.isBoolean() &&
-          auth.uid == root.child('rooms/' + $room_name + '/owner').val()
+        auth.uid == root.child('rooms/' + $room_name + '/owner').val()
         "
       },
 
@@ -194,7 +192,6 @@
 
   "$room_name": {
     ".read": true,
-    // To be modified if only readable by users in the room
     ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
     ".validate": "newData.hasChildren(['mechanic',
     'mode',
@@ -228,7 +225,6 @@
 
   "$room_name": {
     ".read": true,
-    // To be modified if only readable by users in the room
     ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
 
     "$push_id": {
