@@ -1,0 +1,260 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "tutorials": {
+      ".read": "auth != null",
+      ".write": false
+    },
+
+    "uploads": {
+      ".read": "auth != null",
+
+      "names": {
+        "$file_name": {
+          ".write": "( !data.exists() && auth.uid == newData.child('owner').val() ) ||
+            (data.exists() && auth.uid == data.child('owner').val())
+          ",
+          ".validate": "newData.hasChild('owner')",
+
+          "owner": {
+            ".validate": "newData.isString() &&
+            newData.val().length > 0 "
+          },
+
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+
+      "data": {
+        "$file_name": {
+          ".write": "( !data.exists() && auth.uid == newData.child('owner').val() ) ||
+            (data.exists() && auth.uid == data.child('owner').val())
+          ",
+          ".validate": "newData.hasChildren(['owner', 'keypresses', 'settings'])",
+
+          "owner": {
+            ".validate": "newData.isString() &&
+            newData.val().length > 0 "
+          },
+
+          "keypresses": {
+            "$push_id": {
+              ".validate": "newData.hasChildren(['code',
+              'type',
+              'timestamp'])
+          ",
+          "code": {
+            ".validate": "newData.isString() &&
+            newData.val().length > 0 "
+          },
+
+          "type": {
+            ".validate": "newData.isString() &&
+            newData.val().length > 0 "
+          },
+
+          "timestamp": {
+            ".validate": "newData.isNumber()"
+          },
+
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+
+      "settings": {
+        ".validate": "newData.hasChildren(['mechanic',
+        'mode',
+        'scale',
+        'sequence'])
+    ",
+
+    "mechanic": {
+      ".validate": "newData.isString()"
+    },
+
+    "mode": {
+      ".validate": "newData.isNumber()"
+    },
+
+    "scale": {
+      ".validate": "newData.isNumber()"
+    },
+
+    "sequence": {
+      ".validate": "newData.isNumber()"
+    },
+
+    "$other": {
+      ".validate": false
+    }
+  },
+
+  "$other": {
+    ".validate": false
+  }
+}
+}
+},
+
+"rooms": {
+  ".read": true,
+
+  "$room_name": {
+    ".write": "$room_name != 'Create room' &&
+      ((!data.exists() && auth.uid == newData.child('owner').val()) ||
+        (data.exists() && auth.uid == data.child('owner').val()))
+    ",
+    ".validate": "newData.hasChild('owner')",
+
+    "owner": {
+      ".validate": "newData.isString() &&
+      newData.val().length > 0 "
+    },
+
+    "$other": {
+      ".validate": false
+    }
+  }
+},
+
+"users": {
+
+  "$user_id": {
+    ".read": "auth.uid == $user_id",
+    ".write": "auth.uid == $user_id",
+
+    "room": {
+      ".validate": "newData.isString() &&
+      newData.val().length > 0 "
+    },
+
+    "displayName": {
+      ".validate": "newData.isString() &&
+      newData.val().length > 0 "
+    },
+
+    "$other": {
+      ".validate": false
+    }
+  }
+},
+
+"messages": {
+
+  "$room_name": {
+    ".read": true,
+    // To be modified if only readable by users in the room
+    ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
+
+    "$push_id": {
+      ".write": "( !data.exists() && auth.uid == newData.child('user').val() ) ||
+        (data.exists() && auth.uid == data.child('user').val())
+      ",
+      // To be modified if only writeable by users in the room
+      ".validate": "newData.hasChildren(['user', 'text'])",
+      ".indexOn": ["user"],
+
+      "admin": {
+        ".validate": "newData.isBoolean() &&
+          auth.uid == root.child('rooms/' + $room_name + '/owner').val()
+        "
+      },
+
+      "user": {
+        ".validate": "newData.isString() &&
+        newData.val().length > 0 "
+      },
+
+      "displayName": {
+        ".validate": "newData.isString() &&
+        newData.val().length > 0 &&
+        !newData.val().toLowerCase().contains('admin')
+        "
+      },
+
+      "text": {
+        ".validate": "newData.isString() &&
+        newData.val().length > 0 "
+      },
+
+      "$other": {
+        ".validate": false
+      }
+    }
+  }
+},
+
+"settings": {
+
+  "$room_name": {
+    ".read": true,
+    // To be modified if only readable by users in the room
+    ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
+    ".validate": "newData.hasChildren(['mechanic',
+    'mode',
+    'scale',
+    'sequence'])
+",
+
+"mechanic": {
+  ".validate": "newData.isString()"
+},
+
+"mode": {
+  ".validate": "newData.isNumber()"
+},
+
+"scale": {
+  ".validate": "newData.isNumber()"
+},
+
+"sequence": {
+  ".validate": "newData.isNumber()"
+},
+
+"$other": {
+  ".validate": false
+}
+}
+},
+
+"keypresses": {
+
+  "$room_name": {
+    ".read": true,
+    // To be modified if only readable by users in the room
+    ".write": "auth.uid == root.child('rooms/' + $room_name + '/owner').val()",
+
+    "$push_id": {
+      ".validate": "newData.hasChildren(['code',
+      'type',
+      'timestamp'])
+  ",
+  "code": {
+    ".validate": "newData.isString() &&
+    newData.val().length > 0 "
+  },
+
+  "type": {
+    ".validate": "newData.isString() &&
+    newData.val().length > 0 "
+  },
+
+  "timestamp": {
+    ".validate": "newData.isNumber()"
+  },
+
+  "$other": {
+    ".validate": false
+  }
+}
+}
+}
+}
+}
