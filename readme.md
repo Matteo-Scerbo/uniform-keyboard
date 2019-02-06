@@ -8,6 +8,12 @@ The application offers a platform for "pre-recorded" tutorials as well as online
 
 A live version of the application is hosted on [Firebase hosting](https://uniform-keyboard.firebaseapp.com/).
 
+## Demos
+
+You can check out some pictures and videos in the "Screens" folder.
+
+*Some videos show a typo: "tonal" instead of "tonic". This has been fixed in the app.*
+
 ## Getting Started
 
 ### Prerequisites
