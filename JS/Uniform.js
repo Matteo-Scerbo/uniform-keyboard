@@ -805,7 +805,7 @@ function stopTone( i ) {
   }
 }
 
-// Finds the lowest and highest versions of the chord's tonal on the keyboard,
+// Finds the lowest and highest versions of the chord's tonic on the keyboard,
 // the third and fifth between them, all keys corresponfing to those notes,
 // and simulates pressing them.
 // Always calls handleNoteStart() and handleNoteStop().
@@ -904,7 +904,7 @@ function changeScale( value ) {
 // Changes the mode according to the selected mechanic and keypress.
 // Always calls renderMode(), handleChordProgression().
 function changeMode( code ) {
-  if ( modeMechanic == 'None' ) {
+  if ( modeMechanic == 'None' || ( roomName && !iAmAdmin ) || inTutorial || inUserUpload ) {
     return;
   }
 
@@ -1030,13 +1030,13 @@ function renderSlider() {
 
   if ( currentScaleIndex ) {
     scaleSliderLabel.innerHTML = 'Scale: ' + currentScale[ 0 ] + ' Major.';
-    scaleSliderLabelInfo.innerHTML = currentScale[ 0 ] + ' is the tonal (in green),' +
+    scaleSliderLabelInfo.innerHTML = currentScale[ 0 ] + ' is the tonic (in green),' +
       '<br>the note from which the scale is built.';
   } else {
     dashedPointer.style.height = 0 + 'px';
     scaleSliderLabel.innerHTML = 'No scale selected.';
     scaleSliderLabelInfo.innerHTML = 'Drag this button to select the<br>' +
-      'tonal of the scale to display.';
+      'tonic of the scale to display.';
   }
 
   let pad = +window.getComputedStyle( document.getElementById( 'scaleBox' ) )
