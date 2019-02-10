@@ -10,9 +10,7 @@ A live version of the application is hosted on [Firebase hosting](https://unifor
 
 ## Demos
 
-You can check out some pictures and videos in the "Screens" folder.
-
-*Some videos show a typo: "tonal" instead of "tonic". This has been fixed in the app.*
+You can check out some pictures and videos in the "Screenshots" folder.
 
 ## References
 
@@ -20,7 +18,7 @@ A few JSON files are included for reference:
 * DBstructure: the reference structure for the Database. Most branches may or may not be present.
 * DBrules: the rules of the Database, exactly as they are implemented.
 * Tutorials: the file that was uploaded to the Database to put the two example tutorials in place.
-* Ode to joy: a recording file that you can import. It is exactly in the format created by the export feature.
+* Ode to joy: a recording file that you can import. It was created using the export feature.
 
 ## Getting Started
 
