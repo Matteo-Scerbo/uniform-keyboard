@@ -2070,8 +2070,10 @@ function fadeOutOverlay( text ) {
   overlay.parentNode.replaceChild( overlay.cloneNode( true ), overlay );
 
   window.setTimeout( function () {
-    overlay.style.display = 'none';
-    overlay.style.animation = '';
+    document.getElementById( 'onlineOverlay' )
+      .style.display = 'none';
+    document.getElementById( 'onlineOverlay' )
+      .style.animation = '';
   }, 5000 );
 }
 
