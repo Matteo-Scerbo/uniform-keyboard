@@ -85,6 +85,7 @@ h1 {
   margin-left: -11px;
   margin-top: 16px;
   width: fit-content;
+  width: -moz-fit-content;
   z-index: 2;
 }
 
@@ -402,6 +403,7 @@ label::before {
 
 #sequenceBox {
   height: fit-content;
+  height: -moz-fit-content;
   display: table;
   margin: 0 auto;
   padding: 30px 0;
@@ -639,6 +641,7 @@ label::before {
 .nextChordsDiv {
   height: 50px;
   width: fit-content;
+  width: -moz-fit-content;
   padding: 0;
 }
 
@@ -953,6 +956,7 @@ input:disabled:hover+.hoverLabelBelow {
 
 .message {
   width: fit-content;
+  width: -moz-fit-content;
   background: linear-gradient(var(--dark), var(--light) 10px);
   border-radius: 5px;
   padding: 5px;
