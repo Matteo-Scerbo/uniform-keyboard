@@ -27,7 +27,7 @@ var itaNotesShown = false;
 // Memory of past selected modes. Max length can be modified.
 var playedSequence = [];
 // Tension of the previous selected mode.
-var previousTension = 0;
+var previousTension = -1;
 // Consonance of a chord with respect to the previous is guessed
 // from short-memory prediction.
 var consonancePrediction = [];
@@ -980,17 +980,18 @@ function changeModeMechanic( value ) {
 // the selected scale.
 // Always calls renderSlider(), renderMode().
 function renderScale() {
-  renderSlider();
-
   // Remove color classes.
   let divs = document.querySelectorAll( '.mode' );
   divs.forEach( function ( div ) {
-    if ( !div.id.startsWith( 'mode' ) ) {
+    if ( !div.id.startsWith( 'mode' ) && !div.classList.contains( 'tensionLabel' ) && !div.classList.contains( 'nextTensionLabel' ) ) {
       numerals.forEach( function ( numeral ) {
         div.classList.remove( numeral );
       } );
+      div.classList.add( 'outOfScale' );
     }
   } );
+
+  renderSlider();
 
   [].forEach.call( document.getElementsByClassName( 'key' ), function ( key ) {
     for ( i = 0; i < currentScale.length; i++ ) {
@@ -1000,6 +1001,7 @@ function renderScale() {
         keyNote = keyNote.replace( '<small>#</small>', '#' );
         if ( currentScale[ i ] == keyNote ) {
           key.getElementsByClassName( 'mode' )[ 0 ].classList.add( numerals[ i ] );
+          key.getElementsByClassName( 'mode' )[ 0 ].classList.remove( 'outOfScale' );
         }
       }
     }
@@ -1014,11 +1016,13 @@ function renderSlider() {
   let scaleSliderLabel = document.getElementById( 'scaleSliderLabel' );
   let scaleSliderLabelInfo = document.getElementById( 'scaleSliderLabelInfo' );
   let scaleSliderCursor = document.getElementById( 'scaleSliderCursor' );
+  let scaleSliderCursorMode = document.getElementById( 'scaleSliderCursorMode' );
   let dashedPointer = document.getElementById( 'dashedPointer' );
 
   scaleSliderRange.value = currentScaleIndex;
 
-  scaleSliderCursor.classList.add( 'I' );
+  scaleSliderCursorMode.classList.add( 'I' );
+  scaleSliderCursorMode.classList.remove( 'outOfScale' );
 
   if ( currentScaleIndex % 2 ) {
     dashedPointer.style.height = 63 + 'px';
@@ -1057,53 +1061,90 @@ function renderMode() {
   // setting change worth broadcasting)
   broadcastSettings();
 
-  // Reset all markers to selected,
-  let divs = document.querySelectorAll( '.mode' );
-  divs.forEach( function ( div ) {
-    div.classList.remove( 'unselected' );
-  } );
-
   if ( currentModeIndex < 0 ) {
     return;
   }
 
   // Unselect every second, fourth, sixth, and seventh,
+  let root = numerals[ selectedSequence[ currentModeIndex ] ];
   let second = numerals[ ( 1 + selectedSequence[ currentModeIndex ] ) % 7 ];
+  let third = numerals[ ( 2 + selectedSequence[ currentModeIndex ] ) % 7 ];
   let fourth = numerals[ ( 3 + selectedSequence[ currentModeIndex ] ) % 7 ];
+  let fifth = numerals[ ( 4 + selectedSequence[ currentModeIndex ] ) % 7 ];
   let sixth = numerals[ ( 5 + selectedSequence[ currentModeIndex ] ) % 7 ];
   let seventh = numerals[ ( 6 + selectedSequence[ currentModeIndex ] ) % 7 ];
 
-  let markerlist = document.evaluate(
-    "//div[contains(concat(' ', normalize-space(@class), ' '), ' " + second + " ')" +
-    " or contains(concat(' ', normalize-space(@class), ' '), ' " + fourth + " ')" +
-    " or contains(concat(' ', normalize-space(@class), ' '), ' " + sixth + " ')" +
-    " or contains(concat(' ', normalize-space(@class), ' '), ' " + seventh + " ')" +
-    "]", document, null, XPathResult.ANY_TYPE, null );
-  let markers = [];
-  markers[ 0 ] = markerlist.iterateNext();
-  while ( markers[ markers.length - 1 ] != null ) {
-    markers[ markers.length ] = markerlist.iterateNext();
-  }
-  markers.pop();
+  [].forEach.call( document.getElementsByClassName( 'mode' ), function ( modeLabel ) {
+    modeLabel.classList.remove( 'rootNote', 'fifthNote', 'colorNote', 'tensionNote' );
+  } );
 
-  markers.forEach( function ( marker ) {
-    if ( marker.parentNode.getElementsByClassName( 'mode' )[ 0 ] ) {
-      marker.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'unselected' );
+  [].forEach.call( document.getElementsByClassName( root ), function ( rootNote ) {
+    if ( rootNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !rootNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !rootNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      rootNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'rootNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( second ), function ( secondNote ) {
+    if ( secondNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !secondNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !secondNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      secondNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'tensionNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( third ), function ( thirdNote ) {
+    if ( thirdNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !thirdNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !thirdNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      thirdNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'colorNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( fourth ), function ( fourthNote ) {
+    if ( fourthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !fourthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !fourthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      fourthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'tensionNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( fifth ), function ( fifthNote ) {
+    if ( fifthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !fifthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !fifthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      fifthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'fifthNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( sixth ), function ( sixthNote ) {
+    if ( sixthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !sixthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !sixthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      sixthNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'tensionNote' );
+    }
+  } );
+
+  [].forEach.call( document.getElementsByClassName( seventh ), function ( seventhNote ) {
+    if ( seventhNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
+      !seventhNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'tensionLabel' ) &&
+      !seventhNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.contains( 'nextTensionLabel' ) ) {
+      seventhNote.parentNode.getElementsByClassName( 'mode' )[ 0 ].classList.add( 'colorNote' );
     }
   } );
 
   // Reset all markers IN THE MODEBOX to unselected,
   divs = document.querySelectorAll( '[id^="mode"]' );
   divs.forEach( function ( div ) {
-    div.classList.add( 'unselected' );
+    if ( div.id.startsWith( 'mode' ) ) {
+      div.classList.remove( 'rootNote', 'fifthNote', 'colorNote', 'tensionNote' );
+      div.classList.add( 'unselected' );
+    }
   } );
 
   // Select the cursor IN THE MODEBOX.
-  let cursor = document.querySelector( '[id="mode' + currentModeIndex + '"]' );
-  if ( cursor != null ) {
-    cursor.classList.remove( 'unselected' );
-  }
-  cursor = document.querySelector( '[id="scaleSliderCursorMode"]' );
+  let cursor = document.getElementById( 'mode' + currentModeIndex );
   if ( cursor != null ) {
     cursor.classList.remove( 'unselected' );
   }
@@ -1308,16 +1349,22 @@ function alertFeeling( feeling, intensity ) {
 }
 
 // Update the tension wave visualization.
-function changeTension( intensity ) {
-  let svg = document.getElementById( 'tensionSVG' );
-  let waveBack = document.getElementById( 'tensionBack' );
-  let waveFront = document.getElementById( 'tensionFront' );
+function changeTension( id, intensity ) {
+  let svg = document.getElementById( id );
+  let waveBack = document.getElementById( id + 'Back' );
+  let waveFront = document.getElementById( id + 'Front' );
 
-  svg.classList.remove( 'I', 'IV', 'V' );
+  svg.classList.remove( 'I', 'III', 'IV', 'V' );
   switch ( intensity ) {
+    case -1:
+      svg.classList.add( 'FLATgray' );
+      intensity = 0;
+      break;
     case 0:
-    case 1:
       svg.classList.add( 'I' );
+      break;
+    case 1:
+      svg.classList.add( 'III' );
       break;
     case 2:
     case 3:
@@ -1371,11 +1418,14 @@ function handleChordProgression() {
 
   playedSequence.push( numerals[ selectedSequence[ currentModeIndex ] ] );
 
+  // expectation
+  /*
   let expectation = null;
   if ( expectationPrediction ) {
     expectation = expectationPrediction[ playedSequence[ playedSequence.length - 1 ] ];
   }
-  //consonance
+  */
+  // consonance
   /*
     let consonance = null;
     if ( consonancePrediction ) {
@@ -1402,32 +1452,64 @@ function handleChordProgression() {
       tension = 5;
       break;
   }
-  changeTension( tension );
+  changeTension( 'currentTension', tension );
+  changeTension( 'pastTension', previousTension );
 
-  let feeling = null;
-  if ( expectation < expectationThreshold ) {
-    feeling = 'Surprise';
+  numerals.forEach( function ( numeral ) {
+    document.getElementById( 'currentChord' )
+      .classList.remove( numeral );
+    document.getElementById( 'pastChord' )
+      .classList.remove( numeral );
+    document.getElementById( 'pastPastChord' )
+      .classList.remove( numeral );
+  } );
+
+  document.getElementById( 'currentChord' )
+    .classList.add( playedSequence[ playedSequence.length - 1 ] );
+  document.getElementById( 'currentChord' )
+    .innerHTML = playedSequence[ playedSequence.length - 1 ];
+
+  if ( playedSequence.length > 1 ) {
+    document.getElementById( 'pastChord' )
+      .classList.add( playedSequence[ playedSequence.length - 2 ] );
+    document.getElementById( 'pastChord' )
+      .innerHTML = playedSequence[ playedSequence.length - 2 ];
   }
-  if ( tension < previousTension - 2 ) {
-    feeling = 'Resolution';
+
+  if ( playedSequence.length > 2 ) {
+    document.getElementById( 'pastPastChord' )
+      .classList.add( playedSequence[ playedSequence.length - 3 ] );
+    document.getElementById( 'pastPastChord' )
+      .innerHTML = playedSequence[ playedSequence.length - 3 ];
   }
+
+  // Feeling
   /*
-  if ( consonance < consonanceThreshold ) {
-    feeling = 'Dissonance';
-  } else {
+    let feeling = null;
     if ( expectation < expectationThreshold ) {
       feeling = 'Surprise';
     }
     if ( tension < previousTension - 2 ) {
       feeling = 'Resolution';
     }
-  }
-  */
-  if ( feeling ) {
-    alertFeeling( feeling, 5 );
-  }
 
+    if ( consonance < consonanceThreshold ) {
+      feeling = 'Dissonance';
+    } else {
+      if ( expectation < expectationThreshold ) {
+        feeling = 'Surprise';
+      }
+      if ( tension < previousTension - 2 ) {
+        feeling = 'Resolution';
+      }
+    }
+
+    if ( feeling ) {
+      alertFeeling( feeling, 5 );
+    }
+  */
   previousTension = tension;
+
 
   while ( playedSequence.length > maxSequenceMemory ) {
     playedSequence.shift();
@@ -1643,11 +1725,34 @@ function getNextChord( consideredHistory ) {
 
 // Reset all variables related to handling tension and expectation.
 function resetChordProgression() {
-  previousTension = 0;
+  previousTension = -1;
   playedSequence = [];
   consonancePrediction = [];
   expectationPrediction = [];
-  changeTension( 0 );
+  changeTension( 'pastTension', -1 );
+  changeTension( 'currentTension', -1 );
+
+  numerals.forEach( function ( numeral ) {
+    document.getElementById( 'currentChord' )
+      .classList.remove( numeral );
+    document.getElementById( 'pastChord' )
+      .classList.remove( numeral );
+    document.getElementById( 'pastPastChord' )
+      .classList.remove( numeral );
+  } );
+  document.getElementById( 'currentChord' )
+    .classList.add( 'FLATgray' );
+  document.getElementById( 'pastChord' )
+    .classList.add( 'FLATgray' );
+  document.getElementById( 'pastPastChord' )
+    .classList.add( 'FLATgray' );
+
+  document.getElementById( 'currentChord' )
+    .innerHTML = '';
+  document.getElementById( 'pastChord' )
+    .innerHTML = '';
+  document.getElementById( 'pastPastChord' )
+    .innerHTML = '';
 }
 
 

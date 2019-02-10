@@ -366,25 +366,82 @@
   </div>
 
   <div id="accordion">
-    <details id="tensionDetails" class="accordionElement FLATwhite">
+    <details id="tensionDetails" class="accordionElement FLATwhite" open>
       <summary id="tensionBanner" class="accordionBanner FLATblack">
         <span class="accordionTitle">Harmonic tension</span>
       </summary>
       <div id="tensionBox">
-        <div class="indicator">
-          <svg class="I" id="tensionSVG" width="125px" height="100px">
-            <polyline id="tensionBack" class="back" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
-            <polyline id="tensionFront" class="front" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
+
+        <div id="pastPastChord" class="tensionLabel mode FLATgray"></div>
+
+        <div class="indicator" id="pastTensionDiv">
+          <svg class="FLATgray" id="pastTension" width="125px" height="100px">
+            <polyline id="pastTensionBack" class="back" points="5 50 15 50 27.5 50 50 50 70 50 87.5 50 102.5 50 120 50"></polyline>
+            <polyline id="pastTensionFront" class="front" points="5 50 15 50 27.5 50 50 50 70 50 87.5 50 102.5 50 120 50"></polyline>
           </svg>
         </div>
-        <div class="indicator">
-          <svg class="III" id="feelingSVG" width="275px" height="100px">
-            <g>
-              <polyline id="feeling" class="standalone" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 270 50"></polyline>
-              <text id="feelingText" x="10" y="60"></text>
-            </g>
+
+        <div id="pastChord" class="tensionLabel mode FLATgray"></div>
+
+        <div class="indicator" id="currentTensionDiv">
+          <svg class="FLATgray" id="currentTension" width="125px" height="100px">
+            <polyline id="currentTensionBack" class="back" points="5 50 15 50 27.5 50 50 50 70 50 87.5 50 102.5 50 120 50"></polyline>
+            <polyline id="currentTensionFront" class="front" points="5 50 15 50 27.5 50 50 50 70 50 87.5 50 102.5 50 120 50"></polyline>
           </svg>
         </div>
+
+        <div id="currentChord" class="tensionLabel mode FLATgray"></div>
+
+        <div class="indicator nextTensionDiv">
+          <svg class="nextTension I" id="nextTensionNone" width="125px" height="100px">
+            <polyline id="nextTensionNoneBack" class="back" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
+            <polyline id="nextTensionNoneFront" class="front" points="5 50, 15 50, 27.5 50, 50 50, 70 50, 87.5 50, 102.5 50, 120 50"></polyline>
+          </svg>
+        </div>
+
+        <div id="nextChordTonic">
+          <div class="nextTensionLabel mode I">I</div>
+        </div>
+
+        <div class="indicator nextTensionDiv">
+          <svg class="nextTension III" id="nextTensionLow" width="125px" height="100px">
+            <polyline id="nextTensionLowBack" class="back" points="5 50, 15 50, 27.5 55, 50 45, 70 52, 87.5 48, 102.5 50, 120 50"></polyline>
+            <polyline id="nextTensionLowFront" class="front" points="5 50, 15 50, 27.5 55, 50 45, 70 52, 87.5 48, 102.5 50, 120 50"></polyline>
+          </svg>
+        </div>
+
+        <div id="nextChordsLow">
+          <div class="nextTensionLabel mode VI">VI</div>
+          <span class="or">OR</span>
+          <div class="nextTensionLabel mode III">III</div>
+        </div>
+
+        <div class="indicator nextTensionDiv">
+          <svg class="nextTension IV" id="nextTensionMedium" width="125px" height="100px">
+            <polyline id="nextTensionMediumBack" class="back" points="5 50, 15 50, 27.5 65, 50 35, 70 56, 87.5 44, 102.5 50, 120 50"></polyline>
+            <polyline id="nextTensionMediumFront" class="front" points="5 50, 15 50, 27.5 65, 50 35, 70 56, 87.5 44, 102.5 50, 120 50"></polyline>
+          </svg>
+        </div>
+
+        <div id="nextChordsMedium">
+          <div class="nextTensionLabel mode II">II</div>
+          <span class="or">OR</span>
+          <div class="nextTensionLabel mode IV">IV</div>
+        </div>
+
+        <div class="indicator nextTensionDiv">
+          <svg class="nextTension V" id="nextTensionHigh" width="125px" height="100px">
+            <polyline id="nextTensionHighBack" class="back" points="5 50, 15 50, 27.5 75, 50 25, 70 60, 87.5 40, 102.5 50, 120 50"></polyline>
+            <polyline id="nextTensionHighFront" class="front" points="5 50, 15 50, 27.5 75, 50 25, 70 60, 87.5 40, 102.5 50, 120 50"></polyline>
+          </svg>
+        </div>
+
+        <div id="nextChordsHigh">
+          <div class="nextTensionLabel mode V">V</div>
+          <span class="or">OR</span>
+          <div class="nextTensionLabel mode VII">VII</div>
+        </div>
+
       </div>
     </details>
     <details id="onlineDetails" class="accordionElement FLATwhite">

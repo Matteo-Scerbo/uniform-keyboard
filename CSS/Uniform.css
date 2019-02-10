@@ -16,50 +16,41 @@
 .I {
   --light: #2ECC71;
   --dark: #27AE60;
-  --inside: var(--light);
-  --outside: var(--dark);
 }
 
 .II {
   --dark: #16A085;
   --light: #1ABC9C;
-  --inside: var(--dark);
-  --outside: var(--light);
 }
 
 .III {
   --light: #3498DB;
   --dark: #2980B9;
-  --inside: var(--light);
-  --outside: var(--dark);
 }
 
 .IV {
   --dark: #8E44AD;
   --light: #9B59B6;
-  --inside: var(--dark);
-  --outside: var(--light);
 }
 
 .V {
   --light: #E74C3C;
   --dark: #C0392B;
-  --inside: var(--light);
-  --outside: var(--dark);
 }
 
 .VI {
   --dark: #D35400;
   --light: #E67E22;
-  --inside: var(--dark);
-  --outside: var(--light);
 }
 
 .VII {
   --light: #F1C40F;
   --dark: #F39C12;
-  --inside: var(--light);
-  --outside: var(--dark);
+}
+
+.outOfScale {
+  --light: transparent;
+  --dark: transparent;
 }
 
 html {
@@ -176,15 +167,13 @@ h1 {
 #dashedPointer {
   position: absolute;
   transform-origin: center center;
-  left: 3px;
+  left: 28px;
   top: 14px;
   height: 0;
   margin-left: 25px;
   margin-top: 45px;
-  height: 63px;
   width: 0;
   border-left: 2px dotted var(--dark);
-  transform-origin: center center;
   z-index: 1;
 }
 
@@ -244,11 +233,13 @@ h1 {
 .white {
   color: #2C3E50;
   background-color: #ECF0F1;
+  --keyColor: #ECF0F1;
 }
 
 .black {
   color: #ECF0F1;
   background-color: #2C3E50;
+  --keyColor: #2C3E50;
 }
 
 .pressed {
@@ -282,20 +273,38 @@ h1 {
 }
 
 .mode {
-  width: 30px;
-  height: 30px;
+  position: absolute;
+  width: 20px;
+  height: 20px;
   margin: 10px;
   border-radius: 50%;
+  border: 5px solid var(--dark);
   display: inline-block;
   font: 170% serif;
   text-align: center;
-  background-color: var(--inside);
-  box-shadow: 0px 0px 0px 5px var(--outside) inset;
+  background-color: var(--light);
+}
+
+.rootNote {
+  box-shadow: 0px 0px 1px 2px var(--keyColor) inset;
+}
+
+.colorNote {
+  box-shadow: 0px 0px 1px 4px var(--keyColor) inset;
+}
+
+.fifthNote {
+  box-shadow: 0px 0px 1px 6px var(--keyColor) inset;
+}
+
+.tensionNote {
+  opacity: 0.6;
+  box-shadow: 0px 0px 0px 10px var(--keyColor) inset;
 }
 
 .unselected {
   opacity: 0.6;
-  background-color: transparent;
+  box-shadow: 0px 0px 0px 20px white inset;
 }
 
 #modalBox {
@@ -304,7 +313,8 @@ h1 {
   margin: 0 auto;
 }
 
-#mechanicSettingsBox, #playChordSettingsBox {
+#mechanicSettingsBox,
+#playChordSettingsBox {
   padding: 10px;
   color: var(--dark);
   white-space: nowrap;
@@ -402,10 +412,11 @@ label::before {
 }
 
 .sequenceLabel {
-  width: 50px;
-  height: 40px;
+  position: relative;
+  width: 40px;
+  height: 35px;
   margin: 15px;
-  padding-top: 10px;
+  padding-top: 5px;
 }
 
 .leftArrow {
@@ -421,7 +432,8 @@ label::before {
   transform: rotate(-135deg);
 }
 
-.leftArrow:before, .leftArrow:after {
+.leftArrow:before,
+.leftArrow:after {
   content: '';
   position: absolute;
   border: 12px solid;
@@ -456,7 +468,8 @@ label::before {
   transform: rotate(45deg);
 }
 
-.rightArrow:before, .rightArrow:after {
+.rightArrow:before,
+.rightArrow:after {
   content: '';
   position: absolute;
   border: 12px solid;
@@ -554,19 +567,105 @@ label::before {
   font-size: 20px;
 }
 
+#tensionBox {
+  position: relative;
+  min-height: 350px;
+}
+
+.tensionLabel {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 35px;
+  margin: 15px;
+  margin-top: -30px;
+  padding-top: 5px;
+}
+
+#pastChord,
+#currentTensionDiv {
+  left: 25%;
+}
+
+#currentChord,
+.nextTensionDiv {
+  left: 50%;
+}
+
+.nextTension {
+  transform-origin: -40px center;
+}
+
+.nextTensionLabel {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 35px;
+  margin: 5px;
+  padding-top: 5px;
+}
+
+#nextTensionNone {
+  transform: rotate(-45deg);
+}
+
+#nextTensionLow {
+  transform: rotate(-15deg);
+}
+
+#nextTensionMedium {
+  transform: rotate(15deg);
+}
+
+#nextTensionHigh {
+  transform: rotate(45deg);
+}
+
+#nextChordTonic {
+  position: absolute;
+  top: 0;
+  left: 70%;
+}
+
+#nextChordsLow {
+  position: absolute;
+  top: 26%;
+  left: 75%;
+}
+
+#nextChordsMedium {
+  position: absolute;
+  bottom: 26%;
+  left: 75%;
+}
+
+#nextChordsHigh {
+  position: absolute;
+  bottom: 0;
+  left: 70%;
+}
+
+.or {
+  font-weight: bold;
+  font-size: 125%;
+}
+
 #feelingText {
   opacity: 1;
   -webkit-transition: 1s opacity;
   -o-transition: 1s opacity;
   transition: 1s opacity;
-  fill: var(--inside);
+  fill: var(--light);
   font-weight: bold;
   font-size: 45px;
 }
 
 .indicator {
   display: inline;
-  margin: 0 10px;
+  position: absolute;
+  top: 50%;
+  margin-left: 10%;
+  margin-top: -55px;
 }
 
 .indicator svg polyline {
@@ -577,11 +676,11 @@ label::before {
 }
 
 .indicator svg polyline.back {
-  stroke: var(--outside);
+  stroke: var(--light);
 }
 
 .indicator svg polyline.front {
-  stroke: var(--inside);
+  stroke: var(--dark);
   stroke-dasharray: 100% 200%;
   stroke-dashoffset: 300%;
   animation: slide 1s linear infinite;
@@ -589,7 +688,7 @@ label::before {
 
 .indicator svg polyline.standalone {
   display: none;
-  stroke: var(--inside);
+  stroke: var(--dark);
   stroke-dasharray: 100% 200%;
   stroke-dashoffset: 300%;
   animation:
@@ -931,7 +1030,8 @@ input:disabled:hover+.hoverLabelBelow {
   margin: 10px 0;
 }
 
-#exportRecordingAnchor, #importRecordingInput {
+#exportRecordingAnchor,
+#importRecordingInput {
   display: none;
 }
 
