@@ -1758,6 +1758,11 @@ function resetChordProgression() {
         .style.transform = 'scale(0.5)';
     }
   } );
+
+  document.getElementById( 'pastFeeling' )
+    .innerHTML = '';
+  document.getElementById( 'currentFeeling' )
+    .innerHTML = '';
 }
 
 // Display an animation next to the tension wave. It fades out.
