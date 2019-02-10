@@ -450,7 +450,9 @@ function handleLocalEvent( type, code, timestamp ) {
     switch ( true ) {
       case code == 'Space':
       case code.startsWith( 'Numpad' ):
-        changeMode( code );
+        if ( iAmAdmin || ( !roomName && !inTutorial && !inUserUpload ) ) {
+          changeMode( code );
+        }
         break;
       case code == 'Enter':
         nextTutorialStep();
@@ -547,7 +549,6 @@ function handleNextRemoteEvent() {
         handleNoteStop( remoteEvents[ 0 ].code );
     }
   }
-
   remoteEvents.shift();
 
   if ( remoteEvents[ 0 ] ) {
@@ -904,7 +905,7 @@ function changeScale( value ) {
 // Changes the mode according to the selected mechanic and keypress.
 // Always calls renderMode(), handleChordProgression().
 function changeMode( code ) {
-  if ( modeMechanic == 'None' || ( roomName && !iAmAdmin ) || inTutorial || inUserUpload ) {
+  if ( modeMechanic == 'None' || ( roomName && !iAmAdmin ) ) {
     return;
   }
 
@@ -1061,6 +1062,10 @@ function renderMode() {
   // setting change worth broadcasting)
   broadcastSettings();
 
+  [].forEach.call( document.getElementsByClassName( 'mode' ), function ( modeLabel ) {
+    modeLabel.classList.remove( 'rootNote', 'fifthNote', 'colorNote', 'tensionNote' );
+  } );
+
   if ( currentModeIndex < 0 ) {
     return;
   }
@@ -1073,10 +1078,6 @@ function renderMode() {
   let fifth = numerals[ ( 4 + selectedSequence[ currentModeIndex ] ) % 7 ];
   let sixth = numerals[ ( 5 + selectedSequence[ currentModeIndex ] ) % 7 ];
   let seventh = numerals[ ( 6 + selectedSequence[ currentModeIndex ] ) % 7 ];
-
-  [].forEach.call( document.getElementsByClassName( 'mode' ), function ( modeLabel ) {
-    modeLabel.classList.remove( 'rootNote', 'fifthNote', 'colorNote', 'tensionNote' );
-  } );
 
   [].forEach.call( document.getElementsByClassName( root ), function ( rootNote ) {
     if ( rootNote.parentNode.getElementsByClassName( 'mode' )[ 0 ] &&
@@ -1292,61 +1293,7 @@ function showNoteLabels( value, checked ) {
 
 
 
-// TENSION AND FEELING FUNCTIONS
-
-// Display an animation next to the tension wave. It fades out.
-// Has to be replaced every time, as CSS animations don't repeat.
-function alertFeeling( feeling, intensity ) {
-  let svg = document.getElementById( 'feelingSVG' );
-  let wave = document.getElementById( 'feeling' );
-
-  wave.style.display = 'block';
-
-  let lowpoint1 = svg.createSVGPoint();
-  let lowpoint2 = svg.createSVGPoint();
-  let highpoint1 = svg.createSVGPoint();
-  let highpoint2 = svg.createSVGPoint();
-  lowpoint1.x = 27.5;
-  lowpoint1.y = 50 + intensity * 5;
-  highpoint1.x = 50;
-  highpoint1.y = 50 - intensity * 5;
-  lowpoint2.x = 70;
-  lowpoint2.y = 50 + intensity * 2;
-  highpoint2.x = 87.5;
-  highpoint2.y = 50 - intensity * 2;
-
-  wave.points.replaceItem( lowpoint1, 2 );
-  wave.points.replaceItem( highpoint1, 3 );
-  wave.points.replaceItem( lowpoint2, 4 );
-  wave.points.replaceItem( highpoint2, 5 );
-
-  wave.parentNode.replaceChild(
-    wave.cloneNode( true ),
-    wave
-  );
-  wave = document.getElementById( 'feeling' );
-
-  let text = document.getElementById( 'feelingText' );
-  text.innerHTML = feeling;
-  text.style.fontWeight = intensity * 90;
-  text.style.fontSize = 20 + intensity * 2;
-  text.setAttribute( 'x', 80 - intensity * 7 );
-  text.setAttribute( 'y', 53 + intensity / 1.5 );
-
-  // The text is reinserted as a new element so that the transition
-  // from opacity 0 to 1 is instantaneous, while from 1 to 0 it is slow.
-  text.parentNode.replaceChild(
-    text.cloneNode( true ),
-    text
-  );
-  text = document.getElementById( 'feelingText' );
-
-  text.style.opacity = 1;
-  window.setTimeout( function () {
-    text.style.opacity = 0;
-    wave.style.display = 'none';
-  }, 2000 );
-}
+// TENSION FUNCTIONS
 
 // Update the tension wave visualization.
 function changeTension( id, intensity ) {
@@ -1417,21 +1364,20 @@ function handleChordProgression() {
   }
 
   playedSequence.push( numerals[ selectedSequence[ currentModeIndex ] ] );
+  while ( playedSequence.length > maxSequenceMemory ) {
+    playedSequence.shift();
+  }
 
   // expectation
-  /*
   let expectation = null;
   if ( expectationPrediction ) {
     expectation = expectationPrediction[ playedSequence[ playedSequence.length - 1 ] ];
   }
-  */
   // consonance
-  /*
-    let consonance = null;
-    if ( consonancePrediction ) {
-      consonance = consonancePrediction[ numerals[ selectedSequence[ currentModeIndex ] ] ];
-    }
-  */
+  let consonance = null;
+  if ( consonancePrediction ) {
+    consonance = consonancePrediction[ numerals[ selectedSequence[ currentModeIndex ] ] ];
+  }
 
   let tension = 0;
   switch ( playedSequence[ playedSequence.length - 1 ] ) {
@@ -1445,15 +1391,34 @@ function handleChordProgression() {
     case 'IV':
       tension = 3;
       break;
-    case 'VII':
-      tension = 4;
-      break;
     case 'V':
+    case 'VII':
       tension = 5;
       break;
   }
   changeTension( 'currentTension', tension );
   changeTension( 'pastTension', previousTension );
+
+  switch ( tension ) {
+    case -1:
+      document.getElementById( 'tensionAdvice' )
+        .innerHTML = 'It is best to start<br>with the tonic.';
+      break;
+
+    case 0:
+      document.getElementById( 'tensionAdvice' )
+        .innerHTML = 'You played the tonic:<br>no tension is felt.';
+      break;
+
+    case 5:
+      document.getElementById( 'tensionAdvice' )
+        .innerHTML = 'Resolve the tension!';
+      break;
+
+    default:
+      document.getElementById( 'tensionAdvice' )
+        .innerHTML = '';
+  }
 
   numerals.forEach( function ( numeral ) {
     document.getElementById( 'currentChord' )
@@ -1465,11 +1430,15 @@ function handleChordProgression() {
   } );
 
   document.getElementById( 'currentChord' )
+    .classList.remove( 'FLATgray' );
+  document.getElementById( 'currentChord' )
     .classList.add( playedSequence[ playedSequence.length - 1 ] );
   document.getElementById( 'currentChord' )
     .innerHTML = playedSequence[ playedSequence.length - 1 ];
 
   if ( playedSequence.length > 1 ) {
+    document.getElementById( 'pastChord' )
+      .classList.remove( 'FLATgray' );
     document.getElementById( 'pastChord' )
       .classList.add( playedSequence[ playedSequence.length - 2 ] );
     document.getElementById( 'pastChord' )
@@ -1478,42 +1447,36 @@ function handleChordProgression() {
 
   if ( playedSequence.length > 2 ) {
     document.getElementById( 'pastPastChord' )
+      .classList.remove( 'FLATgray' );
+    document.getElementById( 'pastPastChord' )
       .classList.add( playedSequence[ playedSequence.length - 3 ] );
     document.getElementById( 'pastPastChord' )
       .innerHTML = playedSequence[ playedSequence.length - 3 ];
   }
 
-  // Feeling
-  /*
-    let feeling = null;
-    if ( expectation < expectationThreshold ) {
-      feeling = 'Surprise';
-    }
-    if ( tension < previousTension - 2 ) {
-      feeling = 'Resolution';
-    }
+  document.getElementById( 'pastFeeling' )
+    .innerHTML = document.getElementById( 'currentFeeling' )
+    .innerHTML;
 
-    if ( consonance < consonanceThreshold ) {
-      feeling = 'Dissonance';
-    } else {
-      if ( expectation < expectationThreshold ) {
-        feeling = 'Surprise';
-      }
-      if ( tension < previousTension - 2 ) {
-        feeling = 'Resolution';
-      }
-    }
-
-    if ( feeling ) {
-      alertFeeling( feeling, 5 );
-    }
-  */
-  previousTension = tension;
-
-
-  while ( playedSequence.length > maxSequenceMemory ) {
-    playedSequence.shift();
+  switch ( true ) {
+    case ( tension == 0 && previousTension == 5 ):
+      document.getElementById( 'currentFeeling' )
+        .innerHTML = 'Resolution!';
+      break;
+    case ( tension == 1 && previousTension == 5 ):
+      document.getElementById( 'currentFeeling' )
+        .innerHTML = 'Deceit!';
+      break;
+    case ( consonancePrediction[ playedSequence[ playedSequence.length - 1 ] ] < 5 ):
+      document.getElementById( 'currentFeeling' )
+        .innerHTML = 'Weird leap...';
+      break;
+    default:
+      document.getElementById( 'currentFeeling' )
+        .innerHTML = '';
   }
+
+  previousTension = tension;
 
   consonancePrediction = getNextChord( 1 );
   if ( showConsonance ) {
@@ -1546,6 +1509,32 @@ function handleChordProgression() {
       }
     } );
   }
+
+  let consonanceDegree = 1;
+  numerals.forEach( function ( numeral ) {
+    switch ( true ) {
+      case consonancePrediction[ numeral ] == 0:
+        consonanceDegree = 0.5;
+        break;
+      case consonancePrediction[ numeral ] < 5:
+        consonanceDegree = 0.7;
+        break;
+      case consonancePrediction[ numeral ] < 10:
+        consonanceDegree = 0.8;
+        break;
+      case consonancePrediction[ numeral ] < 15:
+        consonanceDegree = 0.9;
+        break;
+      default:
+        consonanceDegree = 1;
+        break;
+    }
+
+    document.getElementById( 'nextTensionLabel' + numeral )
+      .style.opacity = consonanceDegree;
+    document.getElementById( 'nextTensionLabel' + numeral )
+      .style.transform = 'scale(' + consonanceDegree + ')';
+  } );
 }
 
 // Get the next chord predictions by looking at the sequence in memory.
@@ -1753,7 +1742,79 @@ function resetChordProgression() {
     .innerHTML = '';
   document.getElementById( 'pastPastChord' )
     .innerHTML = '';
+
+  document.getElementById( 'tensionAdvice' )
+    .innerHTML = 'It is best to start<br>with the tonic.';
+  document.getElementById( 'nextTensionLabelI' )
+    .style.opacity = 1;
+  document.getElementById( 'nextTensionLabelI' )
+    .style.transform = 'scale(1)';
+
+  numerals.forEach( function ( numeral ) {
+    if ( numeral != 'I' ) {
+      document.getElementById( 'nextTensionLabel' + numeral )
+        .style.opacity = 0.5;
+      document.getElementById( 'nextTensionLabel' + numeral )
+        .style.transform = 'scale(0.5)';
+    }
+  } );
 }
+
+// Display an animation next to the tension wave. It fades out.
+// Has to be replaced every time, as CSS animations don't repeat.
+/*
+function alertFeeling( feeling, intensity ) {
+  let svg = document.getElementById( 'feelingSVG' );
+  let wave = document.getElementById( 'feeling' );
+
+  wave.style.display = 'block';
+
+  let lowpoint1 = svg.createSVGPoint();
+  let lowpoint2 = svg.createSVGPoint();
+  let highpoint1 = svg.createSVGPoint();
+  let highpoint2 = svg.createSVGPoint();
+  lowpoint1.x = 27.5;
+  lowpoint1.y = 50 + intensity * 5;
+  highpoint1.x = 50;
+  highpoint1.y = 50 - intensity * 5;
+  lowpoint2.x = 70;
+  lowpoint2.y = 50 + intensity * 2;
+  highpoint2.x = 87.5;
+  highpoint2.y = 50 - intensity * 2;
+
+  wave.points.replaceItem( lowpoint1, 2 );
+  wave.points.replaceItem( highpoint1, 3 );
+  wave.points.replaceItem( lowpoint2, 4 );
+  wave.points.replaceItem( highpoint2, 5 );
+
+  wave.parentNode.replaceChild(
+    wave.cloneNode( true ),
+    wave
+  );
+  wave = document.getElementById( 'feeling' );
+
+  let text = document.getElementById( 'feelingText' );
+  text.innerHTML = feeling;
+  text.style.fontWeight = intensity * 90;
+  text.style.fontSize = 20 + intensity * 2;
+  text.setAttribute( 'x', 80 - intensity * 7 );
+  text.setAttribute( 'y', 53 + intensity / 1.5 );
+
+  // The text is reinserted as a new element so that the transition
+  // from opacity 0 to 1 is instantaneous, while from 1 to 0 it is slow.
+  text.parentNode.replaceChild(
+    text.cloneNode( true ),
+    text
+  );
+  text = document.getElementById( 'feelingText' );
+
+  text.style.opacity = 1;
+  window.setTimeout( function () {
+    text.style.opacity = 0;
+    wave.style.display = 'none';
+  }, 2000 );
+}
+*/
 
 
 // CHAT FUNCTIONS
@@ -2170,7 +2231,7 @@ function createRoom() {
                   document.getElementById( 'onlineOverlay' )
                     .style.display = 'block';
                   document.getElementById( 'onlineOverlayText' )
-                    .innerHTML = "Couldn't create room.\nPlease reload the page.";
+                    .innerHTML = "Couldn't create room.<br>Please reload the page.";
                   document.getElementById( 'onlineOverlayButton' )
                     .style.display = 'none';
                 } );
@@ -2210,7 +2271,7 @@ function createRoom() {
               document.getElementById( 'onlineOverlay' )
                 .style.display = 'block';
               document.getElementById( 'onlineOverlayText' )
-                .innerHTML = "Couldn't create room.\nPlease reload the page.";
+                .innerHTML = "Couldn't create room.<br>Please reload the page.";
               document.getElementById( 'onlineOverlayButton' )
                 .style.display = 'none';
             } );
@@ -2221,7 +2282,7 @@ function createRoom() {
         document.getElementById( 'onlineOverlay' )
           .style.display = 'block';
         document.getElementById( 'onlineOverlayText' )
-          .innerHTML = "Couldn't create room.\nPlease reload the page.";
+          .innerHTML = "Couldn't create room.<br>Please reload the page.";
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
@@ -2280,8 +2341,6 @@ function joinRoom( name ) {
         listenForRemoteEvents( snap.val(), remoteEventDelay );
       } );
 
-  resetChordProgression();
-
   updateChatListener();
 
   disableSettings( true );
@@ -2300,7 +2359,7 @@ function joinRoom( name ) {
 
         leaveRoom();
 
-        fadeOutOverlay( 'You were kicked from the room.\n(admin disconnected)' );
+        fadeOutOverlay( 'You were kicked from the room.<br>(admin disconnected)' );
       } );
 }
 
@@ -2354,7 +2413,7 @@ function leaveRoom() {
             document.getElementById( 'onlineOverlay' )
               .style.display = 'block';
             document.getElementById( 'onlineOverlayText' )
-              .innerHTML = "Couldn't delete room.\nPlease reload the page.";
+              .innerHTML = "Couldn't delete room.<br>Please reload the page.";
             document.getElementById( 'onlineOverlayButton' )
               .style.display = 'none';
           } );
@@ -2375,7 +2434,7 @@ function leaveRoom() {
         document.getElementById( 'onlineOverlay' )
           .style.display = 'block';
         document.getElementById( 'onlineOverlayText' )
-          .innerHTML = "Couldn't delete room.\nPlease reload the page.";
+          .innerHTML = "Couldn't delete room.<br>Please reload the page.";
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
@@ -2434,7 +2493,7 @@ function leaveRoom() {
         document.getElementById( 'onlineOverlay' )
           .style.display = 'block';
         document.getElementById( 'onlineOverlayText' )
-          .innerHTML = "Couldn't leave room.\nPlease reload the page.";
+          .innerHTML = "Couldn't leave room.<br>Please reload the page.";
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
@@ -2581,14 +2640,12 @@ function loadTutorial( name ) {
 
       updateChatListener();
 
-      resetChordProgression();
-
       tutorialStep = -1;
       nextTutorialStep();
     }, function ( error ) {
       console.error( "Couldn't load tutorial.", error );
 
-      fadeOutOverlay( "Couldn't load tutorial.\nTry again later or reload the page." );
+      fadeOutOverlay( "Couldn't load tutorial.<br>Try again later or reload the page." );
     } );
 }
 
@@ -2753,13 +2810,13 @@ function updateRoomBox() {
   while ( box.firstChild ) {
     box.removeChild( box.firstChild );
   }
-
-  if ( !document.getElementById( 'onlineDetails' )
-    .open ) {
-    document.getElementById( 'onlineBanner' )
-      .click();
-  }
-
+  /*
+    if ( !document.getElementById( 'onlineDetails' )
+      .open ) {
+      document.getElementById( 'onlineBanner' )
+        .click();
+    }
+  */
   disableSettings( false );
 
   let tutorialpar = document.createElement( 'h1' );
@@ -2849,7 +2906,7 @@ function updateRoomBox() {
         document.getElementById( 'onlineOverlay' )
           .style.display = 'block';
         document.getElementById( 'onlineOverlayText' )
-          .innerHTML = "Couldn't retrieve info from DB.\nPlease reload the page.";
+          .innerHTML = "Couldn't retrieve info from DB.<br>Please reload the page.";
         document.getElementById( 'onlineOverlayButton' )
           .style.display = 'none';
       } );
@@ -3023,7 +3080,6 @@ function replayRecording() {
       userUploadKeypressSequence.push( keypress );
     } );
 
-  resetChordProgression();
   remoteEvents = [];
 
   clearTimeout( scheduledEvent );
@@ -3156,17 +3212,17 @@ function uploadRecording() {
                   console.error( "Couldn't roll back...", error );
                 } );
 
-              fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
+              fadeOutOverlay( "Couldn't upload recording.<br>Try again later or reload the page." );
             } );
         }, function ( error ) {
           console.error( "Couldn't upload recording.", error );
 
-          fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
+          fadeOutOverlay( "Couldn't upload recording.<br>Try again later or reload the page." );
         } );
     }, function ( error ) {
       console.error( "Couldn't retrieve upload names.", error );
 
-      fadeOutOverlay( "Couldn't upload recording.\nTry again later or reload the page." );
+      fadeOutOverlay( "Couldn't upload recording.<br>Try again later or reload the page." );
     } );
 }
 
@@ -3285,7 +3341,6 @@ function loadUserUpload( name ) {
           userUploadKeypressSequence.push( keypressSnap );
         } );
 
-      resetChordProgression();
       remoteEvents = [];
 
       clearTimeout( scheduledEvent );
@@ -3362,7 +3417,7 @@ function loadUserUpload( name ) {
     }, function ( error ) {
       console.error( "Couldn't load tutorial.", error );
 
-      fadeOutOverlay( "Couldn't load recording.\nTry again later or reload the page." );
+      fadeOutOverlay( "Couldn't load recording.<br>Try again later or reload the page." );
     } );
 }
 

@@ -541,7 +541,7 @@ label::before {
   border-radius: 5px;
   min-height: 80px;
   max-height: 800px;
-  width: 850px;
+  width: 900px;
   -webkit-transition: all 0.6s;
   -o-transition: all 0.6s;
   transition: all 0.6s;
@@ -569,7 +569,20 @@ label::before {
 
 #tensionBox {
   position: relative;
-  min-height: 350px;
+  min-height: 375px;
+}
+
+.nextChordText {
+  font-weight: bold;
+  font-size: 125%;
+  display: inline-block;
+  max-width: 205px;
+  margin: 0 5px;
+  color: var(--dark);
+}
+
+#tensionAdvice {
+  vertical-align: sub;
 }
 
 .tensionLabel {
@@ -580,6 +593,7 @@ label::before {
   margin: 15px;
   margin-top: -30px;
   padding-top: 5px;
+  transform-origin: center;
 }
 
 #pastChord,
@@ -588,12 +602,13 @@ label::before {
 }
 
 #currentChord,
-.nextTensionDiv {
+.nextTensionDiv,
+.nextChordsDiv {
   left: 50%;
 }
 
 .nextTension {
-  transform-origin: -40px center;
+  transform-origin: -50px center;
 }
 
 .nextTensionLabel {
@@ -601,7 +616,7 @@ label::before {
   display: inline-block;
   width: 40px;
   height: 35px;
-  margin: 5px;
+  margin: 0;
   padding-top: 5px;
 }
 
@@ -621,43 +636,43 @@ label::before {
   transform: rotate(45deg);
 }
 
+.nextChordsDiv {
+  height: 50px;
+  width: fit-content;
+  padding: 0;
+}
+
 #nextChordTonic {
-  position: absolute;
-  top: 0;
-  left: 70%;
+  transform: translate(155px, -155px);
 }
 
 #nextChordsLow {
-  position: absolute;
-  top: 26%;
-  left: 75%;
+  transform: translate(210px, -55px);
 }
 
 #nextChordsMedium {
-  position: absolute;
-  bottom: 26%;
-  left: 75%;
+  transform: translate(210px, 55px);
 }
 
 #nextChordsHigh {
+  transform: translate(155px, 155px);
+}
+
+#pastFeeling,
+#currentFeeling {
   position: absolute;
-  bottom: 0;
-  left: 70%;
+  top: 60%;
+  font-weight: bold;
+  font-size: 150%;
+  color: var(--dark);
 }
 
-.or {
-  font-weight: bold;
-  font-size: 125%;
+#pastFeeling {
+  left: 10%;
 }
 
-#feelingText {
-  opacity: 1;
-  -webkit-transition: 1s opacity;
-  -o-transition: 1s opacity;
-  transition: 1s opacity;
-  fill: var(--light);
-  font-weight: bold;
-  font-size: 45px;
+#currentFeeling {
+  left: 35%;
 }
 
 .indicator {

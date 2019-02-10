@@ -370,7 +370,7 @@
       <summary id="tensionBanner" class="accordionBanner FLATblack">
         <span class="accordionTitle">Harmonic tension</span>
       </summary>
-      <div id="tensionBox">
+      <div id="tensionBox" class="FLATblack">
 
         <div id="pastPastChord" class="tensionLabel mode FLATgray"></div>
 
@@ -399,8 +399,9 @@
           </svg>
         </div>
 
-        <div id="nextChordTonic">
-          <div class="nextTensionLabel mode I">I</div>
+        <div id="nextChordTonic" class="tensionLabel nextChordsDiv">
+          <div id="nextTensionLabelI" class="nextTensionLabel mode I">I</div>
+          <span id="tensionAdvice" class="nextChordText">It is best to start<br>with the tonic.</span>
         </div>
 
         <div class="indicator nextTensionDiv">
@@ -410,10 +411,10 @@
           </svg>
         </div>
 
-        <div id="nextChordsLow">
-          <div class="nextTensionLabel mode VI">VI</div>
-          <span class="or">OR</span>
-          <div class="nextTensionLabel mode III">III</div>
+        <div id="nextChordsLow" class="tensionLabel nextChordsDiv">
+          <div id="nextTensionLabelIII" class="nextTensionLabel mode III">III</div>
+          <span class="nextChordText">OR</span>
+          <div id="nextTensionLabelVI" class="nextTensionLabel mode VI">VI</div>
         </div>
 
         <div class="indicator nextTensionDiv">
@@ -423,10 +424,10 @@
           </svg>
         </div>
 
-        <div id="nextChordsMedium">
-          <div class="nextTensionLabel mode II">II</div>
-          <span class="or">OR</span>
-          <div class="nextTensionLabel mode IV">IV</div>
+        <div id="nextChordsMedium" class="tensionLabel nextChordsDiv">
+          <div id="nextTensionLabelIV" class="nextTensionLabel mode IV">IV</div>
+          <span class="nextChordText">OR</span>
+          <div id="nextTensionLabelII" class="nextTensionLabel mode II">II</div>
         </div>
 
         <div class="indicator nextTensionDiv">
@@ -436,11 +437,14 @@
           </svg>
         </div>
 
-        <div id="nextChordsHigh">
-          <div class="nextTensionLabel mode V">V</div>
-          <span class="or">OR</span>
-          <div class="nextTensionLabel mode VII">VII</div>
+        <div id="nextChordsHigh" class="tensionLabel nextChordsDiv">
+          <div id="nextTensionLabelV" class="nextTensionLabel mode V">V</div>
+          <span class="nextChordText">OR</span>
+          <div id="nextTensionLabelVII" class="nextTensionLabel mode VII">VII</div>
         </div>
+
+        <div id="pastFeeling"></div>
+        <div id="currentFeeling"></div>
 
       </div>
     </details>
