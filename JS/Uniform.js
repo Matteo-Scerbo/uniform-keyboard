@@ -10,6 +10,8 @@ var selectedSequenceIndex = 0;
 var modeMechanic = 'None';
 // Option for hearing the chord upon selection of the mode.
 var playChordSelected = false;
+// Regarding the previous option, whether the seventh should be sounded.
+var playSeventhSelected = false;
 // 0 means no scale selected, 1 to 12 are C to B.
 var currentScaleIndex = 0;
 // The selected scale is stored for ease.
@@ -806,9 +808,9 @@ function stopTone( i ) {
   }
 }
 
-// Finds the lowest and highest versions of the chord's tonic on the keyboard,
-// the third and fifth between them, all keys corresponfing to those notes,
-// and simulates pressing them.
+// Finds the lowest root note and highest fifth note on the keyboard,
+// all roots, thirds, and fifths between them,
+// all keys corresponfing to those notes, and simulates pressing them.
 // Always calls handleNoteStart() and handleNoteStop().
 function playChord( mode ) {
   if ( mode > 6 ) {
@@ -818,56 +820,98 @@ function playChord( mode ) {
   let first = document.getElementsByClassName( numerals[ ( 0 + mode ) % 7 ] );
   let third = document.getElementsByClassName( numerals[ ( 2 + mode ) % 7 ] );
   let fifth = document.getElementsByClassName( numerals[ ( 4 + mode ) % 7 ] );
+  let seventh = document.getElementsByClassName( numerals[ ( 6 + mode ) % 7 ] );
 
-  let lowestFirst = 99;
-  let highestFirst = -1;
+  let lowestNote = 99;
+  let highestNote = -1;
+  let keysToPlay = [];
 
   [].forEach.call( first, function ( f ) {
-
-    if ( !f || !f.parentNode.classList || !f.parentNode.classList.contains( 'key' ) ) {
+    if ( !f ||
+      !f.parentNode.classList ||
+      !f.parentNode.classList.contains( 'key' ) ||
+      f.parentNode.id == 'scaleSliderCursor'
+    ) {
       return;
     }
 
-    let key = f.parentNode;
-    handleNoteStart( key.dataset[ 'code' ] );
-    ( function ( key ) {
-      setTimeout( function () {
-        handleNoteStop( key.dataset[ 'code' ] );
-      }, 500 );
-    } )( key );
-
-    if ( lowestFirst > +f.parentNode.dataset[ 'id' ] ) {
-      lowestFirst = +f.parentNode.dataset[ 'id' ];
+    // If the seventh is to be played, only one root note (the lowest)
+    // is picked: extending the chord over more than one octave would sound bad.
+    if ( playSeventhSelected &&
+      lowestNote != 99 &&
+      lowestNote < +f.parentNode.dataset[ 'id' ]
+    ) {
+      return;
     }
-    if ( highestFirst < +f.parentNode.dataset[ 'id' ] ) {
-      highestFirst = +f.parentNode.dataset[ 'id' ];
+
+    keysToPlay.push( f.parentNode );
+
+    if ( lowestNote > +f.parentNode.dataset[ 'id' ] ) {
+      lowestNote = +f.parentNode.dataset[ 'id' ];
     }
   } );
 
   [].forEach.call( third, function ( t ) {
-    if ( !t || !t.parentNode.classList || !t.parentNode.classList.contains( 'key' ) ) {
+    if ( !t ||
+      !t.parentNode.classList ||
+      !t.parentNode.classList.contains( 'key' ) ||
+      t.parentNode.id == 'scaleSliderCursor'
+    ) {
       return;
     }
-    let key = t.parentNode;
-    if ( key.dataset[ 'id' ] < lowestFirst || key.dataset[ 'id' ] > highestFirst ) {
-      return;
-    }
-    handleNoteStart( key.dataset[ 'code' ] );
-    ( function ( key ) {
-      setTimeout( function () {
-        handleNoteStop( key.dataset[ 'code' ] );
-      }, 500 );
-    } )( key );
+
+    keysToPlay.push( t.parentNode );
   } );
 
   [].forEach.call( fifth, function ( f ) {
-    if ( !f || !f.parentNode.classList || !f.parentNode.classList.contains( 'key' ) ) {
+    if ( !f ||
+      !f.parentNode.classList ||
+      !f.parentNode.classList.contains( 'key' ) ||
+      f.parentNode.id == 'scaleSliderCursor'
+    ) {
       return;
     }
-    let key = f.parentNode;
-    if ( key.dataset[ 'id' ] < lowestFirst || key.dataset[ 'id' ] > highestFirst ) {
+
+    keysToPlay.push( f.parentNode );
+
+    if ( !playSeventhSelected ) {
+      if ( highestNote < +f.parentNode.dataset[ 'id' ] ) {
+        highestNote = +f.parentNode.dataset[ 'id' ];
+      }
+    }
+  } );
+
+  if ( playSeventhSelected ) {
+    [].forEach.call( seventh, function ( s ) {
+      if ( !s ||
+        !s.parentNode.classList ||
+        !s.parentNode.classList.contains( 'key' ) ||
+        s.parentNode.id == 'scaleSliderCursor'
+      ) {
+        return;
+      }
+
+      // If the seventh is to be played, only one seventh note (the lowest above the lowest root)
+      // is picked: extending the chord over more than one octave would sound bad.
+      if ( highestNote != -1 || s.parentNode.dataset[ 'id' ] <= lowestNote ) {
+        return;
+      }
+
+      keysToPlay.push( s.parentNode );
+
+      if ( highestNote < +s.parentNode.dataset[ 'id' ] ) {
+        highestNote = +s.parentNode.dataset[ 'id' ];
+      }
+    } );
+  }
+
+  [].forEach.call( keysToPlay, function ( key ) {
+    if ( key.dataset[ 'id' ] < lowestNote ||
+      key.dataset[ 'id' ] > highestNote
+    ) {
       return;
     }
+
     handleNoteStart( key.dataset[ 'code' ] );
     ( function ( key ) {
       setTimeout( function () {
@@ -875,7 +919,6 @@ function playChord( mode ) {
       }, 500 );
     } )( key );
   } );
-
 }
 
 
